@@ -23,7 +23,7 @@ namespace PaddleBuddy.Droid.Activities
             Task.Run(() => Setup());
         }
 
-        private async void Setup()
+        private static async void Setup()
         {
             await DatabaseService.GetInstance().Setup(true);
         }
