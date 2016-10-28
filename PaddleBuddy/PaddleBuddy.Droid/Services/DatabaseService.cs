@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PaddleBuddy.Core.Models.LinqModels;
 using PaddleBuddy.Core.Models.Map;
+using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Services;
-using PaddleBuddy.Core.Utilities;
 
 namespace PaddleBuddy.Droid.Services
 {
@@ -45,6 +45,7 @@ namespace PaddleBuddy.Droid.Services
             }
             UpdateIsReady();
             if (!IsReady) await UpdateAll();
+            
         }
 
         public async Task UpdateAll()
@@ -78,9 +79,9 @@ namespace PaddleBuddy.Droid.Services
             get { return _isReady; }
             set
             {
+                if (!_isReady && value)
+                    GalaSoft.MvvmLight.Messaging.Messenger.Default.Send(new DbReadyMessage());
                 _isReady = value;
-                //todo: this notification wont work
-                //if (_isReady) MessengerService.Messenger.Publish(new DbReadyMessage(this));
             }
         }
 
@@ -172,8 +173,6 @@ namespace PaddleBuddy.Droid.Services
 
         public async Task<bool> UpdatePoints()
         {
-            Stopwatch stop = new Stopwatch();
-            stop.Start();
             try
             {
                 var resp = await GetAsync("all_points/");
@@ -194,15 +193,11 @@ namespace PaddleBuddy.Droid.Services
                 LogService.Log("Failed to update points");
                 return false;
             }
-            stop.Stop();
-            Debug.WriteLine("pbuddy points: " + stop.Elapsed);
             return true;
         }
 
         public async Task<bool> UpdateRivers()
         {
-            Stopwatch stop = new Stopwatch();
-            stop.Start();
             try
             {
                 var resp = await GetAsync("all_rivers/");
@@ -222,15 +217,11 @@ namespace PaddleBuddy.Droid.Services
                 LogService.Log("Failed to update rivers");
                 return false;
             }
-            stop.Stop();
-            Debug.WriteLine("pbuddy rivers: " + stop.Elapsed);
             return true;
         }
 
         public async Task<bool> UpdateLinks()
         {
-            Stopwatch stop = new Stopwatch();
-            stop.Start();
             try
             {
                 var resp = await GetAsync("all_links/");
@@ -250,8 +241,6 @@ namespace PaddleBuddy.Droid.Services
                 LogService.Log("Failed to update links");
                 return false;
             }
-            stop.Stop();
-            Debug.WriteLine("pbuddy links: " + stop.Elapsed);
             return true;
         }
     }

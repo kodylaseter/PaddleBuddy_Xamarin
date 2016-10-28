@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace PaddleBuddy.Core.Models.Map
+﻿namespace PaddleBuddy.Core.Models.Map
 {
     public class River
     {
