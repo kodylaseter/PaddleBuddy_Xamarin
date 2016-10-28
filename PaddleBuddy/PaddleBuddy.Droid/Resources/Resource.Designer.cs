@@ -26,6 +26,8 @@ namespace PaddleBuddy.Droid
 		
 		public static void UpdateIdValues()
 		{
+			global::PCLStorage.Resource.String.ApplicationName = global::PaddleBuddy.Droid.Resource.String.ApplicationName;
+			global::PCLStorage.Resource.String.Hello = global::PaddleBuddy.Droid.Resource.String.Hello;
 		}
 		
 		public partial class Attribute
@@ -37,6 +39,28 @@ namespace PaddleBuddy.Droid
 			}
 			
 			private Attribute()
+			{
+			}
+		}
+		
+		public partial class Color
+		{
+			
+			// aapt resource value: 0x7f050002
+			public const int colorAccent = 2131034114;
+			
+			// aapt resource value: 0x7f050000
+			public const int colorPrimary = 2131034112;
+			
+			// aapt resource value: 0x7f050001
+			public const int colorPrimaryDark = 2131034113;
+			
+			static Color()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Color()
 			{
 			}
 		}
@@ -57,27 +81,14 @@ namespace PaddleBuddy.Droid
 			}
 		}
 		
-		public partial class Id
-		{
-			
-			// aapt resource value: 0x7f050000
-			public const int MyButton = 2131034112;
-			
-			static Id()
-			{
-				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
-			}
-			
-			private Id()
-			{
-			}
-		}
-		
 		public partial class Layout
 		{
 			
 			// aapt resource value: 0x7f030000
-			public const int Main = 2130903040;
+			public const int activity_main = 2130903040;
+			
+			// aapt resource value: 0x7f030001
+			public const int activity_setup = 2130903041;
 			
 			static Layout()
 			{
@@ -92,8 +103,11 @@ namespace PaddleBuddy.Droid
 		public partial class String
 		{
 			
+			// aapt resource value: 0x7f040001
+			public const int ApplicationName = 2130968577;
+			
 			// aapt resource value: 0x7f040000
-			public const int ApplicationName = 2130968576;
+			public const int Hello = 2130968576;
 			
 			static String()
 			{
@@ -101,6 +115,22 @@ namespace PaddleBuddy.Droid
 			}
 			
 			private String()
+			{
+			}
+		}
+		
+		public partial class Style
+		{
+			
+			// aapt resource value: 0x7f060000
+			public const int CustomMaterialTheme = 2131099648;
+			
+			static Style()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Style()
 			{
 			}
 		}

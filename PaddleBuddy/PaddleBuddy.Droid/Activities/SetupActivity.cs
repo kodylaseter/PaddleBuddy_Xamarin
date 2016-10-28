@@ -1,6 +1,8 @@
-﻿using Android.App;
+﻿using System.Threading.Tasks;
+using Android.App;
 using Android.OS;
-using Android.Widget;
+using PaddleBuddy.Core;
+using PaddleBuddy.Droid.Services;
 
 namespace PaddleBuddy.Droid.Activities
 {
@@ -12,15 +14,16 @@ namespace PaddleBuddy.Droid.Activities
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
-
+            SysPrefs.Device = SysPrefs.Devices.Android;
             // Set our view from the "main" layout resource
-            SetContentView(Resource.Layout.Main);
 
-            // Get our button from the layout resource,
-            // and attach an event to it
-            Button button = FindViewById<Button>(Resource.Id.MyButton);
+            SetContentView(Resource.Layout.activity_setup);
+            Task.Run(() => Setup());
+        }
 
-            button.Click += delegate { button.Text = string.Format("{0} clicks!", count++); };
+        private async void Setup()
+        {
+            await DatabaseService.GetInstance().Setup();
         }
     }
 }
