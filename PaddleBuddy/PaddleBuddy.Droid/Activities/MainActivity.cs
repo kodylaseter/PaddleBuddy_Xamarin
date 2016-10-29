@@ -2,11 +2,15 @@ using System;
 using Android.App;
 using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 using Android.Views;
+using PaddleBuddy.Core.Services;
+using PaddleBuddy.Droid.Fragments;
+using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
 
 namespace PaddleBuddy.Droid.Activities
 {
@@ -33,9 +37,10 @@ namespace PaddleBuddy.Droid.Activities
 
             _navigationView = (NavigationView) FindViewById(Resource.Id.nav_view);
             _navigationView.SetNavigationItemSelectedListener(this);
+            OnNavigationItemSelected();
         }
 
-        public bool OnNavigationItemSelected(IMenuItem menuItem)
+        public bool OnNavigationItemSelected(IMenuItem menuItem = null)
         {
             int id;
             if (menuItem == null)
@@ -47,20 +52,31 @@ namespace PaddleBuddy.Droid.Activities
             {
                 id = menuItem.ItemId;
             }
-            Type fragmentType = null;
-            switch (id)
+            try
             {
-                case Resource.Id.nav_map:
-                    //set fragmentType
-                    break;
-                case Resource.Id.nav_plan:
-                    //set fragmentType
-                    break;
-                default:
-                    //set to default
-                    break;
-            }
+                BaseFragment fragment;
+                switch (id)
+                {
+                    case Resource.Id.nav_map:
+                        fragment = MapFragment.NewInstance();
+                        break;
+                    case Resource.Id.nav_plan:
+                        fragment = PlanFragment.NewInstance();
+                        break;
+                    default:
+                        fragment = MapFragment.NewInstance();
+                        break;
+                }
+                if (fragment != null)
+                {
+                    SupportFragmentManager.BeginTransaction().Replace(Resource.Id.content_f, fragment).Commit();
+                }
 
+            }
+            catch (Exception e)
+            {
+                LogService.Log(e);
+            }
             _drawer.CloseDrawer(GravityCompat.Start);
             return true;
         }

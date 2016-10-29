@@ -37,7 +37,7 @@ namespace PaddleBuddy.Droid.Activities
         private void Setup()
         {
 
-            Task.Run(() => DatabaseService.GetInstance().Setup(true));
+            Task.Run(() => DatabaseService.GetInstance().Setup());
             PermissionService.SetupLocation(this);
         }
 
