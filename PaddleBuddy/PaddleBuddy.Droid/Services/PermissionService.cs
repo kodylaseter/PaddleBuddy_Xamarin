@@ -1,7 +1,5 @@
-using System.Threading.Tasks;
 using Android;
 using Android.App;
-using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using PaddleBuddy.Core.Models;
@@ -44,7 +42,6 @@ namespace PaddleBuddy.Droid.Services
             else
             {
                 LogService.Log("Location permission already given!");
-                //Task.Run(() => Core.Services.LocationService.SetupLocation());
             }
         }
     }

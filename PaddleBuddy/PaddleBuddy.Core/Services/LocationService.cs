@@ -84,11 +84,11 @@ namespace PaddleBuddy.Core.Services
             CurrentLocation = point;
         }
 
-        public static void SetupLocation()
+        public static async void SetupLocation()
         {
             LogService.Log("Setting up location service");
             GetInstance().StartListening();
-            //await GetInstance().GetLocationAsync();
+            await GetInstance().Geolocator.GetPositionAsync(500);
         }
 
         public void StartSimulating(List<Point> points)
