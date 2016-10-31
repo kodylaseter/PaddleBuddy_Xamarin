@@ -187,6 +187,7 @@
     <AndroidResource Include="Resources\layout\fragment_plan.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
+    <AndroidResource Include="Resources\layout\infowindow_custom_marker.axml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\activity_setup.axml" />

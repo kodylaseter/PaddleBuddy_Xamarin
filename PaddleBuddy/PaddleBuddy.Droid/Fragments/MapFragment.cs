@@ -7,7 +7,10 @@ using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content.Res;
 using Android.Views;
+using Android.Widget;
+using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Services;
+using PaddleBuddy.Droid.Activities;
 using PaddleBuddy.Droid.Services;
 using Path = PaddleBuddy.Core.Models.Map.Path;
 using Point = PaddleBuddy.Core.Models.Map.Point;
@@ -21,12 +24,17 @@ namespace PaddleBuddy.Droid.Fragments
         private MapView _mapView;
         private MapModes MapMode { get; set; }
         public bool IsLoading { get; set; }
+        private Point _selectedMarkerPoint;
+        private Button _planTripButton;
+
         private MarkerOptions _currentMarkerOptions;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             MapMode = MapModes.Init;
             var view = inflater.Inflate(Resource.Layout.fragment_map, container, false);
+            _planTripButton = (Button)view.FindViewById(Resource.Id.plan_trip_button);
+            _planTripButton.Click += OnPlanTripButtonClicked;
             var rootView = view.RootView;
             _mapView = (MapView)rootView.FindViewById(Resource.Id.map_view);
             _mapView.OnCreate(savedInstanceState);
@@ -47,16 +55,31 @@ namespace PaddleBuddy.Droid.Fragments
         public void OnMapReady(GoogleMap googleMap)
         {
             GoogleMap = googleMap;
+            MessengerService.Messenger.Register<LocationUpdatedMessage>(this, LocationUpdatedReceived);
             GoogleMap.SetOnMarkerClickListener(this);
             GoogleMap.SetOnMapClickListener(this);
             GoogleMap.SetInfoWindowAdapter(this);
             Setup();
         }
 
+        private void LocationUpdatedReceived(LocationUpdatedMessage obj)
+        {
+            switch (MapMode)
+            {
+                case MapModes.Browse:
+                    DrawCurrent();
+                    break;
+                default: 
+                    throw new NotImplementedException();
+            }
+        }
+
         private void Setup()
         {
             IsLoading = true;
             _currentMarker = null;
+            _selectedMarkerPoint = null;
+            DrawCurrent();
             switch (MapMode)
             {
                 case MapModes.Init:
@@ -93,6 +116,7 @@ namespace PaddleBuddy.Droid.Fragments
                 LogService.Log("Error in setup init");
                 LogService.Log(e.Message);
             }
+            MapMode = MapModes.Browse;
         }
 
         private void SetupInitFromPlan()
@@ -106,6 +130,16 @@ namespace PaddleBuddy.Droid.Fragments
             set { _googleMap = value; }
         }
 
+        public Point SelectedMarkerPoint
+        {
+            get { return _selectedMarkerPoint; }
+            set
+            {
+                _selectedMarkerPoint = value;
+                _planTripButton.Visibility = _selectedMarkerPoint != null ? ViewStates.Visible : ViewStates.Gone;
+            }
+        }
+
         private Point GetCurrentLocation
         {
             get { return LocationService.GetInstance().CurrentLocation; }
@@ -117,25 +151,43 @@ namespace PaddleBuddy.Droid.Fragments
             return new MapFragment();
         }
 
+        private void OnPlanTripButtonClicked(object sender, EventArgs e)
+        {
+            ((MainActivity)Activity).HandleNavigation(null, PlanFragment.NewInstance(_selectedMarkerPoint.Id));
+        }
 
         public bool OnMarkerClick(Marker marker)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var id = int.Parse(marker.Snippet);
+                SelectedMarkerPoint = DatabaseService.GetInstance().GetPoint(id);
+                marker.ShowInfoWindow();
+                return true;
+            }
+            catch (Exception e)
+            {
+                LogService.Log("Issue in map fragment marker click");
+                LogService.Log(e.Message);
+            }
+            return false;
         }
 
         public void OnMapClick(LatLng point)
         {
-            throw new NotImplementedException();
+            SelectedMarkerPoint = null;
         }
 
         public View GetInfoContents(Marker marker)
         {
-            throw new NotImplementedException();
+            var view = GetLayoutInflater(null).Inflate(Resource.Layout.infowindow_custom_marker, null);
+            ((TextView) view.FindViewById(Resource.Id.markerTitle)).Text = _selectedMarkerPoint.Label;
+            return view;
         }
 
         public View GetInfoWindow(Marker marker)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         private void DrawMarker(Point p)
@@ -236,7 +288,8 @@ namespace PaddleBuddy.Droid.Fragments
         public enum MapModes
         {
             Init,
-            InitFromPlan
+            InitFromPlan,
+            Browse
         }
     }
 }

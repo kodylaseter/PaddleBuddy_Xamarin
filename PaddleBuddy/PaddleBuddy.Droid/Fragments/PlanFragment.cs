@@ -1,3 +1,4 @@
+using System;
 using Android.OS;
 using Android.Support.V4.App;
 using Android.Views;
@@ -11,9 +12,14 @@ namespace PaddleBuddy.Droid.Fragments
             return inflater.Inflate(Resource.Layout.fragment_plan, container, false);
         }
 
-        public static PlanFragment NewInstance()
+        public static PlanFragment NewInstance(int startId = int.MaxValue)
         {
-            return new PlanFragment();
+            var fragment = new PlanFragment();
+            if (startId == int.MaxValue) return fragment;
+            var args = new Bundle();
+            args.PutInt("startId", startId);
+            fragment.Arguments = args;
+            return fragment;
         }
     }
 }

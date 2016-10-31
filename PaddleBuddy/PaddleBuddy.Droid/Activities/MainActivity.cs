@@ -42,43 +42,43 @@ namespace PaddleBuddy.Droid.Activities
 
         public bool OnNavigationItemSelected(IMenuItem menuItem = null)
         {
-            int id;
-            if (menuItem == null)
+            HandleNavigation(menuItem, null);
+            
+            _drawer.CloseDrawer(GravityCompat.Start);
+            return true;
+        }
+
+        public void HandleNavigation(IMenuItem menuItem = null, BaseFragment fragment = null)
+        {
+            var id = menuItem?.ItemId ?? Resource.Id.nav_map;
+            //converts id to a drawerindex
+            switch (id)
             {
-                id = Resource.Id.nav_map;
-                _navigationView.Menu.GetItem(0).SetChecked(true);
-            }
-            else
-            {
-                id = menuItem.ItemId;
+                case Resource.Id.nav_map:
+                    id = (int)NavDraweritems.Map;
+                    fragment = fragment ?? MapFragment.NewInstance();
+                    break;
+                case Resource.Id.nav_plan:
+                    id = (int)NavDraweritems.Plan;
+                    fragment = fragment ?? PlanFragment.NewInstance();
+                    break;
+                default:
+                    id = (int)NavDraweritems.Map;
+                    fragment = fragment ?? MapFragment.NewInstance();
+                    break;
             }
             try
             {
-                BaseFragment fragment;
-                switch (id)
-                {
-                    case Resource.Id.nav_map:
-                        fragment = MapFragment.NewInstance();
-                        break;
-                    case Resource.Id.nav_plan:
-                        fragment = PlanFragment.NewInstance();
-                        break;
-                    default:
-                        fragment = MapFragment.NewInstance();
-                        break;
-                }
                 if (fragment != null)
                 {
                     SupportFragmentManager.BeginTransaction().Replace(Resource.Id.content_f, fragment).Commit();
                 }
-
+                _navigationView.Menu.GetItem(id).SetChecked(true);
             }
             catch (Exception e)
             {
                 LogService.Log(e);
             }
-            _drawer.CloseDrawer(GravityCompat.Start);
-            return true;
         }
 
         public override void OnBackPressed()
@@ -91,6 +91,12 @@ namespace PaddleBuddy.Droid.Activities
             {
                 base.OnBackPressed();
             }
+        }
+
+        private enum NavDraweritems
+        {
+            Map = 0,
+            Plan = 1
         }
     }
 }
