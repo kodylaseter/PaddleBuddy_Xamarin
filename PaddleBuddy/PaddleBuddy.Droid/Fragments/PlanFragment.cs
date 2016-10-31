@@ -8,7 +8,7 @@ namespace PaddleBuddy.Droid.Fragments
     {
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            return inflater.Inflate(Resource.Layout.fragment_map, container, false);
+            return inflater.Inflate(Resource.Layout.fragment_plan, container, false);
         }
 
         public static PlanFragment NewInstance()

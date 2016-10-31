@@ -5,4 +5,8 @@
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<application android:label="PaddleBuddy" android:theme="@style/AppTheme"></application>
+    <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+    <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="AIzaSyCf2sKdCPms-lp2ZHyfRk6aR2bRPz6_deU"/>
 </manifest>

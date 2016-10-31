@@ -37,7 +37,6 @@ namespace PaddleBuddy.Core.Services
 
         public async Task<Point> GetLocationAsync()
         {
-
             var position = await Geolocator.GetPositionAsync(10000);
             var point = new Point
             {
@@ -62,6 +61,7 @@ namespace PaddleBuddy.Core.Services
 
         private void OnPositionChanged(object sender, object eventArgs)
         {
+            LogService.Log("location updated");
             var point = new Point();
             if (eventArgs.GetType() == typeof(PositionEventArgs))
             {
@@ -71,6 +71,7 @@ namespace PaddleBuddy.Core.Services
                     Lat = args.Position.Latitude,
                     Lng = args.Position.Longitude
                 };
+                MessengerService.Messenger.Send(new LocationUpdatedMessage());
             }
             else if (eventArgs.GetType() == typeof(Point))
             {
@@ -83,10 +84,11 @@ namespace PaddleBuddy.Core.Services
             CurrentLocation = point;
         }
 
-        public static async void SetupLocation()
+        public static void SetupLocation()
         {
+            LogService.Log("Setting up location service");
             GetInstance().StartListening();
-            await GetInstance().GetLocationAsync();
+            //await GetInstance().GetLocationAsync();
         }
 
         public void StartSimulating(List<Point> points)

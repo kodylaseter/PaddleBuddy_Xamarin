@@ -12,7 +12,7 @@ using PaddleBuddy.Droid.Services;
 
 namespace PaddleBuddy.Droid.Activities
 {
-    [Activity(Label = "PaddleBuddy", MainLauncher = true, Icon = "@drawable/icon")]
+    [Activity(Label = "PaddleBuddy", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/AppTheme.NoActionBar")]
     public class SetupActivity : AppCompatActivity
     {
         private bool _mainActivityStarted;
@@ -26,11 +26,12 @@ namespace PaddleBuddy.Droid.Activities
             _mainActivityStarted = false;
             _dbReady = false;
             _locationPermissionApproved = false;
-            _locationReady = true;
+            _locationReady = false;
             SysPrefs.Device = SysPrefs.Devices.Android;
             SetContentView(Resource.Layout.activity_setup);
             MessengerService.Messenger.Register<DbReadyMessage>(this, DbReadyReceived);
             MessengerService.Messenger.Register<PermissionMessage>(this, PermissionMessageReceived);
+            MessengerService.Messenger.Register<LocationUpdatedMessage>(this, LocationUpdatedReceived);
             Setup();
         }
 
@@ -38,7 +39,9 @@ namespace PaddleBuddy.Droid.Activities
         {
 
             Task.Run(() => DatabaseService.GetInstance().Setup());
-            PermissionService.SetupLocation(this);
+            Task.Run(() => Core.Services.LocationService.SetupLocation());
+            Task.Run(() => PermissionService.SetupLocation(this));
+
         }
 
         private void TryToStartMainActivity()
@@ -48,6 +51,11 @@ namespace PaddleBuddy.Droid.Activities
                 _mainActivityStarted = true;
                 StartActivity(typeof(MainActivity));
             }
+        }
+
+        private void LocationUpdatedReceived(LocationUpdatedMessage obj)
+        {
+            LocationReady = true;
         }
 
         private void DbReadyReceived(DbReadyMessage obj)
@@ -119,8 +127,7 @@ namespace PaddleBuddy.Droid.Activities
                         }
                         else
                         {
-                            _locationPermissionApproved = true;
-                            TryToStartMainActivity();
+                            LocationPermissionApproved = true;
                         }
                         break;
                     }
