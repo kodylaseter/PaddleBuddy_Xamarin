@@ -8,6 +8,7 @@ using PaddleBuddy.Core.Models.LinqModels;
 using PaddleBuddy.Core.Models.Map;
 using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Services;
+using PaddleBuddy.Core.Utilities;
 
 namespace PaddleBuddy.Droid.Services
 {
@@ -64,7 +65,6 @@ namespace PaddleBuddy.Droid.Services
             StorageService.SaveSerializedToFile(points, "points");
             StorageService.SaveSerializedToFile(rivers, "rivers");
             StorageService.SaveSerializedToFile(links, "links");
-            UpdateIsReady();
         }
 
         private void UpdateIsReady()
@@ -79,9 +79,8 @@ namespace PaddleBuddy.Droid.Services
             get { return _isReady; }
             set
             {
-                if (!_isReady && value)
-                    GalaSoft.MvvmLight.Messaging.Messenger.Default.Send(new DbReadyMessage());
                 _isReady = value;
+                MessengerService.Messenger.Send(new DbReadyMessage());
             }
         }
 
@@ -111,13 +110,13 @@ namespace PaddleBuddy.Droid.Services
         }
 
         //todo: enable this
-        //public Path GetClosestRiver()
-        //{
-        //    var curr = LocationService.GetInstance().CurrentLocation;
-        //    var point = (from p in Points let dist = PBUtilities.Distance(curr, p) orderby dist ascending select p).First();
-        //    ClosestRiverId = point.RiverId;
-        //    return GetPath(point.RiverId);
-        //}
+        public Path GetClosestRiver()
+        {
+            var curr = LocationService.GetInstance().CurrentLocation;
+            var point = (from p in Points let dist = PBUtilities.Distance(curr, p) orderby dist ascending select p).First();
+            ClosestRiverId = point.RiverId;
+            return GetPath(point.RiverId);
+        }
 
         public Point GetPoint(int id)
         {

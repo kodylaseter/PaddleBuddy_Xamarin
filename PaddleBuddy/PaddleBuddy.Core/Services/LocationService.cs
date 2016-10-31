@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using PaddleBuddy.Core.Models.Map;
@@ -37,7 +38,7 @@ namespace PaddleBuddy.Core.Services
 
         public async Task<Point> GetLocationAsync()
         {
-            var position = await Geolocator.GetPositionAsync(10000);
+            var position = await Geolocator.GetPositionAsync();
             var point = new Point
             {
                 Lat = position.Latitude,
@@ -71,24 +72,24 @@ namespace PaddleBuddy.Core.Services
                     Lat = args.Position.Latitude,
                     Lng = args.Position.Longitude
                 };
-                MessengerService.Messenger.Send(new LocationUpdatedMessage());
+                CurrentLocation = point;
             }
             else if (eventArgs.GetType() == typeof(Point))
             {
-                point = (Point)eventArgs;
+                //point = (Point)eventArgs;
+                throw new NotImplementedException();
             }
             else
             {
                 LogService.Log("OnPositionChanged error");
             }
-            CurrentLocation = point;
         }
 
         public static async void SetupLocation()
         {
             LogService.Log("Setting up location service");
             GetInstance().StartListening();
-            await GetInstance().Geolocator.GetPositionAsync(500);
+            GetInstance().GetLocationAsync();
         }
 
         public void StartSimulating(List<Point> points)

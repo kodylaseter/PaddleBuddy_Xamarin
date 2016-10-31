@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
@@ -32,17 +31,19 @@ namespace PaddleBuddy.Droid.Activities
             MessengerService.Messenger.Register<DbReadyMessage>(this, DbReadyReceived);
             MessengerService.Messenger.Register<PermissionMessage>(this, PermissionMessageReceived);
             MessengerService.Messenger.Register<LocationUpdatedMessage>(this, LocationUpdatedReceived);
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
             Setup();
         }
 
         private void Setup()
         {
 
-            Task.Run(() => DatabaseService.GetInstance().Setup());
-            Core.Services.LocationService.SetupLocation();
-            //Task.Run(() => Core.Services.LocationService.SetupLocation());
-            //Task.Run(() => PermissionService.SetupLocation(this));
-
+            Task.Run(() => DatabaseService.GetInstance().Setup(true));
+            Task.Run(() => PermissionService.SetupLocation(this));
         }
 
         private void TryToStartMainActivity()
@@ -50,6 +51,9 @@ namespace PaddleBuddy.Droid.Activities
             if (!_mainActivityStarted & _dbReady & _locationPermissionApproved & _locationReady)
             {
                 _mainActivityStarted = true;
+                MessengerService.Messenger.Unregister<DbReadyMessage>(this);
+                MessengerService.Messenger.Unregister<PermissionMessage>(this);
+                MessengerService.Messenger.Unregister<LocationUpdatedMessage>(this);
                 StartActivity(typeof(MainActivity));
             }
         }
@@ -69,6 +73,10 @@ namespace PaddleBuddy.Droid.Activities
         {
             if (obj.PermissionCode == PermissionCodes.LOCATION)
             {
+                if (!_locationPermissionApproved)
+                {
+                    Core.Services.LocationService.SetupLocation();
+                }
                 LocationPermissionApproved = true;
             }
         }
@@ -98,6 +106,7 @@ namespace PaddleBuddy.Droid.Activities
             get { return _locationReady; }
             set
             {
+                if (_locationReady) return;
                 _locationReady = value;
                 TryToStartMainActivity();
             }
@@ -133,6 +142,12 @@ namespace PaddleBuddy.Droid.Activities
                         break;
                     }
             }
+        }
+
+        public void OnGlobalLayout()
+        {
+            //Setup();
+            
         }
     }
 }
