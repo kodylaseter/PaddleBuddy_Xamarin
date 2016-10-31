@@ -42,7 +42,7 @@ namespace PaddleBuddy.Droid.Activities
 
         public bool OnNavigationItemSelected(IMenuItem menuItem = null)
         {
-            HandleNavigation(menuItem, null);
+            HandleNavigation(menuItem);
             
             _drawer.CloseDrawer(GravityCompat.Start);
             return true;
