@@ -41,9 +41,10 @@ namespace PaddleBuddy.Droid.Activities
 
         private void Setup()
         {
-
-            Task.Run(() => DatabaseService.GetInstance().Setup(true));
-            Task.Run(() => PermissionService.SetupLocation(this));
+            DatabaseService.GetInstance().Setup();
+            PermissionService.SetupLocation(this);
+            //Task.Run(() => DatabaseService.GetInstance().Setup(true));
+            //Task.Run(() => PermissionService.SetupLocation(this));
         }
 
         private void TryToStartMainActivity()
@@ -60,12 +61,12 @@ namespace PaddleBuddy.Droid.Activities
 
         private void LocationUpdatedReceived(LocationUpdatedMessage obj)
         {
-            LocationReady = true;
+            if (!_locationReady) LocationReady = true;
         }
 
         private void DbReadyReceived(DbReadyMessage obj)
         {
-            DbReady = true;
+            if (!_dbReady) DbReady = true;
         }
 
 
@@ -75,9 +76,9 @@ namespace PaddleBuddy.Droid.Activities
             {
                 if (!_locationPermissionApproved)
                 {
+                    LocationPermissionApproved = true;
                     Core.Services.LocationService.SetupLocation();
                 }
-                LocationPermissionApproved = true;
             }
         }
 

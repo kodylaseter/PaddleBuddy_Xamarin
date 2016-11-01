@@ -85,7 +85,7 @@ namespace PaddleBuddy.Core.Services
             }
         }
 
-        public static async void SetupLocation()
+        public static void SetupLocation()
         {
             LogService.Log("Setting up location service");
             GetInstance().StartListening();
