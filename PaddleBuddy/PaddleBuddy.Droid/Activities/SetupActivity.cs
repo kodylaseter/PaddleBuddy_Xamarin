@@ -1,4 +1,6 @@
-﻿using Android.App;
+﻿using System;
+using System.Threading.Tasks;
+using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.App;
@@ -21,6 +23,7 @@ namespace PaddleBuddy.Droid.Activities
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
+            LogService.Log("setup activity started");
             _mainActivityStarted = false;
             _dbReady = false;
             _locationPermissionApproved = false;
@@ -40,14 +43,16 @@ namespace PaddleBuddy.Droid.Activities
 
         private void Setup()
         {
-            DatabaseService.GetInstance().Setup();
+            //todo: consider making these async again
+            //DatabaseService.GetInstance().Setup();
+            Task.Run(() => DatabaseService.GetInstance().Setup(true));
             PermissionService.SetupLocation(this);
-            //Task.Run(() => DatabaseService.GetInstance().Setup(true));
             //Task.Run(() => PermissionService.SetupLocation(this));
         }
 
         private void TryToStartMainActivity()
         {
+            LogService.Log(string.Format("trying to start main activity... _mainactivitystarted = {0} _dbready = {1} _locationpermissionapproved = {2} _locationready = {3}", _mainActivityStarted, _dbReady, _locationPermissionApproved, _locationReady));
             if (!_mainActivityStarted & _dbReady & _locationPermissionApproved & _locationReady)
             {
                 _mainActivityStarted = true;
@@ -60,17 +65,26 @@ namespace PaddleBuddy.Droid.Activities
 
         private void LocationUpdatedReceived(LocationUpdatedMessage obj)
         {
-            if (!_locationReady) LocationReady = true;
+            LogService.Log("locationupdate message received");
+            if (!_locationReady)
+            {
+                LocationReady = true;
+            }
         }
 
         private void DbReadyReceived(DbReadyMessage obj)
         {
-            if (!_dbReady) DbReady = true;
+            LogService.Log("dbready message received");
+            if (!_dbReady)
+            {
+                DbReady = true;
+            }
         }
 
 
         private void PermissionMessageReceived(PermissionMessage obj)
         {
+            LogService.Log("permission message received");
             if (obj.PermissionCode == PermissionCodes.LOCATION)
             {
                 if (!_locationPermissionApproved)

@@ -23,6 +23,7 @@ namespace PaddleBuddy.Droid.Activities
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            LogService.Log("main activity started");
             SetContentView(Resource.Layout.activity_main);
 
             _toolbar = (Toolbar) FindViewById(Resource.Id.toolbar);

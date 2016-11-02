@@ -39,6 +39,7 @@ namespace PaddleBuddy.Droid.Services
             }
             if (StorageService.HasData(names))
             {
+                LogService.Log("Device has local data");
                 Points = JsonConvert.DeserializeObject<List<Point>>(StorageService.ReadSerializedFromFile("points"));
                 Rivers = JsonConvert.DeserializeObject<List<River>>(StorageService.ReadSerializedFromFile("rivers"));
                 Links = JsonConvert.DeserializeObject<List<Link>>(StorageService.ReadSerializedFromFile("links"));

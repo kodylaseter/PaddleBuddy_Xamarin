@@ -30,12 +30,26 @@
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
         </android.support.design.widget.AppBarLayout>
-
-        <FrameLayout
-            android:id="@+id/content_f"
+        <!--<RelativeLayout
+            android:id="@+id/main_relative"
             android:layout_marginTop="?attr/actionBarSize"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"/>
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/subbar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorAccent">
+                
+            </LinearLayout>
+
+
+        </RelativeLayout>-->
+        <FrameLayout
+    android:id="@+id/content_f"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"/>
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
