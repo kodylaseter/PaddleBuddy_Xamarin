@@ -249,6 +249,9 @@
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\current_circle.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\values-v21\styles.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

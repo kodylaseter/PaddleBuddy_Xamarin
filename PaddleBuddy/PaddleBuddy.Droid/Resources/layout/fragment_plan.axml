@@ -11,8 +11,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:hint="Start location"
-            android:theme="@style/MaterialEditText"/>
+            android:hint="Start location"/>
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -23,8 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:hint="End location"
-            android:theme="@style/MaterialEditText"/>
+            android:hint="End location"/>
     </android.support.design.widget.TextInputLayout>
     
     <View

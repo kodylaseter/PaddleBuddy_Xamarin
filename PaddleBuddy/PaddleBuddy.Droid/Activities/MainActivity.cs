@@ -13,7 +13,7 @@ using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
 
 namespace PaddleBuddy.Droid.Activities
 {
-    [Activity(Label = "MainActivity", Theme = "@style/AppTheme.NoActionBar")]
+    [Activity(Label = "MainActivity", Theme = "@style/AppTheme")]
     public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener
     {
         private Toolbar _toolbar;

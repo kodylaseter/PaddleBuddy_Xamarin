@@ -14,42 +14,45 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
         tools:context="com.paddlebuddy.activities.MainActivity">
 
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay">
+            android:layout_height="wrap_content">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
+                android:layout_height="?attr/actionBarSize"/>
 
         </android.support.design.widget.AppBarLayout>
-        <!--<RelativeLayout
-            android:id="@+id/main_relative"
+        <LinearLayout
+            android:id="@+id/main_linear"
             android:layout_marginTop="?attr/actionBarSize"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            
             <LinearLayout
                 android:id="@+id/subbar_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/colorAccent">
-                
+                android:layout_height="@dimen/subbar_height"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:background="@color/colorPrimaryDark">
+                <TextView
+                    android:id="@+id/subbar_text"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="subbar"
+                    android:textColor="@color/white"/>
             </LinearLayout>
-
-
-        </RelativeLayout>-->
-        <FrameLayout
-    android:id="@+id/content_f"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent"/>
+            <FrameLayout
+                android:id="@+id/content_f"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/subbartext"/>
+        </LinearLayout>
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView

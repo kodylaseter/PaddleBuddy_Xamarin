@@ -12,7 +12,7 @@ using PaddleBuddy.Droid.Services;
 
 namespace PaddleBuddy.Droid.Activities
 {
-    [Activity(Label = "PaddleBuddy", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/AppTheme.NoActionBar")]
+    [Activity(Label = "PaddleBuddy", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/AppTheme")]
     public class SetupActivity : AppCompatActivity
     {
         private bool _mainActivityStarted;
@@ -85,13 +85,9 @@ namespace PaddleBuddy.Droid.Activities
         private void PermissionMessageReceived(PermissionMessage obj)
         {
             LogService.Log("permission message received");
-            if (obj.PermissionCode == PermissionCodes.LOCATION)
+            if (obj.PermissionCode == PermissionCodes.LOCATION && !_locationPermissionApproved)
             {
-                if (!_locationPermissionApproved)
-                {
-                    LocationPermissionApproved = true;
-                    Core.Services.LocationService.SetupLocation();
-                }
+                LocationPermissionApproved = true;
             }
         }
 
@@ -110,6 +106,7 @@ namespace PaddleBuddy.Droid.Activities
             get { return _locationPermissionApproved; }
             set
             {
+                Core.Services.LocationService.SetupLocation();
                 _locationPermissionApproved = value;
                 TryToStartMainActivity();
             }
@@ -120,7 +117,6 @@ namespace PaddleBuddy.Droid.Activities
             get { return _locationReady; }
             set
             {
-                if (_locationReady) return;
                 _locationReady = value;
                 TryToStartMainActivity();
             }
