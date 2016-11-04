@@ -1023,32 +1023,32 @@ namespace PaddleBuddy.Droid
 		public partial class Color
 		{
 			
-			// aapt resource value: 0x7f07005f
-			public const int abc_background_cache_hint_selector_material_dark = 2131165279;
+			// aapt resource value: 0x7f07005c
+			public const int abc_background_cache_hint_selector_material_dark = 2131165276;
 			
-			// aapt resource value: 0x7f070060
-			public const int abc_background_cache_hint_selector_material_light = 2131165280;
+			// aapt resource value: 0x7f07005d
+			public const int abc_background_cache_hint_selector_material_light = 2131165277;
 			
-			// aapt resource value: 0x7f070061
-			public const int abc_color_highlight_material = 2131165281;
+			// aapt resource value: 0x7f07005e
+			public const int abc_color_highlight_material = 2131165278;
 			
 			// aapt resource value: 0x7f070011
 			public const int abc_input_method_navigation_guard = 2131165201;
 			
+			// aapt resource value: 0x7f07005f
+			public const int abc_primary_text_disable_only_material_dark = 2131165279;
+			
+			// aapt resource value: 0x7f070060
+			public const int abc_primary_text_disable_only_material_light = 2131165280;
+			
+			// aapt resource value: 0x7f070061
+			public const int abc_primary_text_material_dark = 2131165281;
+			
 			// aapt resource value: 0x7f070062
-			public const int abc_primary_text_disable_only_material_dark = 2131165282;
+			public const int abc_primary_text_material_light = 2131165282;
 			
 			// aapt resource value: 0x7f070063
-			public const int abc_primary_text_disable_only_material_light = 2131165283;
-			
-			// aapt resource value: 0x7f070064
-			public const int abc_primary_text_material_dark = 2131165284;
-			
-			// aapt resource value: 0x7f070065
-			public const int abc_primary_text_material_light = 2131165285;
-			
-			// aapt resource value: 0x7f070066
-			public const int abc_search_url_text = 2131165286;
+			public const int abc_search_url_text = 2131165283;
 			
 			// aapt resource value: 0x7f070012
 			public const int abc_search_url_text_normal = 2131165202;
@@ -1059,11 +1059,11 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f070014
 			public const int abc_search_url_text_selected = 2131165204;
 			
-			// aapt resource value: 0x7f070067
-			public const int abc_secondary_text_material_dark = 2131165287;
+			// aapt resource value: 0x7f070064
+			public const int abc_secondary_text_material_dark = 2131165284;
 			
-			// aapt resource value: 0x7f070068
-			public const int abc_secondary_text_material_light = 2131165288;
+			// aapt resource value: 0x7f070065
+			public const int abc_secondary_text_material_light = 2131165285;
 			
 			// aapt resource value: 0x7f070015
 			public const int accent_material_dark = 2131165205;
@@ -1083,8 +1083,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f07001a
 			public const int background_material_light = 2131165210;
 			
-			// aapt resource value: 0x7f07005d
-			public const int black = 2131165277;
+			// aapt resource value: 0x7f07005a
+			public const int black = 2131165274;
 			
 			// aapt resource value: 0x7f07001b
 			public const int bright_foreground_disabled_material_dark = 2131165211;
@@ -1122,8 +1122,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f070008
 			public const int common_action_bar_splitter = 2131165192;
 			
-			// aapt resource value: 0x7f070069
-			public const int common_google_signin_btn_text_dark = 2131165289;
+			// aapt resource value: 0x7f070066
+			public const int common_google_signin_btn_text_dark = 2131165286;
 			
 			// aapt resource value: 0x7f070009
 			public const int common_google_signin_btn_text_dark_default = 2131165193;
@@ -1137,8 +1137,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f07000a
 			public const int common_google_signin_btn_text_dark_pressed = 2131165194;
 			
-			// aapt resource value: 0x7f07006a
-			public const int common_google_signin_btn_text_light = 2131165290;
+			// aapt resource value: 0x7f070067
+			public const int common_google_signin_btn_text_light = 2131165287;
 			
 			// aapt resource value: 0x7f07000d
 			public const int common_google_signin_btn_text_light_default = 2131165197;
@@ -1152,8 +1152,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f07000e
 			public const int common_google_signin_btn_text_light_pressed = 2131165198;
 			
-			// aapt resource value: 0x7f07006b
-			public const int common_plus_signin_btn_text_dark = 2131165291;
+			// aapt resource value: 0x7f070068
+			public const int common_plus_signin_btn_text_dark = 2131165288;
 			
 			// aapt resource value: 0x7f070000
 			public const int common_plus_signin_btn_text_dark_default = 2131165184;
@@ -1167,8 +1167,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f070001
 			public const int common_plus_signin_btn_text_dark_pressed = 2131165185;
 			
-			// aapt resource value: 0x7f07006c
-			public const int common_plus_signin_btn_text_light = 2131165292;
+			// aapt resource value: 0x7f070069
+			public const int common_plus_signin_btn_text_light = 2131165289;
 			
 			// aapt resource value: 0x7f070004
 			public const int common_plus_signin_btn_text_light_default = 2131165188;
@@ -1181,9 +1181,6 @@ namespace PaddleBuddy.Droid
 			
 			// aapt resource value: 0x7f070005
 			public const int common_plus_signin_btn_text_light_pressed = 2131165189;
-			
-			// aapt resource value: 0x7f07005c
-			public const int dark_gray = 2131165276;
 			
 			// aapt resource value: 0x7f07004b
 			public const int design_fab_shadow_end_color = 2131165259;
@@ -1230,8 +1227,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f070028
 			public const int foreground_material_light = 2131165224;
 			
-			// aapt resource value: 0x7f07005b
-			public const int gray = 2131165275;
+			// aapt resource value: 0x7f070059
+			public const int gray = 2131165273;
 			
 			// aapt resource value: 0x7f070029
 			public const int highlighted_text_material_dark = 2131165225;
@@ -1244,9 +1241,6 @@ namespace PaddleBuddy.Droid
 			
 			// aapt resource value: 0x7f07002c
 			public const int hint_foreground_material_light = 2131165228;
-			
-			// aapt resource value: 0x7f070059
-			public const int light_gray = 2131165273;
 			
 			// aapt resource value: 0x7f07002d
 			public const int material_blue_grey_800 = 2131165229;
@@ -1283,9 +1277,6 @@ namespace PaddleBuddy.Droid
 			
 			// aapt resource value: 0x7f070038
 			public const int material_grey_900 = 2131165240;
-			
-			// aapt resource value: 0x7f07005a
-			public const int med_gray = 2131165274;
 			
 			// aapt resource value: 0x7f070039
 			public const int primary_dark_material_dark = 2131165241;
@@ -1338,11 +1329,11 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f070048
 			public const int switch_thumb_disabled_material_light = 2131165256;
 			
-			// aapt resource value: 0x7f07006d
-			public const int switch_thumb_material_dark = 2131165293;
+			// aapt resource value: 0x7f07006a
+			public const int switch_thumb_material_dark = 2131165290;
 			
-			// aapt resource value: 0x7f07006e
-			public const int switch_thumb_material_light = 2131165294;
+			// aapt resource value: 0x7f07006b
+			public const int switch_thumb_material_light = 2131165291;
 			
 			// aapt resource value: 0x7f070049
 			public const int switch_thumb_normal_material_dark = 2131165257;
@@ -1350,8 +1341,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f07004a
 			public const int switch_thumb_normal_material_light = 2131165258;
 			
-			// aapt resource value: 0x7f07005e
-			public const int text_gray = 2131165278;
+			// aapt resource value: 0x7f07005b
+			public const int text_gray = 2131165275;
 			
 			// aapt resource value: 0x7f070058
 			public const int white = 2131165272;
@@ -3745,6 +3736,9 @@ namespace PaddleBuddy.Droid
 			
 			// aapt resource value: 0x7f0b00ee
 			public const int ThemeOverlay_AppCompat_Light = 2131427566;
+			
+			// aapt resource value: 0x7f0b0146
+			public const int ToolbarTheme = 2131427654;
 			
 			// aapt resource value: 0x7f0b00ef
 			public const int Widget_AppCompat_ActionBar = 2131427567;
