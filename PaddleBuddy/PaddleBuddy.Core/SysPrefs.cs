@@ -13,6 +13,9 @@
 
         public static Devices Device { get; set; }
 
+        public static bool TestOffline = false;
+        public static bool DisableMap = false;
+
         public enum Devices
         {
             Android,

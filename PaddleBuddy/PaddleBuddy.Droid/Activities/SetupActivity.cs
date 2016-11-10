@@ -28,11 +28,8 @@ namespace PaddleBuddy.Droid.Activities
             _dbReady = false;
             _locationPermissionApproved = false;
             _locationReady = false;
-            SysPrefs.Device = SysPrefs.Devices.Android;
+            SetupSysPrefs();
             SetContentView(Resource.Layout.activity_setup);
-            MessengerService.Messenger.Register<DbReadyMessage>(this, DbReadyReceived);
-            MessengerService.Messenger.Register<PermissionMessage>(this, PermissionMessageReceived);
-            MessengerService.Messenger.Register<LocationUpdatedMessage>(this, LocationUpdatedReceived);
         }
 
         protected override void OnResume()
@@ -41,13 +38,29 @@ namespace PaddleBuddy.Droid.Activities
             Setup();
         }
 
+        private void SetupSysPrefs()
+        {
+            SysPrefs.Device = SysPrefs.Devices.Android;
+            SysPrefs.TestOffline = true;
+            SysPrefs.DisableMap = true;
+        }
+
         private void Setup()
         {
             //todo: consider making these async again
-            //DatabaseService.GetInstance().Setup();
-            Task.Run(() => DatabaseService.GetInstance().Setup(true));
-            PermissionService.SetupLocation(this);
-            //Task.Run(() => PermissionService.SetupLocation(this));
+            LogService.Log(SysPrefs.TestOffline ? "Testing offline" : "Testing online");
+            if (!SysPrefs.TestOffline)
+            {
+                MessengerService.Messenger.Register<DbReadyMessage>(this, DbReadyReceived);
+                MessengerService.Messenger.Register<PermissionMessage>(this, PermissionMessageReceived);
+                MessengerService.Messenger.Register<LocationUpdatedMessage>(this, LocationUpdatedReceived);
+                Task.Run(() => DatabaseService.GetInstance().Setup(true));
+                PermissionService.SetupLocation(this);
+            }
+            else
+            {
+                StartActivity(typeof(MainActivity));
+            }
         }
 
         private void TryToStartMainActivity()

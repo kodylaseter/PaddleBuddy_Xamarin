@@ -8,6 +8,7 @@ using Android.OS;
 using Android.Support.V4.Content.Res;
 using Android.Views;
 using Android.Widget;
+using PaddleBuddy.Core;
 using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Activities;
@@ -36,19 +37,22 @@ namespace PaddleBuddy.Droid.Fragments
             _planTripButton = (Button)view.FindViewById(Resource.Id.plan_trip_button);
             _planTripButton.Click += OnPlanTripButtonClicked;
             var rootView = view.RootView;
-            _mapView = (MapView)rootView.FindViewById(Resource.Id.map_view);
-            _mapView.OnCreate(savedInstanceState);
-            _mapView.OnResume();
-            try
+            if (!SysPrefs.DisableMap)
             {
-                MapsInitializer.Initialize(Application.Context);
+                _mapView = (MapView)rootView.FindViewById(Resource.Id.map_view);
+                _mapView.OnCreate(savedInstanceState);
+                _mapView.OnResume();
+                try
+                {
+                    MapsInitializer.Initialize(Application.Context);
+                }
+                catch (Exception e)
+                {
+                    LogService.Log("Problem initializing map");
+                    LogService.Log(e.Message);
+                }
+                _mapView.GetMapAsync(this);
             }
-            catch (Exception e)
-            {
-                LogService.Log("Problem initializing map");
-                LogService.Log(e.Message);
-            }
-            _mapView.GetMapAsync(this);
             return view;
         }
 

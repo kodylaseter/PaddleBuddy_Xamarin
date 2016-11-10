@@ -13,7 +13,7 @@ using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
 
 namespace PaddleBuddy.Droid.Activities
 {
-    [Activity(Label = "MainActivity", Theme = "@style/AppTheme")]
+    [Activity(Label = "PaddleBuddy", Theme = "@style/AppTheme")]
     public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener
     {
         private Toolbar _toolbar;
@@ -38,6 +38,22 @@ namespace PaddleBuddy.Droid.Activities
             _navigationView = (NavigationView) FindViewById(Resource.Id.nav_view);
             _navigationView.SetNavigationItemSelectedListener(this);
             OnNavigationItemSelected();
+        }
+
+        public override bool OnCreateOptionsMenu(IMenu menu)
+        {
+            MenuInflater.Inflate(Resource.Menu.main_menu, menu);
+            return base.OnCreateOptionsMenu(menu);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            int id = item.ItemId;
+            if (id == Resource.Id.action_search)
+            {
+                FindViewById(Resource.Id.search_linear_layout).Visibility = ViewStates.Visible;
+            }
+            return base.OnOptionsItemSelected(item);
         }
 
         public bool OnNavigationItemSelected(IMenuItem menuItem = null)
@@ -79,6 +95,7 @@ namespace PaddleBuddy.Droid.Activities
             {
                 LogService.Log(e);
             }
+            LogService.Log("toolbar height: " + _toolbar.Height);
         }
 
         public override void OnBackPressed()
