@@ -23,7 +23,9 @@
             iOS
         }
 
-        
+        public static double TripPointsCloseThreshold = 20;
+
+
 
     }
 }

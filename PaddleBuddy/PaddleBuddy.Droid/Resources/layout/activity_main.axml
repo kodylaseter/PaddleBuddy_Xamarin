@@ -45,33 +45,38 @@
                 </android.support.v7.widget.Toolbar>
 
             </android.support.design.widget.AppBarLayout>
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/main_linear"
-                android:layout_marginTop="?attr/actionBarSize"
+                android:layout_marginTop="@dimen/subbar_height"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
+                <FrameLayout
+                    android:id="@+id/content_f"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_alignParentTop="true"/>
                 <LinearLayout
                     android:id="@+id/subbar_layout"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/subbar_height"
                     android:orientation="vertical"
                     android:visibility="gone"
-                    android:background="@color/colorPrimaryDark">
+                    android:background="@color/colorPrimaryDark"
+                    android:layout_alignParentTop="true"
+                    android:layout_gravity="center">
                     <TextView
-                        android:id="@+id/subbar_text"
+                        android:id="@+id/subbar_text1"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
-                        android:text="subbar"
+                        android:textColor="@color/white"/>
+                    <TextView
+                        android:id="@+id/subbar_text2"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
                         android:textColor="@color/white"/>
                 </LinearLayout>
-                <FrameLayout
-                    android:id="@+id/content_f"
-                    android:layout_height="match_parent"
-                    android:layout_width="match_parent"
-                    android:layout_below="@+id/subbartext"/>
-            </LinearLayout>
+            </RelativeLayout>
         </android.support.design.widget.CoordinatorLayout>
 
         <android.support.design.widget.NavigationView

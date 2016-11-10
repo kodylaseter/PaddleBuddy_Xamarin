@@ -172,6 +172,7 @@
     <Compile Include="Services\BaseAndroidService.cs" />
     <Compile Include="Services\DatabaseService.cs" />
     <Compile Include="Services\PermissionService.cs" />
+    <Compile Include="Services\SimulatorService.cs" />
     <Compile Include="Services\StorageService.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -180,7 +181,9 @@
     <None Include="packages.config" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
-    <AndroidResource Include="Resources\layout\activity_main.axml" />
+    <AndroidResource Include="Resources\layout\activity_main.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
     <AndroidResource Include="Resources\layout\fragment_map.axml">
       <SubType>Designer</SubType>
     </AndroidResource>

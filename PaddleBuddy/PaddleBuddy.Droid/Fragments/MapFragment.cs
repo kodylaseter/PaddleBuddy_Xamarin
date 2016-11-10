@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Android.App;
 using Android.Gms.Maps;
@@ -9,8 +10,10 @@ using Android.Support.V4.Content.Res;
 using Android.Views;
 using Android.Widget;
 using PaddleBuddy.Core;
+using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Services;
+using PaddleBuddy.Core.Utilities;
 using PaddleBuddy.Droid.Activities;
 using PaddleBuddy.Droid.Services;
 using Path = PaddleBuddy.Core.Models.Map.Path;
@@ -27,15 +30,20 @@ namespace PaddleBuddy.Droid.Fragments
         public bool IsLoading { get; set; }
         private Point _selectedMarkerPoint;
         private Button _planTripButton;
+        private TripData _tripData;
+        private LinearLayout _subBarLayout;
+        private TextView _subBarTextView1;
+        private TextView _subBarTextView2;
 
         private MarkerOptions _currentMarkerOptions;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            MapMode = MapModes.Init;
+            MapMode = MapModes.Browse;
             var view = inflater.Inflate(Resource.Layout.fragment_map, container, false);
             _planTripButton = (Button)view.FindViewById(Resource.Id.plan_trip_button);
             _planTripButton.Click += OnPlanTripButtonClicked;
+            ((Button) view.FindViewById(Resource.Id.test_simulate_button)).Click += OnSimulateButtonClicked;
             var rootView = view.RootView;
             if (!SysPrefs.DisableMap)
             {
@@ -53,6 +61,9 @@ namespace PaddleBuddy.Droid.Fragments
                 }
                 _mapView.GetMapAsync(this);
             }
+            _subBarLayout = (LinearLayout)Activity.FindViewById(Resource.Id.subbar_layout);
+            _subBarTextView1 = (TextView)Activity.FindViewById(Resource.Id.subbar_text1);
+            _subBarTextView2 = (TextView)Activity.FindViewById(Resource.Id.subbar_text2);
             return view;
         }
 
@@ -73,21 +84,45 @@ namespace PaddleBuddy.Droid.Fragments
                 case MapModes.Browse:
                     DrawCurrent();
                     break;
+                case MapModes.Navigate:
+                    DrawCurrent();
+                    NavigationUpdate();
+                    break;
                 default: 
                     throw new NotImplementedException();
+            }
+        }
+
+        private void NavigationUpdate()
+        {
+            if (_tripData == null || _tripData.Points == null || _tripData.Points.Count < 1)
+            {
+                LogService.Log("No navigation update. tripData not configured correctly");
+                return;
+            }
+            AnimateCameraBounds(new[]{CurrentLocation, _tripData.NextPoint});
+            var distance = PBUtilities.DistanceInMeters(CurrentLocation, _tripData.NextPoint);
+            if (distance > SysPrefs.TripPointsCloseThreshold)
+            {
+                UpdateSubBar(ViewStates.Visible, "Navigate to starting point",
+                    "Distance remaining " + distance + " meters");
+            }
+            else
+            {
+                HideSubBar();
             }
         }
 
         private void Setup()
         {
             IsLoading = true;
+            DrawCurrent();
             _currentMarker = null;
             _selectedMarkerPoint = null;
-            DrawCurrent();
             switch (MapMode)
             {
-                case MapModes.Init:
-                    SetupInit();
+                case MapModes.Browse:
+                    SetupBrowse();
                     break;
                 case MapModes.InitFromPlan:
                     SetupInitFromPlan();
@@ -97,11 +132,11 @@ namespace PaddleBuddy.Droid.Fragments
             IsLoading = false;
         }
 
-        private void SetupInit()
+        private void SetupBrowse()
         {
-            MoveCameraZoom(GetCurrentLocation, 8);
             try
             {
+                MoveCameraZoomToCurrent();
                 var path = DatabaseService.GetInstance().GetClosestRiver();
                 if (path.Points != null && path.Points.Count > 1)
                 {
@@ -117,7 +152,7 @@ namespace PaddleBuddy.Droid.Fragments
             }
             catch (Exception e)
             {
-                LogService.Log("Error in setup init");
+                LogService.Log("Error in browse setup");
                 LogService.Log(e.Message);
             }
             MapMode = MapModes.Browse;
@@ -126,6 +161,45 @@ namespace PaddleBuddy.Droid.Fragments
         private void SetupInitFromPlan()
         {
             
+        }
+
+        private void SetupTripData(List<Point> points)
+        {
+            _tripData = new TripData {Points = points};
+        }
+
+        private void StartSimulating(int type)
+        {
+            var p = new List<Point>();
+            switch (type)
+            {
+                case 0:
+                    p.Add(DatabaseService.GetInstance().GetPoint(86));
+                    SetupTripData(p);
+                    SimulatorService.StartSimulating(p);
+                    break;
+                default:
+                    break;
+            }
+            MapMode = MapModes.Navigate;
+        }
+
+
+        private void UpdateSubBar(ViewStates state, string text1, string text2)
+        {
+            ShowSubBar();
+            _subBarTextView1.Text = text1;
+            _subBarTextView2.Text = text2;
+        }
+
+        private void HideSubBar()
+        {
+            _subBarLayout.Visibility = ViewStates.Gone;
+        }
+
+        private void ShowSubBar()
+        {
+            _subBarLayout.Visibility = ViewStates.Visible;
         }
 
         private GoogleMap GoogleMap
@@ -144,11 +218,10 @@ namespace PaddleBuddy.Droid.Fragments
             }
         }
 
-        private Point GetCurrentLocation
+        private Point CurrentLocation
         {
             get { return LocationService.GetInstance().CurrentLocation; }
         }
-
 
         public static MapFragment NewInstance()
         {
@@ -158,6 +231,11 @@ namespace PaddleBuddy.Droid.Fragments
         private void OnPlanTripButtonClicked(object sender, EventArgs e)
         {
             ((MainActivity)Activity).HandleNavigation(null, PlanFragment.NewInstance(_selectedMarkerPoint.Id));
+        }
+
+        private void OnSimulateButtonClicked(object sender, EventArgs e)
+        {
+            StartSimulating(0);
         }
 
         public bool OnMarkerClick(Marker marker)
@@ -230,16 +308,29 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void DrawCurrent()
         {
-            if (MapIsNull) return;
-            var position = AndroidUtils.ToLatLng(GetCurrentLocation);
-            if (_currentMarker != null)
+            try
             {
-                _currentMarker.Position = position;
+                if (MapIsNull) return;
+                var position = AndroidUtils.ToLatLng(CurrentLocation);
+                if (_currentMarker != null)
+                {
+                    _currentMarker.Position = position;
+                }
+                else
+                {
+                    _currentMarker = GoogleMap.AddMarker(CurrentMarkerOptions.SetPosition(position));
+                }
             }
-            else
+            catch (Exception e)
             {
-                _currentMarker = GoogleMap.AddMarker(CurrentMarkerOptions.SetPosition(position));
+                LogService.Log(e.Message);
             }
+        }
+
+        public void MoveCameraZoomToCurrent()
+        {
+            var zoomLevel = 8;
+            MoveCameraZoom(CurrentLocation, zoomLevel);
         }
 
         public void MoveCamera(Point p)
@@ -291,9 +382,9 @@ namespace PaddleBuddy.Droid.Fragments
 
         public enum MapModes
         {
-            Init,
             InitFromPlan,
-            Browse
+            Browse,
+            Navigate
         }
     }
 }

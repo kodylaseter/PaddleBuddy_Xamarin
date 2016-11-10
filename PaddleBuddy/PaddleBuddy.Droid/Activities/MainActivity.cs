@@ -5,11 +5,12 @@ using Android.Support.Design.Widget;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Android.Views;
+using Android.Widget;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Fragments;
 using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
+using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace PaddleBuddy.Droid.Activities
 {
@@ -19,6 +20,7 @@ namespace PaddleBuddy.Droid.Activities
         private Toolbar _toolbar;
         private DrawerLayout _drawer;
         private NavigationView _navigationView;
+        private LinearLayout _subBarLayout;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -37,6 +39,8 @@ namespace PaddleBuddy.Droid.Activities
 
             _navigationView = (NavigationView) FindViewById(Resource.Id.nav_view);
             _navigationView.SetNavigationItemSelectedListener(this);
+
+            _subBarLayout = (LinearLayout) FindViewById(Resource.Id.subbar_layout);
             OnNavigationItemSelected();
         }
 
@@ -53,6 +57,7 @@ namespace PaddleBuddy.Droid.Activities
             {
                 //todo: fix this for search
                 //FindViewById(Resource.Id.search_linear_layout).Visibility = ViewStates.Visible;
+                _subBarLayout.Visibility = _subBarLayout.Visibility == ViewStates.Gone ? ViewStates.Visible : ViewStates.Gone;
             }
             return base.OnOptionsItemSelected(item);
         }
