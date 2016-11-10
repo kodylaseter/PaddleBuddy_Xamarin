@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using PaddleBuddy.Core.Models.Map;
 using PaddleBuddy.Core.Models.Messages;
+using PaddleBuddy.Core.Utilities;
 using Plugin.Geolocator;
 using Plugin.Geolocator.Abstractions;
 
@@ -94,25 +95,22 @@ namespace PaddleBuddy.Core.Services
 
         public void StartSimulating(List<Point> points)
         {
-            //this
+            StopListening();
+            Task.Run(() => Simulate(points));
         }
 
-        //public async void Simulate()
-        //{
-
-        //    var curr = new Point();
-        //    while (true)
-        //    {
-        //        await Task.Delay(500);
-        //        if (ViewModel.StartPoint != null)
-        //        {
-        //            curr.Lat = ViewModel.CurrentLocation.Lat;
-        //            curr.Lng = ViewModel.CurrentLocation.Lng + (-84.1180229 - ViewModel.CurrentLocation.Lng) / 2;
-        //            //Need to set current location
-        //            //Need to refactor this
-        //        }
-        //    }
-        //}
+        public async void Simulate(List<Point> points)
+        {
+            foreach (var point in points)
+            {
+                while (PBUtilities.DistanceInMeters(_currentLocation, point) > 20)
+                {
+                    CurrentLocation = PBUtilities.PointBetween(_currentLocation, point, 0.1);
+                    await Task.Delay(500);
+                }
+                CurrentLocation = point;
+            }
+        }
 
         //using this simulate, plan from tretret to qwertyuiop
         //if (CurrentLocation == null)

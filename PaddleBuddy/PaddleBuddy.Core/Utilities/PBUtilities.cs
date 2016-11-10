@@ -10,6 +10,15 @@ namespace PaddleBuddy.Core.Utilities
 {
     public class PBUtilities
     {
+        public static Point PointBetween(Point current, Point goal, double percentage)
+        {
+            return new Point
+            {
+                Lat = current.Lat + (Math.Abs(current.Lat - goal.Lat) * percentage),
+                Lng = current.Lng + (Math.Abs(current.Lng - goal.Lng) * percentage)
+            };
+        }
+
         public static TripEstimate LinksToEstimate(List<LinkPoint> list)
         {
             double totalTime = 0;
