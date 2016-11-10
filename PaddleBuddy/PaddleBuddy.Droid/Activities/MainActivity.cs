@@ -51,7 +51,8 @@ namespace PaddleBuddy.Droid.Activities
             int id = item.ItemId;
             if (id == Resource.Id.action_search)
             {
-                FindViewById(Resource.Id.search_linear_layout).Visibility = ViewStates.Visible;
+                //todo: fix this for search
+                //FindViewById(Resource.Id.search_linear_layout).Visibility = ViewStates.Visible;
             }
             return base.OnOptionsItemSelected(item);
         }
