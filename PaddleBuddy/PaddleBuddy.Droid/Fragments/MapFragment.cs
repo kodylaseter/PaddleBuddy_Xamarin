@@ -28,9 +28,9 @@ namespace PaddleBuddy.Droid.Fragments
         private MapView _mapView;
         private MapModes MapMode { get; set; }
         public bool IsLoading { get; set; }
+        public TripData TripData { get; set; }
         private Point _selectedMarkerPoint;
         private Button _planTripButton;
-        private TripData _tripData;
         private LinearLayout _subBarLayout;
         private TextView _subBarTextView1;
         private TextView _subBarTextView2;
@@ -95,22 +95,41 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void NavigationUpdate()
         {
-            if (_tripData == null || _tripData.Points == null || _tripData.Points.Count < 1)
+            if (TripData == null || TripData.Points == null || TripData.Points.Count < 1)
             {
                 LogService.Log("No navigation update. tripData not configured correctly");
                 return;
             }
-            AnimateCameraBounds(new[]{CurrentLocation, _tripData.NextPoint});
-            var distance = PBUtilities.DistanceInMeters(CurrentLocation, _tripData.NextPoint);
-            if (distance > SysPrefs.TripPointsCloseThreshold)
+            if (!TripData.HasStarted)
             {
-                UpdateSubBar(ViewStates.Visible, "Navigate to starting point",
-                    "Distance remaining " + distance + " meters");
+                AnimateCameraBounds(new[] {CurrentLocation, TripData.NextPoint});
+                if (!TripData.CloseToStart(CurrentLocation))
+                {
+                    UpdateSubBar(ViewStates.Visible, "Navigate to starting point",
+                        "Distance remaining " + TripData.DistanceToNext(CurrentLocation) + " meters");
+                }
+                else
+                {
+                    TripData.Increment();
+                    HideSubBar();
+                }
             }
             else
-            {
-                HideSubBar();
+            { 
+                NavigateCamera();
+                if (TripData.CloseToNext(CurrentLocation))
+                {
+                    if (TripData.HasNext)
+                    {
+                        TripData.Increment();
+                    }
+                    else
+                    {
+                        LogService.Log("Finished trip!");
+                    }
+                }
             }
+
         }
 
         private void Setup()
@@ -165,7 +184,7 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void SetupTripData(List<Point> points)
         {
-            _tripData = new TripData {Points = points};
+            TripData = new TripData {Points = points};
         }
 
         private void StartSimulating(int type)
@@ -175,8 +194,11 @@ namespace PaddleBuddy.Droid.Fragments
             {
                 case 0:
                     p.Add(DatabaseService.GetInstance().GetPoint(86));
+                    p.Add(DatabaseService.GetInstance().GetPoint(87));
+                    p.Add(DatabaseService.GetInstance().GetPoint(88));
+                    p.Add(DatabaseService.GetInstance().GetPoint(89));
                     SetupTripData(p);
-                    SimulatorService.StartSimulating(p);
+                    SimulatorService.StartSimulating(TripData.Points);
                     break;
                 default:
                     break;
@@ -329,8 +351,12 @@ namespace PaddleBuddy.Droid.Fragments
 
         public void MoveCameraZoomToCurrent()
         {
-            var zoomLevel = 8;
-            MoveCameraZoom(CurrentLocation, zoomLevel);
+            MoveCameraZoom(CurrentLocation, 8);
+        }
+
+        public void NavigateCamera()
+        {
+            MoveCameraZoom(CurrentLocation, 17);
         }
 
         public void MoveCamera(Point p)

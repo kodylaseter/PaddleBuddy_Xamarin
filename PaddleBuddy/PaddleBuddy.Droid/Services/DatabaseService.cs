@@ -113,7 +113,7 @@ namespace PaddleBuddy.Droid.Services
         public Path GetClosestRiver()
         {
             var curr = LocationService.GetInstance().CurrentLocation;
-            var point = (from p in Points let dist = PBUtilities.Distance(curr, p) orderby dist ascending select p).First();
+            var point = (from p in Points let dist = PBUtilities.DistanceInMiles(curr, p) orderby dist ascending select p).First();
             ClosestRiverId = point.RiverId;
             return GetPath(point.RiverId);
         }

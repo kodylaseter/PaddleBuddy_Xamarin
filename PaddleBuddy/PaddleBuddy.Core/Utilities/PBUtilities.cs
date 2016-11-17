@@ -10,13 +10,10 @@ namespace PaddleBuddy.Core.Utilities
 {
     public class PBUtilities
     {
-        public static Point PointBetween(Point current, Point goal, double percentage)
+        public static Point PointBetween(Point current, Point goal, double fraction)
         {
-            return new Point
-            {
-                Lat = current.Lat + (Math.Abs(current.Lat - goal.Lat) * percentage),
-                Lng = current.Lng + (Math.Abs(current.Lng - goal.Lng) * percentage)
-            };
+            var point = Point.Add(current, Point.MultiplyByFraction(Point.Subtract(goal, current), fraction));
+            return point;
         }
 
         public static TripEstimate LinksToEstimate(List<LinkPoint> list)
@@ -39,16 +36,16 @@ namespace PaddleBuddy.Core.Utilities
         }
 
         //returns in miles
-        public static double Distance(Point begin, Point end)
+        public static double DistanceInMiles(Point begin, Point end)
         {
-            if (begin != null || end != null) return Distance(begin.Lat, begin.Lng, end.Lat, end.Lng) * 0.000621371;
+            if (begin != null && end != null) return Distance(begin.Lat, begin.Lng, end.Lat, end.Lng) * 0.000621371;
             Debug.WriteLine("Distance calculation failed");
             return double.MaxValue;
         }
 
         public static double DistanceInMeters(Point begin, Point end)
         {
-            if (begin != null || end != null) return Distance(begin.Lat, begin.Lng, end.Lat, end.Lng);
+            if (begin != null && end != null) return Distance(begin.Lat, begin.Lng, end.Lat, end.Lng);
             Debug.WriteLine("Distance calculation failed");
             return double.MaxValue;
         }
