@@ -110,6 +110,7 @@ namespace PaddleBuddy.Droid.Fragments
                 }
                 else
                 {
+                    //todo check if hasnext
                     TripData.Increment();
                     HideSubBar();
                 }
