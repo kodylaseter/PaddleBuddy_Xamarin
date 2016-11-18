@@ -65,23 +65,16 @@ namespace PaddleBuddy.Core.Models
 
         private Point PointAt(int index)
         {
-            Point point;
-            try
-            {
-                point = _points.ElementAt(index);
-            }
-            catch (Exception e)
-            {
-                LogService.Log("Issue in pointAt");
-                LogService.Log(e.Message);
-                return null;
-            }
-            return point;
+            return (_points.Count >= index + 1) ? _points.ElementAt(index) : null;
         }
 
         public bool HasNext
         {
-            get { return PointAt(_index + 1) != null; }
+            get
+            {
+                var point = PointAt(_index + 1);
+                return point != null;
+            }
         }
     }
 }
