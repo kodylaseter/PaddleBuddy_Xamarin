@@ -13,32 +13,5 @@
         {
             return "id: " + Id + ", lat: " + Lat;
         }
-
-        public static Point Add(Point a, Point b)
-        {
-            return new Point
-            {
-                Lat = a.Lat + b.Lat,
-                Lng = a.Lng + b.Lng
-            };
-        }
-
-        public static Point Subtract(Point a, Point b)
-        {
-            return new Point
-            {
-                Lat = a.Lat - b.Lat,
-                Lng = a.Lng - b.Lng
-            };
-        }
-
-        public static Point MultiplyByFraction(Point point, double fraction)
-        {
-            return new Point
-            {
-                Lat = point.Lat*fraction,
-                Lng = point.Lng*fraction
-            };
-        }
     }
 }

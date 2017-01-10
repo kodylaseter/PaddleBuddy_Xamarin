@@ -193,11 +193,16 @@ namespace PaddleBuddy.Droid.Fragments
             var p = new List<Point>();
             switch (type)
             {
-                case 0:
+                case 0: //random bad test
                     p.Add(DatabaseService.GetInstance().GetPoint(86));
                     p.Add(DatabaseService.GetInstance().GetPoint(87));
                     p.Add(DatabaseService.GetInstance().GetPoint(88));
                     p.Add(DatabaseService.GetInstance().GetPoint(89));
+                    SetupTripData(p);
+                    SimulatorService.StartSimulating(TripData.Points);
+                    break;
+                case 1: //chat test 7-42
+                    p = DatabaseService.GetInstance().GetPath(2).Points;
                     SetupTripData(p);
                     SimulatorService.StartSimulating(TripData.Points);
                     break;
@@ -258,7 +263,7 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void OnSimulateButtonClicked(object sender, EventArgs e)
         {
-            StartSimulating(0);
+            StartSimulating(1);
         }
 
         public bool OnMarkerClick(Marker marker)

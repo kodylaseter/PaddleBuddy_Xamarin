@@ -10,6 +10,8 @@ namespace PaddleBuddy.Droid.Services
 {
     public class SimulatorService
     {
+
+        public const double SIM_INC = 20; //how much to increment each sim jump (meters)
         public static void StartSimulating(List<Point> points)
         {
             LogService.Log("Started simulating");
@@ -25,7 +27,7 @@ namespace PaddleBuddy.Droid.Services
                 {
                     var newPoint = PBUtilities.PointBetween(LS.CurrentLocation, point, 0.7);
                     SetCurrent(newPoint);
-                    await Task.Delay(1000);
+                    await Task.Delay(500);
                 }
                 SetCurrent(point);
             }

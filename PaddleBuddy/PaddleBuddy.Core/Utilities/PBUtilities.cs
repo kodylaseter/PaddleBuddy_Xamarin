@@ -12,8 +12,35 @@ namespace PaddleBuddy.Core.Utilities
     {
         public static Point PointBetween(Point current, Point goal, double fraction)
         {
-            var point = Point.Add(current, Point.MultiplyByFraction(Point.Subtract(goal, current), fraction));
+            var point = PointAdd(current, PointMultiplyByFraction(PointSubtract(goal, current), fraction));
             return point;
+        }
+
+        public static Point PointAdd(Point a, Point b)
+        {
+            return new Point
+            {
+                Lat = a.Lat + b.Lat,
+                Lng = a.Lng + b.Lng
+            };
+        }
+
+        public static Point PointSubtract(Point a, Point b)
+        {
+            return new Point
+            {
+                Lat = a.Lat - b.Lat,
+                Lng = a.Lng - b.Lng
+            };
+        }
+
+        public static Point PointMultiplyByFraction(Point point, double fraction)
+        {
+            return new Point
+            {
+                Lat = point.Lat * fraction,
+                Lng = point.Lng * fraction
+            };
         }
 
         public static TripEstimate LinksToEstimate(List<LinkPoint> list)
