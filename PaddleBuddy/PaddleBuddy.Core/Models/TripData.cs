@@ -68,13 +68,6 @@ namespace PaddleBuddy.Core.Models
             return (_points.Count >= index + 1) ? _points.ElementAt(index) : null;
         }
 
-        public bool HasNext
-        {
-            get
-            {
-                var point = PointAt(_index + 1);
-                return point != null;
-            }
-        }
+        public bool HasNext => PointAt(_index + 1) != null;
     }
 }

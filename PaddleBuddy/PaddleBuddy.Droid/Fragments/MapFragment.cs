@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Android.Animation;
 using Android.App;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;

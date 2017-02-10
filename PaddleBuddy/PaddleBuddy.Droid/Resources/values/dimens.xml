@@ -12,4 +12,6 @@
     <dimen name="appbar_detail_height">56dp</dimen>
     
     <dimen name="bottom_button_height">60dp</dimen>
+    <dimen name="mapbar_height">50dp</dimen>
+    <dimen name="mapbar_button_size">50dp</dimen>
 </resources>

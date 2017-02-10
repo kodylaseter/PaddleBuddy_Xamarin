@@ -2,30 +2,55 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
+        android:id="@+id/mapbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mapbar_height"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:background="@color/colorPrimary">
+        <Button
+            android:id="@+id/cancel_trip_button"
+            android:layout_height="@dimen/mapbar_button_size"
+            android:layout_width="@dimen/mapbar_button_size"
+            android:text="X"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+        <View
+            style="@style/VerticalLayoutDivider" />
+        <TextView
+            android:layout_gravity="center"
+            android:id="@+id/mapbar_text1"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textColor="@color/white"
+            android:text="test"/>
+    </LinearLayout>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                  xmlns:tools="http://schemas.android.com/tools"
                  android:layout_width="fill_parent"
                  android:layout_height="fill_parent"
-                 android:layout_alignParentTop="true">
+                 android:layout_above="@id/mapbar_layout">
         <com.google.android.gms.maps.MapView
             android:id="@+id/map_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </FrameLayout>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
-        <Button 
-            android:id="@+id/plan_trip_button"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"/>
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Plan"
-            android:visibility="gone"/>
-        <Button android:id="@+id/test_simulate_button"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/plan_trip_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Test"/>
-    </LinearLayout>
+                android:text="Plan"
+                android:visibility="gone"/>
+            <Button android:id="@+id/test_simulate_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Test"/>
+        </LinearLayout>
+    </RelativeLayout>
+
 </RelativeLayout>
