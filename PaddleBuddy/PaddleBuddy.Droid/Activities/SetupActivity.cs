@@ -55,7 +55,7 @@ namespace PaddleBuddy.Droid.Activities
                 MessengerService.Messenger.Register<DbReadyMessage>(this, DbReadyReceived);
                 MessengerService.Messenger.Register<PermissionMessage>(this, PermissionMessageReceived);
                 MessengerService.Messenger.Register<LocationUpdatedMessage>(this, LocationUpdatedReceived);
-                Task.Run(() => DatabaseService.GetInstance().Setup(true));
+                Task.Run(() => DatabaseService.GetInstance().Setup());
                 PermissionService.SetupLocation(this);
             }
             else

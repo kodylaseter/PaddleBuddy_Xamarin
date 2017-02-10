@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Android.Animation;
 using Android.App;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
@@ -24,18 +25,21 @@ namespace PaddleBuddy.Droid.Fragments
     public class MapFragment : BaseFragment, IOnMapReadyCallback, GoogleMap.IOnMarkerClickListener, GoogleMap.IOnMapClickListener, GoogleMap.IInfoWindowAdapter
     {
         private Marker _currentMarker;
-        private GoogleMap _googleMap;
+        private GoogleMap _myMap;
         private MapView _mapView;
-        private MapModes MapMode { get; set; }
         public bool IsLoading { get; set; }
         public TripData TripData { get; set; }
+        private MapModes _mapMode;
         private Point _selectedMarkerPoint;
         private Button _planTripButton;
         private LinearLayout _subBarLayout;
         private TextView _subBarTextView1;
         private TextView _subBarTextView2;
-
         private MarkerOptions _currentMarkerOptions;
+
+        private const int NAV_ZOOM = 17;
+        private const int BROWSE_ZOOM = 8;
+        private const int NAV_TILT = 70;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -69,12 +73,22 @@ namespace PaddleBuddy.Droid.Fragments
 
         public void OnMapReady(GoogleMap googleMap)
         {
-            GoogleMap = googleMap;
+            MyMap = googleMap;
             MessengerService.Messenger.Register<LocationUpdatedMessage>(this, LocationUpdatedReceived);
-            GoogleMap.SetOnMarkerClickListener(this);
-            GoogleMap.SetOnMapClickListener(this);
-            GoogleMap.SetInfoWindowAdapter(this);
+            MyMap.SetOnMarkerClickListener(this);
+            MyMap.SetOnMapClickListener(this);
+            MyMap.SetInfoWindowAdapter(this);
             Setup();
+        }
+
+
+        private MapModes MapMode
+        {
+            get { return _mapMode; }
+            set
+            {
+                _mapMode = value;
+            }
         }
 
         private void LocationUpdatedReceived(LocationUpdatedMessage obj)
@@ -127,6 +141,7 @@ namespace PaddleBuddy.Droid.Fragments
                     else
                     {
                         LogService.Log("Finished trip!");
+                        MapMode = MapModes.Browse;
                     }
                 }
             }
@@ -156,7 +171,7 @@ namespace PaddleBuddy.Droid.Fragments
         {
             try
             {
-                MoveCameraZoomToCurrent();
+                MoveCameraZoom();
                 var path = DatabaseService.GetInstance().GetClosestRiver();
                 if (path.Points != null && path.Points.Count > 1)
                 {
@@ -230,10 +245,10 @@ namespace PaddleBuddy.Droid.Fragments
             _subBarLayout.Visibility = ViewStates.Visible;
         }
 
-        private GoogleMap GoogleMap
+        private GoogleMap MyMap
         {
-            get { return _googleMap; }
-            set { _googleMap = value; }
+            get { return _myMap; }
+            set { _myMap = value; }
         }
 
         public Point SelectedMarkerPoint
@@ -305,7 +320,7 @@ namespace PaddleBuddy.Droid.Fragments
             if (MapIsNull) return;
             var marker = new MarkerOptions().SetPosition(new LatLng(p.Lat, p.Lng));
             if (p.IsLaunchSite) marker.SetTitle(p.Label).SetSnippet(p.Id.ToString());
-            GoogleMap.AddMarker(marker);
+            MyMap.AddMarker(marker);
         }
 
         private void DrawLine(Point[] points)
@@ -319,7 +334,7 @@ namespace PaddleBuddy.Droid.Fragments
             {
                 polyOpts.Add(AndroidUtils.ToLatLng(p));
             }
-            GoogleMap.AddPolyline(polyOpts);
+            MyMap.AddPolyline(polyOpts);
         }
 
         private void DrawLine(Path path)
@@ -346,7 +361,7 @@ namespace PaddleBuddy.Droid.Fragments
                 }
                 else
                 {
-                    _currentMarker = GoogleMap.AddMarker(CurrentMarkerOptions.SetPosition(position));
+                    _currentMarker = MyMap.AddMarker(CurrentMarkerOptions.SetPosition(position));
                 }
             }
             catch (Exception e)
@@ -355,30 +370,38 @@ namespace PaddleBuddy.Droid.Fragments
             }
         }
 
-        public void MoveCameraZoomToCurrent()
+        private void SetTilt()
         {
-            MoveCameraZoom(CurrentLocation, 8);
+            var camPos = new CameraPosition.Builder(MyMap.CameraPosition).Tilt(NAV_TILT).Zoom(NAV_ZOOM).Build();
+            MyMap.MoveCamera(CameraUpdateFactory.NewCameraPosition(camPos));
         }
 
         public void NavigateCamera()
         {
-            MoveCameraZoom(CurrentLocation, 17);
+            //MoveCameraZoom(CurrentLocation, 17);
+            if (MapIsNull) return;
+            var bearing = PBUtilities.BearingBetweenPoints(CurrentLocation, TripData.NextPoint);
+            var camPos = new CameraPosition.Builder(MyMap.CameraPosition).Target(new LatLng(CurrentLocation.Lat, CurrentLocation.Lng)).Tilt(NAV_TILT).Zoom(NAV_ZOOM).Bearing(bearing).Build();
+            MyMap.AnimateCamera(CameraUpdateFactory.NewCameraPosition(camPos));
         }
-
-        public void MoveCamera(Point p)
+        
+        private void MoveCameraZoom(bool animate = false, Point p = null, int zoom = int.MaxValue)
         {
             if (MapIsNull) return;
-            GoogleMap.MoveCamera(CameraUpdateFactory.NewLatLng(new LatLng(p.Lat, p.Lng)));
+            if (p == null) p = CurrentLocation;
+            if (zoom == int.MaxValue) zoom = BROWSE_ZOOM;
+            var cam = CameraUpdateFactory.NewLatLngZoom(new LatLng(p.Lat, p.Lng), zoom);
+            if (animate)
+            {
+                MyMap.AnimateCamera(cam);
+            }
+            else
+            {
+                MyMap.MoveCamera(cam);
+            }
         }
 
-        //todo: combine these methods into 1 camera method
-        public void MoveCameraZoom(Point p, int zoom)
-        {
-            if (MapIsNull) return;
-            GoogleMap.MoveCamera(CameraUpdateFactory.NewLatLngZoom(new LatLng(p.Lat, p.Lng), zoom));
-        }
-
-        public void AnimateCameraBounds(Point[] points)
+        private void AnimateCameraBounds(Point[] points)
         {
             if (MapIsNull) return;
             var builder = new LatLngBounds.Builder();
@@ -388,10 +411,10 @@ namespace PaddleBuddy.Droid.Fragments
             }
             var bounds = builder.Build();
             var cameraUpdate = CameraUpdateFactory.NewLatLngBounds(bounds, 80);
-            GoogleMap.AnimateCamera(cameraUpdate);
+            MyMap.AnimateCamera(cameraUpdate);
         }
 
-        public MarkerOptions CurrentMarkerOptions
+        private MarkerOptions CurrentMarkerOptions
         {
             get
             {
@@ -410,7 +433,7 @@ namespace PaddleBuddy.Droid.Fragments
             }
         }
 
-        private bool MapIsNull => GoogleMap == null;
+        private bool MapIsNull => MyMap == null;
 
         public enum MapModes
         {

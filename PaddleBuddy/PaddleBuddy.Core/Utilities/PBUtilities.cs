@@ -10,6 +10,15 @@ namespace PaddleBuddy.Core.Utilities
 {
     public class PBUtilities
     {
+        public static float BearingBetweenPoints(Point start, Point end)
+        {
+            var x = Math.Cos(end.Lat) * Math.Sin(start.Lng - end.Lng);
+            var y = Math.Cos(start.Lat)*Math.Sin(end.Lat) -
+                    Math.Sin(start.Lat)*Math.Cos(end.Lat)*Math.Cos(start.Lng - end.Lng);
+            var b = Math.Atan2(x, y);
+            return (float) rad2deg(b);
+        }
+
         public static Point PointBetween(Point current, Point goal, double fraction)
         {
             var point = PointAdd(current, PointMultiplyByFraction(PointSubtract(goal, current), fraction));

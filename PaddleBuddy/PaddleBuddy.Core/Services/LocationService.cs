@@ -38,22 +38,23 @@ namespace PaddleBuddy.Core.Services
             }
         }
 
-        public async Task<Point> GetLocationAsync()
-        {
-            var position = await Geolocator.GetPositionAsync();
-            var point = new Point
-            {
-                Lat = position.Latitude,
-                Lng = position.Longitude
-            };
-            CurrentLocation = point;
-            return point;
-        }
+        //public async Task<Point> GetLocationAsync()
+        //{
+        //    var position = await Geolocator.GetPositionAsync();
+        //    var point = new Point
+        //    {
+        //        Lat = position.Latitude,
+        //        Lng = position.Longitude
+        //    };
+        //    CurrentLocation = point;
+        //    return point;
+        //}
 
         public void StartListening()
         {
             if (Geolocator.IsListening) return;
-            Geolocator.StartListeningAsync(5, 5, true);
+            //parameters are milliseconds, meters
+            Geolocator.StartListeningAsync(2000, 5, true);
             Geolocator.PositionChanged += OnPositionChanged;
         }
 
@@ -91,7 +92,7 @@ namespace PaddleBuddy.Core.Services
         {
             LogService.Log("Setting up location service");
             GetInstance().StartListening();
-            GetInstance().GetLocationAsync();
+            //GetInstance().GetLocationAsync();
         }
     }
 }
