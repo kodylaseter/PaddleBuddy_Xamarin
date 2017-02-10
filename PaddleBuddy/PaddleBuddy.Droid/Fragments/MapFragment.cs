@@ -37,7 +37,7 @@ namespace PaddleBuddy.Droid.Fragments
         private TextView _subBarTextView2;
         private MarkerOptions _currentMarkerOptions;
 
-        private const int NAV_ZOOM = 17;
+        private const int NAV_ZOOM = 18;
         private const int BROWSE_ZOOM = 8;
         private const int NAV_TILT = 70;
 
@@ -378,11 +378,14 @@ namespace PaddleBuddy.Droid.Fragments
 
         public void NavigateCamera()
         {
-            //MoveCameraZoom(CurrentLocation, 17);
             if (MapIsNull) return;
-            var bearing = PBUtilities.BearingBetweenPoints(CurrentLocation, TripData.NextPoint);
-            var camPos = new CameraPosition.Builder(MyMap.CameraPosition).Target(new LatLng(CurrentLocation.Lat, CurrentLocation.Lng)).Tilt(NAV_TILT).Zoom(NAV_ZOOM).Bearing(bearing).Build();
-            MyMap.AnimateCamera(CameraUpdateFactory.NewCameraPosition(camPos));
+            var camPos = new CameraPosition.Builder(MyMap.CameraPosition).Target(new LatLng(CurrentLocation.Lat, CurrentLocation.Lng)).Tilt(NAV_TILT).Zoom(NAV_ZOOM);
+            //trying to avoid setting bearing when points are too close to accurately calulate it
+            if (PBUtilities.DistanceInMeters(CurrentLocation, TripData.NextPoint) > SysPrefs.TripPointsCloseThreshold)
+            {
+                camPos.Bearing(PBUtilities.BearingBetweenPoints(CurrentLocation, TripData.NextPoint));
+            }
+            MyMap.AnimateCamera(CameraUpdateFactory.NewCameraPosition(camPos.Build()));
         }
         
         private void MoveCameraZoom(bool animate = false, Point p = null, int zoom = int.MaxValue)

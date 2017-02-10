@@ -10,6 +10,12 @@ namespace PaddleBuddy.Core.Utilities
 {
     public class PBUtilities
     {
+        /// <summary>
+        /// credit: http://www.movable-type.co.uk/scripts/latlong.html
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns> returns float in degrees </returns>
         public static float BearingBetweenPoints(Point start, Point end)
         {
             var x = Math.Cos(end.Lat) * Math.Sin(start.Lng - end.Lng);
@@ -17,6 +23,43 @@ namespace PaddleBuddy.Core.Utilities
                     Math.Sin(start.Lat)*Math.Cos(end.Lat)*Math.Cos(start.Lng - end.Lng);
             var b = Math.Atan2(x, y);
             return (float) rad2deg(b);
+        }
+
+        /// <summary>
+        /// http://stackoverflow.com/a/8243966/4867663
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="distance"> in meters</param>
+        /// <param name="bearing"> in degrees</param>
+        /// <returns></returns>
+        public static Point PointAtDistanceAlongBearing(Point start, double distance, double bearing)
+        {
+            var earthRadiusKm = 6371.01;
+            var distanceKm = distance / 1000; //converting to km
+            var bearingRad = deg2rad(bearing);
+            var distRatio = distanceKm / earthRadiusKm;
+            var distRatioSine = Math.Sin(distRatio);
+            var distRatioCosine = Math.Cos(distRatio);
+
+            var startLatRad = deg2rad(start.Lat);
+            var startLonRad = deg2rad(start.Lng);
+
+            var startLatCos = Math.Cos(startLatRad);
+            var startLatSin = Math.Sin(startLatRad);
+
+            var endLatRads = Math.Asin((startLatSin * distRatioCosine) + (startLatCos * distRatioSine * Math.Cos(bearingRad)));
+
+            var endLonRads = startLonRad
+                + Math.Atan2(
+                    Math.Sin(bearingRad) * distRatioSine * startLatCos,
+                    distRatioCosine - startLatSin * Math.Sin(endLatRads));
+            var endLatDeg = rad2deg(endLatRads);
+            var endLonDeg = rad2deg(endLonRads);
+            return new Point
+            {
+                Lat = endLatDeg,
+                Lng = endLonDeg
+            };
         }
 
         public static Point PointBetween(Point current, Point goal, double fraction)

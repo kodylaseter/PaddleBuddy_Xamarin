@@ -23,7 +23,7 @@
             iOS
         }
 
-        public static double TripPointsCloseThreshold = 20;
+        public static double TripPointsCloseThreshold = 70;
 
 
 

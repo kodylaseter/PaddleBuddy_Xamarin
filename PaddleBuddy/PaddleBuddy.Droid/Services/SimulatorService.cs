@@ -12,8 +12,8 @@ namespace PaddleBuddy.Droid.Services
     public class SimulatorService
     {
 
-        private const double SIM_INC = 20; //how much to increment each sim jump (meters)
-        private const int TIME_DELAY = 1000; //time to delay between sim jumps
+        private const double SIM_INC = 8; //how many increments per map section
+        private const int TIME_DELAY = 800; //time to delay between sim jumps
 
         public static void StartSimulating(List<Point> points)
         {
@@ -25,11 +25,15 @@ namespace PaddleBuddy.Droid.Services
         public static async void Simulate(List<Point> points)
         {
             SetCurrent(points.First());
+            await Task.Delay(TIME_DELAY);
             foreach (var point in points)
             {
+                var inc = PBUtilities.DistanceInMeters(LS.CurrentLocation, point)/SIM_INC;
                 while (PBUtilities.DistanceInMeters(LS.CurrentLocation, point) > SysPrefs.TripPointsCloseThreshold)
                 {
-                    var newPoint = PBUtilities.PointBetween(LS.CurrentLocation, point, 0.5);
+                    //var newPoint = PBUtilities.PointBetween(LS.CurrentLocation, point, 0.7);
+                    var bearing = PBUtilities.BearingBetweenPoints(LS.CurrentLocation, point);
+                    var newPoint = PBUtilities.PointAtDistanceAlongBearing(LS.CurrentLocation, inc, bearing);
                     SetCurrent(newPoint);
                     await Task.Delay(TIME_DELAY);
                 }
