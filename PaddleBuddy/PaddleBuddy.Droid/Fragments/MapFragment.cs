@@ -31,22 +31,20 @@ namespace PaddleBuddy.Droid.Fragments
         private MapModes _mapMode;
         private Point _selectedMarkerPoint;
         private Button _planTripButton;
-        private LinearLayout _subBarLayout;
-        private TextView _subBarTextView1;
-        private TextView _subBarTextView2;
+        private LinearLayout _mapBarLayout;
+        private TextView _mapBarTextView1;
+        private TextView _mapBarTextView2;
         private MarkerOptions _currentMarkerOptions;
 
         private const int NAV_ZOOM = 18;
         private const int BROWSE_ZOOM = 8;
         private const int NAV_TILT = 70;
+        private const int BROWSE_TILT = 0;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            MapMode = MapModes.Browse;
             var view = inflater.Inflate(Resource.Layout.fragment_map, container, false);
-            _planTripButton = (Button)view.FindViewById(Resource.Id.plan_trip_button);
-            _planTripButton.Click += OnPlanTripButtonClicked;
-            ((Button) view.FindViewById(Resource.Id.test_simulate_button)).Click += OnSimulateButtonClicked;
+
             var rootView = view.RootView;
             if (!SysPrefs.DisableMap)
             {
@@ -64,9 +62,12 @@ namespace PaddleBuddy.Droid.Fragments
                 }
                 _mapView.GetMapAsync(this);
             }
-            _subBarLayout = (LinearLayout)Activity.FindViewById(Resource.Id.subbar_layout);
-            _subBarTextView1 = (TextView)Activity.FindViewById(Resource.Id.subbar_text1);
-            _subBarTextView2 = (TextView)Activity.FindViewById(Resource.Id.subbar_text2);
+            view.FindViewById<Button>(Resource.Id.plan_trip_button).Click += OnPlanTripButtonClicked;
+            view.FindViewById<Button>(Resource.Id.test_simulate_button).Click += OnSimulateButtonClicked;
+            view.FindViewById<Button>(Resource.Id.cancel_trip_button).Click += OnCancelTripClicked;
+            _mapBarLayout = view.FindViewById<LinearLayout>(Resource.Id.mapbar_layout);
+            _mapBarTextView1 = view.FindViewById<TextView>(Resource.Id.mapbar_text1);
+            MapMode = MapModes.Browse;
             return view;
         }
 
@@ -87,6 +88,17 @@ namespace PaddleBuddy.Droid.Fragments
             set
             {
                 _mapMode = value;
+                switch (_mapMode)
+                {
+                    case MapModes.Browse:
+                        HideMapBar();
+                        break;
+                    case MapModes.Navigate:
+                        UpdateMapBar("");
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
             }
         }
 
@@ -118,19 +130,18 @@ namespace PaddleBuddy.Droid.Fragments
                 AnimateCameraBounds(new[] {CurrentLocation, TripData.NextPoint});
                 if (!TripData.CloseToStart(CurrentLocation))
                 {
-                    UpdateSubBar(ViewStates.Visible, "Navigate to starting point",
-                        "Distance remaining " + TripData.DistanceToNext(CurrentLocation) + " meters");
+                    UpdateMapBar("Distance remaining " + TripData.DistanceToNext(CurrentLocation) + " meters");
                 }
                 else
                 {
                     //todo check if hasnext
                     TripData.Increment();
-                    HideSubBar();
                 }
             }
             else
             { 
                 NavigateCamera();
+                UpdateMapBar(TripData.NextPoint.Id.ToString());
                 if (TripData.CloseToNext(CurrentLocation))
                 {
                     if (TripData.HasNext)
@@ -168,9 +179,10 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void SetupBrowse()
         {
+            ClearTripData();
             try
             {
-                MoveCameraZoom();
+                MoveCameraZoom(animate: true);
                 var path = DatabaseService.GetInstance().GetClosestRiver();
                 if (path.Points != null && path.Points.Count > 1)
                 {
@@ -202,6 +214,11 @@ namespace PaddleBuddy.Droid.Fragments
             TripData = new TripData {Points = points};
         }
 
+        private void ClearTripData()
+        {
+            TripData = null;
+        }
+
         private void StartSimulating(int type)
         {
             var p = new List<Point>();
@@ -227,21 +244,20 @@ namespace PaddleBuddy.Droid.Fragments
         }
 
 
-        private void UpdateSubBar(ViewStates state, string text1, string text2)
+        private void UpdateMapBar(string text1)
         {
-            ShowSubBar();
-            _subBarTextView1.Text = text1;
-            _subBarTextView2.Text = text2;
+            ShowMapBar();
+            _mapBarTextView1.Text = text1;
         }
 
-        private void HideSubBar()
+        private void HideMapBar()
         {
-            _subBarLayout.Visibility = ViewStates.Gone;
+            _mapBarLayout.Visibility = ViewStates.Gone;
         }
 
-        private void ShowSubBar()
+        private void ShowMapBar()
         {
-            _subBarLayout.Visibility = ViewStates.Visible;
+            _mapBarLayout.Visibility = ViewStates.Visible;
         }
 
         private GoogleMap MyMap
@@ -273,6 +289,11 @@ namespace PaddleBuddy.Droid.Fragments
         private void OnPlanTripButtonClicked(object sender, EventArgs e)
         {
             ((MainActivity)Activity).HandleNavigation(null, PlanFragment.NewInstance(_selectedMarkerPoint.Id));
+        }
+
+        private void OnCancelTripClicked(object sender, EventArgs e)
+        {
+            SetupBrowse();
         }
 
         private void OnSimulateButtonClicked(object sender, EventArgs e)
@@ -371,20 +392,27 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void SetTilt()
         {
-            var camPos = new CameraPosition.Builder(MyMap.CameraPosition).Tilt(NAV_TILT).Zoom(NAV_ZOOM).Build();
+            var camPos = new CameraPosition.Builder(MyMap.CameraPosition).Tilt(NAV_TILT).Build();
+            MyMap.MoveCamera(CameraUpdateFactory.NewCameraPosition(camPos));
+        }
+
+        private void RemoveTilt()
+        {
+            var camPos = new CameraPosition.Builder(MyMap.CameraPosition).Tilt(BROWSE_TILT).Build();
             MyMap.MoveCamera(CameraUpdateFactory.NewCameraPosition(camPos));
         }
 
         public void NavigateCamera()
         {
             if (MapIsNull) return;
-            var camPos = new CameraPosition.Builder(MyMap.CameraPosition).Target(new LatLng(CurrentLocation.Lat, CurrentLocation.Lng)).Tilt(NAV_TILT).Zoom(NAV_ZOOM);
             //trying to avoid setting bearing when points are too close to accurately calulate it
+            var bearing = float.NaN;
             if (PBUtilities.DistanceInMeters(CurrentLocation, TripData.NextPoint) > SysPrefs.TripPointsCloseThreshold)
             {
-                camPos.Bearing(PBUtilities.BearingBetweenPoints(CurrentLocation, TripData.NextPoint));
+               bearing = PBUtilities.BearingBetweenPoints(CurrentLocation, TripData.NextPoint);
             }
-            MyMap.AnimateCamera(CameraUpdateFactory.NewCameraPosition(camPos.Build()));
+            var camPos = CameraUpdateBuilder(CurrentLocation, NAV_TILT, NAV_ZOOM, bearing);
+            MyMap.AnimateCamera(camPos);
         }
         
         private void MoveCameraZoom(bool animate = false, Point p = null, int zoom = int.MaxValue)
@@ -392,14 +420,15 @@ namespace PaddleBuddy.Droid.Fragments
             if (MapIsNull) return;
             if (p == null) p = CurrentLocation;
             if (zoom == int.MaxValue) zoom = BROWSE_ZOOM;
-            var cam = CameraUpdateFactory.NewLatLngZoom(new LatLng(p.Lat, p.Lng), zoom);
+
+            var camPos = CameraUpdateBuilder(p, BROWSE_TILT, zoom, 0);
             if (animate)
             {
-                MyMap.AnimateCamera(cam);
+                MyMap.AnimateCamera(camPos);
             }
             else
             {
-                MyMap.MoveCamera(cam);
+                MyMap.MoveCamera(camPos);
             }
         }
 
@@ -414,6 +443,15 @@ namespace PaddleBuddy.Droid.Fragments
             var bounds = builder.Build();
             var cameraUpdate = CameraUpdateFactory.NewLatLngBounds(bounds, 80);
             MyMap.AnimateCamera(cameraUpdate);
+        }
+
+        private CameraUpdate CameraUpdateBuilder(Point p, int tilt = int.MaxValue, int zoom = 0, float bearing = float.NaN)
+        {
+            var camPos = new CameraPosition.Builder(MyMap.CameraPosition).Target(new LatLng(p.Lat, p.Lng));
+            if (tilt != int.MaxValue) camPos.Tilt(tilt);
+            if (zoom != 0) camPos.Zoom(zoom);
+            if (!bearing.Equals(float.NaN)) camPos.Bearing(bearing);
+            return CameraUpdateFactory.NewCameraPosition(camPos.Build());
         }
 
         private MarkerOptions CurrentMarkerOptions

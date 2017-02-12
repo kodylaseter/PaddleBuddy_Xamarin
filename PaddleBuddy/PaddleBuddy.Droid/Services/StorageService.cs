@@ -31,10 +31,20 @@ namespace PaddleBuddy.Droid.Services
         {
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), name + ".txt");
         }
-
+        /// <summary>
+        /// Checks whether the files exist by name first and then checks to make sure they meet a minimum size
+        /// </summary>
+        /// <param name="names"></param>
+        /// <returns></returns>
         public static bool HasData(string[] names)
         {
-            return names.All(a => File.Exists(GetPath(a)));
+            foreach (var name in names)
+            {
+                if (!File.Exists(GetPath(name))) return false;
+                var fileInfo = new FileInfo(GetPath(name));
+                if (fileInfo.Length <= 0) return false;
+            }
+            return true;
         }
     }
 }

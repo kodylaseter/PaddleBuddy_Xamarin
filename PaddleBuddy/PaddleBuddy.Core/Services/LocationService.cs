@@ -38,18 +38,6 @@ namespace PaddleBuddy.Core.Services
             }
         }
 
-        //public async Task<Point> GetLocationAsync()
-        //{
-        //    var position = await Geolocator.GetPositionAsync();
-        //    var point = new Point
-        //    {
-        //        Lat = position.Latitude,
-        //        Lng = position.Longitude
-        //    };
-        //    CurrentLocation = point;
-        //    return point;
-        //}
-
         public void StartListening()
         {
             if (Geolocator.IsListening) return;
