@@ -1,4 +1,6 @@
-﻿namespace PaddleBuddy.Core.Models.Map
+﻿using System;
+
+namespace PaddleBuddy.Core.Models.Map
 {
     public class Point
     {
@@ -8,6 +10,16 @@
         public int RiverId { get; set; }
         public string Label { get; set; }
         public bool IsLaunchSite { get; set; }
+
+        /// <summary>
+        /// In seconds
+        /// </summary>
+        public double Time { get; set; }
+
+        /// <summary>
+        /// In meters per second
+        /// </summary>
+        public double Speed { get; set; }
 
         public override string ToString()
         {

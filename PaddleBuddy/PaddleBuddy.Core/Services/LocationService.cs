@@ -33,7 +33,18 @@ namespace PaddleBuddy.Core.Services
             get { return _currentLocation; }
             set
             {
-                _currentLocation = value;
+                var tempLocation = value;
+                var time = DateTime.Now.TimeOfDay.TotalSeconds;
+                tempLocation.Time = time;
+                if (_currentLocation != null && _currentLocation.Time > 0 && time > 0)
+                {
+                    var speed = PBUtilities.DistanceInMeters(tempLocation, CurrentLocation) / (tempLocation.Time - CurrentLocation.Time);
+                    if (speed > 0) //todo: attempting to filter out bad speeds
+                    {
+                        tempLocation.Speed = speed;
+                    }
+                }
+                _currentLocation = tempLocation;
                 MessengerService.Messenger.Send(new LocationUpdatedMessage());
             }
         }

@@ -35,11 +35,19 @@ namespace PaddleBuddy.Droid.Fragments
         private TextView _mapBarTextView1;
         private TextView _mapBarTextView2;
         private MarkerOptions _currentMarkerOptions;
+        private TextView _speedTextView;
 
         private const int NAV_ZOOM = 18;
         private const int BROWSE_ZOOM = 8;
         private const int NAV_TILT = 70;
         private const int BROWSE_TILT = 0;
+
+        //speed variables
+        private const int SPEED_CUTOFF_TIME_IN_SECONDS = 10;
+        /// <summary>
+        /// speed, time of day in totalseconds
+        /// </summary>
+        private List<Tuple<double, double>> _speeds; 
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -65,9 +73,11 @@ namespace PaddleBuddy.Droid.Fragments
             view.FindViewById<Button>(Resource.Id.plan_trip_button).Click += OnPlanTripButtonClicked;
             view.FindViewById<Button>(Resource.Id.test_simulate_button).Click += OnSimulateButtonClicked;
             view.FindViewById<Button>(Resource.Id.cancel_trip_button).Click += OnCancelTripClicked;
+            _speedTextView = view.FindViewById<TextView>(Resource.Id.speed_textview);
             _mapBarLayout = view.FindViewById<LinearLayout>(Resource.Id.mapbar_layout);
             _mapBarTextView1 = view.FindViewById<TextView>(Resource.Id.mapbar_text1);
             MapMode = MapModes.Browse;
+            _speeds = new List<Tuple<double, double>>();
             return view;
         }
 
@@ -154,6 +164,7 @@ namespace PaddleBuddy.Droid.Fragments
                         MapMode = MapModes.Browse;
                     }
                 }
+                UpdateSpeed();
             }
 
         }
@@ -179,6 +190,7 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void SetupBrowse()
         {
+            HideSpeed();
             ClearTripData();
             try
             {
@@ -248,6 +260,37 @@ namespace PaddleBuddy.Droid.Fragments
         {
             ShowMapBar();
             _mapBarTextView1.Text = text1;
+        }
+
+        private void UpdateSpeed()
+        {
+            var newTime = CurrentLocation.Time;
+            if (CurrentLocation.Speed > 0)
+            {
+                _speeds.Add(new Tuple<double, double>(CurrentLocation.Speed, CurrentLocation.Time));
+            }
+            //_speeds.RemoveAll(item => newTime - item.Item2 > SPEED_CUTOFF_TIME_IN_SECONDS || newTime - item.Item2 < 0);
+            for (int i = _speeds.Count - 1; i >= 0; i--)
+            {
+                if (newTime - _speeds[i].Item2 > SPEED_CUTOFF_TIME_IN_SECONDS)
+                {
+                    _speeds.RemoveAt(i);
+                }
+            }
+            if (_speeds.Count > 0)
+            {
+                var avg = _speeds.Average(item => item.Item1);
+                if (avg > 0)
+                {
+                    _speedTextView.Text = avg.ToString("0.0");
+                    _speedTextView.Visibility = ViewStates.Visible;
+                }
+            }
+        }
+
+        private void HideSpeed()
+        {
+            _speedTextView.Visibility = ViewStates.Gone;
         }
 
         private void HideMapBar()
