@@ -37,7 +37,7 @@ namespace PaddleBuddy.Droid.Fragments
         private MarkerOptions _currentMarkerOptions;
         private TextView _speedTextView;
 
-        private const int NAV_ZOOM = 18;
+        private const int NAV_ZOOM = 16;
         private const int BROWSE_ZOOM = 8;
         private const int NAV_TILT = 70;
         private const int BROWSE_TILT = 0;

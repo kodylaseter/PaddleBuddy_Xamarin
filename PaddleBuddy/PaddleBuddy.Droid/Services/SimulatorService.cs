@@ -12,8 +12,11 @@ namespace PaddleBuddy.Droid.Services
     public class SimulatorService
     {
 
-        private const double SIM_INC = 10; //how many increments per map section
-        private const int TIME_DELAY = 1000; //time to delay between sim jumps
+        private const double SIM_INC = 8; //how many increments per map section
+        /// <summary>
+        /// 
+        /// </summary>
+        private const int TIME_DELAY = 1100; //
 
         public static void StartSimulating(List<Point> points)
         {

@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
+    <!--map bar-->
     <LinearLayout
         android:id="@+id/mapbar_layout"
         android:layout_width="match_parent"
@@ -25,45 +26,54 @@
             android:textColor="@color/white"
             android:text="test"/>
     </LinearLayout>
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                 xmlns:tools="http://schemas.android.com/tools"
-                 android:layout_width="fill_parent"
-                 android:layout_height="fill_parent"
-                 android:layout_above="@id/mapbar_layout">
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/map_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"/>
-        <LinearLayout
+    
+    <!--map-->
+    
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/map_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/mapbar_layout"/>
+    
+    <!--speed and other buttons-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/mapbar_layout">
+        <Button
+            android:id="@+id/plan_trip_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:orientation="horizontal">
-            <Button
-                android:id="@+id/plan_trip_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Plan"
-                android:visibility="gone"/>
-            <Button android:id="@+id/test_simulate_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Test"/>
-        </LinearLayout>
-    </RelativeLayout>
-    <RelativeLayout
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_above="@id/mapbar_layout">
+            android:text="Plan"
+            android:visibility="gone"/>
         <TextView 
             android:id="@+id/speed_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:visibility="gone"
             android:text="5"/>
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/test_buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal">
+        <Button 
+            android:id="@+id/test_simulate_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Test"/>
+    </LinearLayout>
+
+    
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+    </LinearLayout>
 
 </RelativeLayout>
