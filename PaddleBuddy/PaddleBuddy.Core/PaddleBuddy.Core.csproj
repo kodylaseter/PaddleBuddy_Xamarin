@@ -50,7 +50,7 @@
     <Compile Include="Models\Response.cs" />
     <Compile Include="Models\SearchItem.cs" />
     <Compile Include="Models\TimeEstimate.cs" />
-    <Compile Include="Models\TripData.cs" />
+    <Compile Include="Models\TripManager.cs" />
     <Compile Include="Models\TripEstimate.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 using PaddleBuddy.Core.Models.LinqModels;
 using PaddleBuddy.Core.Models.Map;
 using PaddleBuddy.Core.Models.Messages;
@@ -17,7 +14,6 @@ namespace PaddleBuddy.Droid.Services
         private List<River> _rivers;
         private List<Point> _points;
         private List<Link> _links;
-        private string[] names = { "points", "rivers", "links" };
         public int ClosestRiverId { get; set; }
         private bool _isReady;
 
@@ -31,43 +27,7 @@ namespace PaddleBuddy.Droid.Services
             _isReady = false;
         }
 
-        public async Task Setup(bool sync = false)
-        {
-            if (sync)
-            {
-                await UpdateAll();
-            }
-            if (StorageService.HasData(names))
-            {
-                LogService.Log("Device has local data");
-                Points = JsonConvert.DeserializeObject<List<Point>>(StorageService.ReadSerializedFromFile("points"));
-                Rivers = JsonConvert.DeserializeObject<List<River>>(StorageService.ReadSerializedFromFile("rivers"));
-                Links = JsonConvert.DeserializeObject<List<Link>>(StorageService.ReadSerializedFromFile("links"));
-            }
-            UpdateIsReady();
-            if (!IsReady) await UpdateAll();
-            
-        }
-
-        public async Task UpdateAll()
-        {
-            await UpdateRivers();
-            await UpdateLinks();
-            await UpdatePoints();
-            SaveData();
-        }
-
-        public void SaveData()
-        {
-            var points = JsonConvert.SerializeObject(_points);
-            var rivers = JsonConvert.SerializeObject(_rivers);
-            var links = JsonConvert.SerializeObject(_links);
-            StorageService.SaveSerializedToFile(points, "points");
-            StorageService.SaveSerializedToFile(rivers, "rivers");
-            StorageService.SaveSerializedToFile(links, "links");
-        }
-
-        private void UpdateIsReady()
+        public void UpdateIsReady()
         {
             IsReady = (_rivers != null && _rivers.Count > 0) &&
                     (_points != null && _points.Count > 0) &&
@@ -123,6 +83,12 @@ namespace PaddleBuddy.Droid.Services
             return (from point in Points where point.Id == id select point).Single();
         }
 
+        public Point GetNextPoint(Point point)
+        {
+            var link = (from p in Links where p.Begin == point.Id select p).Single();
+            return GetPoint(link.End);
+        }
+
         public Path GetPath(int riverId)
         {
             var points = (from p in Points where p.RiverId == riverId select p).ToList();
@@ -168,79 +134,6 @@ namespace PaddleBuddy.Droid.Services
                 
             }
             return path;
-        }
-
-        public async Task<bool> UpdatePoints()
-        {
-            try
-            {
-                var resp = await GetAsync("all_points/");
-                if (resp.Success)
-                {
-                    Points = JsonConvert.DeserializeObject<List<Point>>(resp.Data.ToString());
-                }
-                else
-                {
-                    LogService.Log("Failed to update points");
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
-
-                LogService.Log(e);
-                LogService.Log("Failed to update points");
-                return false;
-            }
-            return true;
-        }
-
-        public async Task<bool> UpdateRivers()
-        {
-            try
-            {
-                var resp = await GetAsync("all_rivers/");
-                if (resp.Success)
-                {
-                    Rivers = JsonConvert.DeserializeObject<List<River>>(resp.Data.ToString());
-                }
-                else
-                {
-                    LogService.Log("Failed to update rivers");
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
-                LogService.Log(e);
-                LogService.Log("Failed to update rivers");
-                return false;
-            }
-            return true;
-        }
-
-        public async Task<bool> UpdateLinks()
-        {
-            try
-            {
-                var resp = await GetAsync("all_links/");
-                if (resp.Success)
-                {
-                    Links = JsonConvert.DeserializeObject<List<Link>>(resp.Data.ToString());
-                }
-                else
-                {
-                    LogService.Log("Failed to update links");
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
-                LogService.Log(e);
-                LogService.Log("Failed to update links");
-                return false;
-            }
-            return true;
         }
     }
 }

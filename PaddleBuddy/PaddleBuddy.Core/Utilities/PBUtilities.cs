@@ -4,12 +4,16 @@ using PaddleBuddy.Core.Models.Map;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices.ComTypes;
 using PaddleBuddy.Core.Services;
 
 namespace PaddleBuddy.Core.Utilities
 {
     public class PBUtilities
     {
+        private static double EARTH_RADIUS_IN_METERS = 6371000;
+        private static double EARTH_RADIUS_IN_KM = 6371;
+
         /// <summary>
         /// credit: http://www.movable-type.co.uk/scripts/latlong.html
         /// </summary>
@@ -34,10 +38,9 @@ namespace PaddleBuddy.Core.Utilities
         /// <returns></returns>
         public static Point PointAtDistanceAlongBearing(Point start, double distance, double bearing)
         {
-            var earthRadiusKm = 6371.01;
             var distanceKm = distance / 1000; //converting to km
             var bearingRad = deg2rad(bearing);
-            var distRatio = distanceKm / earthRadiusKm;
+            var distRatio = distanceKm / EARTH_RADIUS_IN_KM;
             var distRatioSine = Math.Sin(distRatio);
             var distRatioCosine = Math.Cos(distRatio);
 
@@ -101,7 +104,7 @@ namespace PaddleBuddy.Core.Utilities
             double totalDistance = 0;
             foreach (var lp in list)
             {
-                var dist = Distance(lp.BeginLat, lp.BeginLng, lp.EndLat, lp.EndLng);
+                var dist = DistanceInMeters(lp.BeginLat, lp.BeginLng, lp.EndLat, lp.EndLng);
                 totalDistance += dist;
                 totalTime += dist / lp.Speed * 3600000;
 
@@ -114,36 +117,61 @@ namespace PaddleBuddy.Core.Utilities
             };
         }
 
+        /// <summary>
+        /// http://www.movable-type.co.uk/scripts/latlong.html
+        /// cross-track distance
+        /// </summary>
+        /// <param name="lineStart"></param>
+        /// <param name="lineEnd"></param>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static double DistanceInMetersFromPointToLine(Point lineStart, Point lineEnd, Point point)
+        {
+            var angularDistance = DistanceInRadians(lineStart, point);
+            var startToPointBearing = deg2rad(BearingBetweenPoints(lineStart, point));
+            var lineBearing = deg2rad(BearingBetweenPoints(lineStart, lineEnd));
+            var dXt =
+                Math.Asin(Math.Sin(angularDistance/EARTH_RADIUS_IN_METERS)*Math.Sin(startToPointBearing - lineBearing))*
+                EARTH_RADIUS_IN_METERS;
+            return dXt;
+        }
+
         //returns in miles
         public static double DistanceInMiles(Point begin, Point end)
         {
-            if (begin != null && end != null) return Distance(begin.Lat, begin.Lng, end.Lat, end.Lng) * 0.000621371;
+            if (begin != null && end != null) return DistanceInMeters(begin.Lat, begin.Lng, end.Lat, end.Lng) * 0.000621371;
             Debug.WriteLine("Distance calculation failed");
             return double.MaxValue;
         }
 
         public static double DistanceInMeters(Point begin, Point end)
         {
-            if (begin != null && end != null) return Distance(begin.Lat, begin.Lng, end.Lat, end.Lng);
+            if (begin != null && end != null) return DistanceInMeters(begin.Lat, begin.Lng, end.Lat, end.Lng);
             Debug.WriteLine("Distance calculation failed");
             return double.MaxValue;
         }
 
-        //METERS
-        public static double Distance(double lat1, double lon1, double lat2, double lon2)
+        public static double DistanceInRadians(Point p1, Point p2)
         {
-            var R = 6371000;
+            return DistanceInRadians(p1.Lat, p1.Lng, p2.Lat, p2.Lng);
+        }
+
+        public static double DistanceInRadians(double lat1, double lon1, double lat2, double lon2)
+        {
             var l1 = deg2rad(lat1);
             var l2 = deg2rad(lat2);
             var deltaLat = deg2rad(lat2 - lat1);
             var deltaLong = deg2rad(lon2 - lon1);
 
             var a = Math.Sin(deltaLat / 2) * Math.Sin(deltaLat / 2) + Math.Cos(l1) * Math.Cos(l2) * Math.Sin(deltaLong / 2) * Math.Sin(deltaLong / 2);
-            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-            var d = R * c;
-            return d;
-            //convert to miles
-            //return d * 0.000621371;
+            return 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+        }
+
+        //METERS
+        private static double DistanceInMeters(double lat1, double lon1, double lat2, double lon2)
+        {
+            var c = DistanceInRadians(lat1, lon1, lat2, lon2);
+            return EARTH_RADIUS_IN_METERS * c;
         }
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

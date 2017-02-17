@@ -1,18 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using PaddleBuddy.Core.Models.Map;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Core.Utilities;
 
 namespace PaddleBuddy.Core.Models
 {
-    public class TripData
+
+
+    public class TripManager
     {
         private List<Point> _points;
         private int _index;
 
-        public TripData()
+        /// <summary>
+        /// Used for IsOnTrack calculation for filtering out points
+        /// </summary>
+        private const double POINT_TOO_FAR_AWAY = 5500;
+
+        public TripManager()
         {
             _index = 0;
         }
@@ -33,14 +41,44 @@ namespace PaddleBuddy.Core.Models
             get { return PointAt(_index); }
         }
 
+        public bool HasStarted
+        {
+            get { return _index > 0; }
+        }
+
+
         public void Increment()
         {
             _index++;
         }
 
-        public bool HasStarted
+        public bool IsOnTrack()
         {
-            get { return _index > 0; }
+            var current = LocationService.GetInstance().CurrentLocation;
+            var tempPoints = _points;
+            //list of points and their distances to the currentlocation
+            List<Tuple<Point, double>> pointsToCheck = new List<Tuple<Point, double>>();
+            //pointsToCheck.RemoveAll(p => PBUtilities.DistanceInMeters(current, p) > POINT_TOO_FAR_AWAY);
+            for (int i = _points.Count - 1; i >= 0; i--)
+            {
+                var dist = PBUtilities.DistanceInMeters(current, _points[i]);
+                if (dist > POINT_TOO_FAR_AWAY)
+                {
+                    tempPoints.RemoveAt(i);
+                }
+                else
+                {
+                    pointsToCheck.Add(new Tuple<Point, double>(tempPoints[i], dist));
+                }
+            }
+            pointsToCheck.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+            foreach (var point in pointsToCheck)
+            {
+                var p = point.Item2;
+                var next = 
+            }
+            return true;
+
         }
 
         public bool CloseToStart(Point current)

@@ -27,7 +27,7 @@ namespace PaddleBuddy.Droid.Fragments
         private GoogleMap _myMap;
         private MapView _mapView;
         public bool IsLoading { get; set; }
-        public TripData TripData { get; set; }
+        public TripManager TripManager { get; set; }
         private MapModes _mapMode;
         private Point _selectedMarkerPoint;
         private Button _planTripButton;
@@ -130,33 +130,34 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void NavigationUpdate()
         {
-            if (TripData == null || TripData.Points == null || TripData.Points.Count < 1)
+            if (TripManager == null || TripManager.Points == null || TripManager.Points.Count < 1)
             {
                 LogService.Log("No navigation update. tripData not configured correctly");
                 return;
             }
-            if (!TripData.HasStarted)
+            if (!TripManager.HasStarted)
             {
-                AnimateCameraBounds(new[] {CurrentLocation, TripData.NextPoint});
-                if (!TripData.CloseToStart(CurrentLocation))
+                AnimateCameraBounds(new[] {CurrentLocation, TripManager.NextPoint});
+                if (!TripManager.CloseToStart(CurrentLocation))
                 {
-                    UpdateMapBar("Distance remaining " + TripData.DistanceToNext(CurrentLocation) + " meters");
+                    UpdateMapBar("Distance remaining " + TripManager.DistanceToNext(CurrentLocation) + " meters");
                 }
                 else
                 {
                     //todo check if hasnext
-                    TripData.Increment();
+                    TripManager.Increment();
                 }
             }
             else
-            { 
+            {
+                TripManager.IsOnTrack();
                 NavigateCamera();
-                UpdateMapBar(TripData.NextPoint.Id.ToString());
-                if (TripData.CloseToNext(CurrentLocation))
+                UpdateMapBar(TripManager.NextPoint.Id.ToString());
+                if (TripManager.CloseToNext(CurrentLocation))
                 {
-                    if (TripData.HasNext)
+                    if (TripManager.HasNext)
                     {
-                        TripData.Increment();
+                        TripManager.Increment();
                     }
                     else
                     {
@@ -223,12 +224,12 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void SetupTripData(List<Point> points)
         {
-            TripData = new TripData {Points = points};
+            TripManager = new TripManager {Points = points};
         }
 
         private void ClearTripData()
         {
-            TripData = null;
+            TripManager = null;
         }
 
         private void StartSimulating(int type)
@@ -242,12 +243,12 @@ namespace PaddleBuddy.Droid.Fragments
                     p.Add(DatabaseService.GetInstance().GetPoint(88));
                     p.Add(DatabaseService.GetInstance().GetPoint(89));
                     SetupTripData(p);
-                    SimulatorService.StartSimulating(TripData.Points);
+                    SimulatorService.StartSimulating(TripManager.Points);
                     break;
                 case 1: //chat test 7-42
                     p = DatabaseService.GetInstance().GetPath(2).Points;
                     SetupTripData(p);
-                    SimulatorService.StartSimulating(TripData.Points);
+                    SimulatorService.StartSimulating(TripManager.Points);
                     break;
                 default:
                     break;
@@ -450,9 +451,9 @@ namespace PaddleBuddy.Droid.Fragments
             if (MapIsNull) return;
             //trying to avoid setting bearing when points are too close to accurately calulate it
             var bearing = float.NaN;
-            if (PBUtilities.DistanceInMeters(CurrentLocation, TripData.NextPoint) > SysPrefs.TripPointsCloseThreshold)
+            if (PBUtilities.DistanceInMeters(CurrentLocation, TripManager.NextPoint) > SysPrefs.TripPointsCloseThreshold)
             {
-               bearing = PBUtilities.BearingBetweenPoints(CurrentLocation, TripData.NextPoint);
+               bearing = PBUtilities.BearingBetweenPoints(CurrentLocation, TripManager.NextPoint);
             }
             var camPos = CameraUpdateBuilder(CurrentLocation, NAV_TILT, NAV_ZOOM, bearing);
             MyMap.AnimateCamera(camPos);

@@ -1,12 +1,134 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using PaddleBuddy.Core.Models.Map;
+using PaddleBuddy.Core.Services;
+using Path = System.IO.Path;
 
 namespace PaddleBuddy.Droid.Services
 {
-    public class StorageService : BaseAndroidService
+    public class StorageService : ApiService
     {
-        public static void SaveSerializedToFile(string json, string name)
+        private static StorageService _storageService;
+        private string[] names = { "points", "rivers", "links" };
+
+        public static StorageService GetInstance()
+        {
+            return _storageService ?? (_storageService = new StorageService());
+        }
+
+        public async Task Setup(bool sync = false)
+        {
+            if (sync)
+            {
+                await UpdateAll();
+            }
+            if (HasData(names))
+            {
+                LogService.Log("Device has local data");
+                DatabaseService.GetInstance().Points = JsonConvert.DeserializeObject<List<Point>>(ReadSerializedFromFile("points"));
+                DatabaseService.GetInstance().Rivers = JsonConvert.DeserializeObject<List<River>>(ReadSerializedFromFile("rivers"));
+                DatabaseService.GetInstance().Links = JsonConvert.DeserializeObject<List<Link>>(ReadSerializedFromFile("links"));
+            }
+            DatabaseService.GetInstance().UpdateIsReady();
+            if (!DatabaseService.GetInstance().IsReady) await UpdateAll();
+        }
+
+        private async Task UpdateAll()
+        {
+            await UpdateRivers();
+            await UpdateLinks();
+            await UpdatePoints();
+            SaveData();
+        }
+
+        public void SaveData()
+        {
+            var points = JsonConvert.SerializeObject(DatabaseService.GetInstance().Points);
+            var rivers = JsonConvert.SerializeObject(DatabaseService.GetInstance().Rivers);
+            var links = JsonConvert.SerializeObject(DatabaseService.GetInstance().Links);
+            SaveSerializedToFile(points, "points");
+            SaveSerializedToFile(rivers, "rivers");
+            SaveSerializedToFile(links, "links");
+        }
+
+        public async Task<bool> UpdatePoints()
+        {
+            try
+            {
+                var resp = await GetAsync("all_points/");
+                if (resp.Success)
+                {
+                    DatabaseService.GetInstance().Points = JsonConvert.DeserializeObject<List<Point>>(resp.Data.ToString());
+                }
+                else
+                {
+                    LogService.Log("Failed to update points");
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+
+                LogService.Log(e);
+                LogService.Log("Failed to update points");
+                return false;
+            }
+            return true;
+        }
+
+        public async Task<bool> UpdateRivers()
+        {
+            try
+            {
+                var resp = await GetAsync("all_rivers/");
+                if (resp.Success)
+                {
+                    DatabaseService.GetInstance().Rivers = JsonConvert.DeserializeObject<List<River>>(resp.Data.ToString());
+                }
+                else
+                {
+                    LogService.Log("Failed to update rivers");
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                LogService.Log(e);
+                LogService.Log("Failed to update rivers");
+                return false;
+            }
+            return true;
+        }
+
+        public async Task<bool> UpdateLinks()
+        {
+            try
+            {
+                var resp = await GetAsync("all_links/");
+                if (resp.Success)
+                {
+                    DatabaseService.GetInstance().Links = JsonConvert.DeserializeObject<List<Link>>(resp.Data.ToString());
+                }
+                else
+                {
+                    LogService.Log("Failed to update links");
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                LogService.Log(e);
+                LogService.Log("Failed to update links");
+                return false;
+            }
+            return true;
+        }
+
+        public void SaveSerializedToFile(string json, string name)
         {
             var path = GetPath(name);
             if (File.Exists(path))
@@ -22,12 +144,12 @@ namespace PaddleBuddy.Droid.Services
             }
         }
 
-        public static string ReadSerializedFromFile(string name)
+        public string ReadSerializedFromFile(string name)
         {
             return File.ReadAllText(GetPath(name));
         }
 
-        public static string GetPath(string name)
+        public string GetPath(string name)
         {
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), name + ".txt");
         }
@@ -36,7 +158,7 @@ namespace PaddleBuddy.Droid.Services
         /// </summary>
         /// <param name="names"></param>
         /// <returns></returns>
-        public static bool HasData(string[] names)
+        public bool HasData(string[] names)
         {
             foreach (var name in names)
             {
