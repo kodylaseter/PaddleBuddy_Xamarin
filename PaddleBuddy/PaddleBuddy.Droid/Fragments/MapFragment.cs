@@ -150,8 +150,10 @@ namespace PaddleBuddy.Droid.Fragments
             }
             else
             {
-                TripManager.IsOnTrack();
+                TripManager.IsOnTrack(TripManager.LastPoint, TripManager.NextPoint, CurrentLocation);
                 NavigateCamera();
+
+                //todo: fix this
                 UpdateMapBar(TripManager.NextPoint.Id.ToString());
                 if (TripManager.CloseToNext(CurrentLocation))
                 {

@@ -15,10 +15,7 @@ namespace PaddleBuddy.Core.Models
         private List<Point> _points;
         private int _index;
 
-        /// <summary>
-        /// Used for IsOnTrack calculation for filtering out points
-        /// </summary>
-        private const double POINT_TOO_FAR_AWAY = 5500;
+        private const double IS_CLOSE_THRESHOLD = 100; //meters
 
         public TripManager()
         {
@@ -41,6 +38,11 @@ namespace PaddleBuddy.Core.Models
             get { return PointAt(_index); }
         }
 
+        public Point LastPoint
+        {
+            get { return PointAt(_index - 1);}
+        }
+
         public bool HasStarted
         {
             get { return _index > 0; }
@@ -52,33 +54,10 @@ namespace PaddleBuddy.Core.Models
             _index++;
         }
 
-        public bool IsOnTrack()
+        public bool IsOnTrack(Point lineStart, Point lineEnd, Point current)
         {
-            var current = LocationService.GetInstance().CurrentLocation;
-            var tempPoints = _points;
-            //list of points and their distances to the currentlocation
-            List<Tuple<Point, double>> pointsToCheck = new List<Tuple<Point, double>>();
-            //pointsToCheck.RemoveAll(p => PBUtilities.DistanceInMeters(current, p) > POINT_TOO_FAR_AWAY);
-            for (int i = _points.Count - 1; i >= 0; i--)
-            {
-                var dist = PBUtilities.DistanceInMeters(current, _points[i]);
-                if (dist > POINT_TOO_FAR_AWAY)
-                {
-                    tempPoints.RemoveAt(i);
-                }
-                else
-                {
-                    pointsToCheck.Add(new Tuple<Point, double>(tempPoints[i], dist));
-                }
-            }
-            pointsToCheck.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-            foreach (var point in pointsToCheck)
-            {
-                var p = point.Item2;
-                var next = 
-            }
-            return true;
-
+            var dist = PBUtilities.DistanceInMetersFromPointToLine(lineStart, lineEnd, current);
+            return dist < IS_CLOSE_THRESHOLD;
         }
 
         public bool CloseToStart(Point current)

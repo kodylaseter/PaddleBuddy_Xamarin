@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using PaddleBuddy.Core.Models.LinqModels;
 using PaddleBuddy.Core.Models.Map;
 using PaddleBuddy.Core.Models.Messages;
-using PaddleBuddy.Core.Services;
 using PaddleBuddy.Core.Utilities;
 
-namespace PaddleBuddy.Droid.Services
+namespace PaddleBuddy.Core.Services
 {
     public class DatabaseService : ApiService
     {
@@ -16,6 +16,10 @@ namespace PaddleBuddy.Droid.Services
         private List<Link> _links;
         public int ClosestRiverId { get; set; }
         private bool _isReady;
+        /// <summary>
+        /// Used for IsOnTrack calculation for filtering out points
+        /// </summary>
+        private const double POINT_TOO_FAR_AWAY = 5500;
 
         public static DatabaseService GetInstance()
         {
@@ -62,6 +66,38 @@ namespace PaddleBuddy.Droid.Services
         {
             get { return _links; }
             set { _links = value; }
+        }
+
+        public Point PickNextDestination(Point current, List<Point> tripPoints)
+        {
+            //list of points and their distances to the currentlocation
+            List<Tuple<Point, double>> pointsToCheck = new List<Tuple<Point, double>>();
+            //pointsToCheck.RemoveAll(p => PBUtilities.DistanceInMeters(current, p) > POINT_TOO_FAR_AWAY);
+            for (int i = _points.Count - 1; i >= 0; i--)
+            {
+                var dist = PBUtilities.DistanceInMeters(current, _points[i]);
+                if (dist > POINT_TOO_FAR_AWAY)
+                {
+                    tripPoints.RemoveAt(i);
+                }
+                else
+                {
+                    pointsToCheck.Add(new Tuple<Point, double>(tripPoints[i], dist));
+                }
+            }
+            pointsToCheck.Sort((x, y) => x.Item2.CompareTo(y.Item2));
+            var closestNextPoint = new Tuple<Point, double>(null, double.MaxValue);
+            foreach (var tup in pointsToCheck)
+            {
+                var point = tup.Item1;
+                var next = DatabaseService.GetInstance().GetNextPoint(point);
+                var dist = PBUtilities.DistanceInMetersFromPointToLine(point, next, current);
+                if (dist < closestNextPoint.Item2)
+                {
+                    closestNextPoint = new Tuple<Point, double>(next, dist);
+                }
+            }
+            return closestNextPoint.Item1;
         }
 
         public River GetRiver(int id)
