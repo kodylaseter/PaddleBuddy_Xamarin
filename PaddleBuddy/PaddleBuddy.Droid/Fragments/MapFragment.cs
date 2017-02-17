@@ -150,7 +150,13 @@ namespace PaddleBuddy.Droid.Fragments
             }
             else
             {
-                TripManager.IsOnTrack(TripManager.LastPoint, TripManager.NextPoint, CurrentLocation);
+                if (!TripManager.IsOnTrack(TripManager.LastPoint, TripManager.NextPoint, CurrentLocation))
+                {
+                    LogService.Log("Off track!");
+                    SimulatorService.Stop = true;
+                    //var nextDestination = DatabaseService.GetInstance().PickNextDestination(CurrentLocation, TripManager);
+                    //setup navigate for this
+                }
                 NavigateCamera();
 
                 //todo: fix this

@@ -127,11 +127,11 @@ namespace PaddleBuddy.Core.Utilities
         /// <returns></returns>
         public static double DistanceInMetersFromPointToLine(Point lineStart, Point lineEnd, Point point)
         {
-            var angularDistance = DistanceInRadians(lineStart, point);
+            var distanceInMeters = DistanceInMeters(lineStart, point);
             var startToPointBearing = deg2rad(BearingBetweenPoints(lineStart, point));
             var lineBearing = deg2rad(BearingBetweenPoints(lineStart, lineEnd));
             var dXt =
-                Math.Asin(Math.Sin(angularDistance/EARTH_RADIUS_IN_METERS)*Math.Sin(startToPointBearing - lineBearing))*
+                Math.Asin(Math.Sin(distanceInMeters / EARTH_RADIUS_IN_METERS) * Math.Sin(startToPointBearing - lineBearing)) *
                 EARTH_RADIUS_IN_METERS;
             return dXt;
         }

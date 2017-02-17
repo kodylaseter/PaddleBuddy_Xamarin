@@ -19,7 +19,7 @@ namespace PaddleBuddy.Droid.Services
         /// </summary>
         private const int TIME_DELAY = 1100; //
 
-        private static bool Stop { get; set; }
+        public static bool Stop { get; set; }
         private static Random Random { get; set; }
 
         public static void StartSimulating(List<Point> points)
@@ -52,7 +52,8 @@ namespace PaddleBuddy.Droid.Services
                 }
                 SetCurrent(point);
                 await Task.Delay(TIME_DELAY);
-                if (Random.Next(1, 10) == 5)
+                var rand = Random.Next(1, 3);
+                if (rand == 2)
                 {
                     await TestOffTrack();
                 }
@@ -66,7 +67,7 @@ namespace PaddleBuddy.Droid.Services
             var bearing = Random.Next(0, 360);
             while (!Stop)
             {
-                var newPoint = PBUtilities.PointAtDistanceAlongBearing(LS.CurrentLocation, 20, bearing);
+                var newPoint = PBUtilities.PointAtDistanceAlongBearing(LS.CurrentLocation, 60, bearing);
                 SetCurrent(newPoint);
                 await Task.Delay(TIME_DELAY);
             }

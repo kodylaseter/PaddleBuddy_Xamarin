@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Models.LinqModels;
 using PaddleBuddy.Core.Models.Map;
 using PaddleBuddy.Core.Models.Messages;
@@ -68,9 +69,10 @@ namespace PaddleBuddy.Core.Services
             set { _links = value; }
         }
 
-        public Point PickNextDestination(Point current, List<Point> tripPoints)
+        public Point PickNextDestination(Point current, TripManager tripManager)
         {
             //list of points and their distances to the currentlocation
+            var tripPoints = tripManager.Points;
             List<Tuple<Point, double>> pointsToCheck = new List<Tuple<Point, double>>();
             //pointsToCheck.RemoveAll(p => PBUtilities.DistanceInMeters(current, p) > POINT_TOO_FAR_AWAY);
             for (int i = _points.Count - 1; i >= 0; i--)

@@ -54,10 +54,17 @@ namespace PaddleBuddy.Core.Models
             _index++;
         }
 
+        /// <summary>
+        /// Improve with pixel detection and rectangle bounding around line?
+        /// </summary>
+        /// <param name="lineStart"></param>
+        /// <param name="lineEnd"></param>
+        /// <param name="current"></param>
+        /// <returns></returns>
         public bool IsOnTrack(Point lineStart, Point lineEnd, Point current)
         {
             var dist = PBUtilities.DistanceInMetersFromPointToLine(lineStart, lineEnd, current);
-            return dist < IS_CLOSE_THRESHOLD;
+            return Math.Abs(dist) < IS_CLOSE_THRESHOLD;
         }
 
         public bool CloseToStart(Point current)
