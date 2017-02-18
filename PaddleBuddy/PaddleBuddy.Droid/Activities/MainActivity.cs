@@ -101,7 +101,6 @@ namespace PaddleBuddy.Droid.Activities
             {
                 LogService.Log(e);
             }
-            LogService.Log("toolbar height: " + _toolbar.Height);
         }
 
         public override void OnBackPressed()
