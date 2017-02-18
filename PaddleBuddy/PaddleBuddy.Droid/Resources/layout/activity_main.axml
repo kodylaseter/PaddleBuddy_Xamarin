@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
@@ -28,28 +29,16 @@
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    app:theme="@style/ToolbarTheme">
+                    android:theme="@style/ToolbarTheme">
                 </android.support.v7.widget.Toolbar>
 
             </android.support.design.widget.AppBarLayout>
-            <!--<LinearLayout
-                android:id="@+id/searchbar"
+            
+            <FrameLayout
+                android:id="@+id/content_f"
+                android:layout_height="match_parent"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/gray">
-                
-            </LinearLayout>-->
-            <RelativeLayout
-                android:id="@+id/main_linear"
-                android:layout_marginTop="?attr/actionBarSize"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <FrameLayout
-                    android:id="@+id/content_f"
-                    android:layout_height="match_parent"
-                    android:layout_width="match_parent"/>
-            </RelativeLayout>
+                android:layout_marginTop="?attr/actionBarSize"/>
         </android.support.design.widget.CoordinatorLayout>
 
         <android.support.design.widget.NavigationView
@@ -63,6 +52,18 @@
             app:itemTextColor="@color/gray"
             app:itemIconTint="@color/gray"/>
 
-    </android.support.v4.widget.DrawerLayout>
+    </android.support.v4.widget.DrawerLayout>    
+    <LinearLayout
+        android:id="@+id/searchbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorAccent">
+        <EditText 
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_gravity="bottom"+/>
+                
+    </LinearLayout>
 </RelativeLayout>
 

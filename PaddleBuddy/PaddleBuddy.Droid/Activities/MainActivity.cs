@@ -5,6 +5,7 @@ using Android.Support.Design.Widget;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
+using Android.Util;
 using Android.Views;
 using Android.Widget;
 using PaddleBuddy.Core.Services;
@@ -38,8 +39,23 @@ namespace PaddleBuddy.Droid.Activities
 
             _navigationView = (NavigationView) FindViewById(Resource.Id.nav_view);
             _navigationView.SetNavigationItemSelectedListener(this);
-            
+            SetSearchBarHeight();
             OnNavigationItemSelected();
+        }
+
+        private void SetSearchBarHeight()
+        {
+            var resourceId = Resources.GetIdentifier("status_bar_height", "dimen", "android");
+            var typedValue = new TypedValue();
+            if (resourceId > 0 && Theme.ResolveAttribute(Android.Resource.Attribute.ActionBarSize, typedValue, true))
+            {
+                var height = Resources.GetDimensionPixelSize(resourceId) + TypedValue.ComplexToDimensionPixelSize(typedValue.Data, Resources.DisplayMetrics);
+                FindViewById(Resource.Id.searchbar).SetMinimumHeight(height);
+            }
+            else
+            {
+                throw new Exception("unable to set searchbar height");
+            }
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
