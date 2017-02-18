@@ -13,6 +13,7 @@ namespace PaddleBuddy.Droid.Services
     public class StorageService : ApiService
     {
         private static StorageService _storageService;
+        private static object locker = new object();
         private string[] names = { "points", "rivers", "links" };
 
         public static StorageService GetInstance()
@@ -130,16 +131,19 @@ namespace PaddleBuddy.Droid.Services
 
         public void SaveSerializedToFile(string json, string name)
         {
-            var path = GetPath(name);
-            if (File.Exists(path))
+            lock (locker)
             {
-                File.Delete(path);
-            }
-            using (var file = File.Open(path, FileMode.Create, FileAccess.Write))
-            {
-                using (var stream = new StreamWriter(file))
+                var path = GetPath(name);
+                if (File.Exists(path))
                 {
-                    stream.Write(json);
+                    File.Delete(path);
+                }
+                using (var file = File.Open(path, FileMode.Create, FileAccess.Write))
+                {
+                    using (var stream = new StreamWriter(file))
+                    {
+                        stream.Write(json);
+                    }
                 }
             }
         }

@@ -18,6 +18,7 @@ namespace PaddleBuddy.Droid.Services
         /// 
         /// </summary>
         private const int TIME_DELAY = 1100; //
+        private const double FRACTION_OFF_TRACK = 0.3;
 
         public static bool Stop { get; set; }
         private static Random Random { get; set; }
@@ -28,10 +29,10 @@ namespace PaddleBuddy.Droid.Services
             LS.StopListening();
             Stop = false;
             Random = new Random();
-            Task.Run(() => Simulate(points));
+            Task.Run(() => Simulate(points, FRACTION_OFF_TRACK));
         }
 
-        public static async void Simulate(List<Point> points)
+        public static async void Simulate(List<Point> points, double fractionTestOffTrack)
         {
             if (Stop) return;
             LS.StopListening();
@@ -52,8 +53,8 @@ namespace PaddleBuddy.Droid.Services
                 }
                 SetCurrent(point);
                 await Task.Delay(TIME_DELAY);
-                var rand = Random.Next(1, 3);
-                if (rand == 2)
+                var rand = Random.Next(1, 11);
+                if (rand <= (int)(fractionTestOffTrack * 10))
                 {
                     await TestOffTrack();
                 }

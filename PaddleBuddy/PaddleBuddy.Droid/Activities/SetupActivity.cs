@@ -66,7 +66,8 @@ namespace PaddleBuddy.Droid.Activities
 
         private void TryToStartMainActivity()
         {
-            LogService.Log(string.Format("trying to start main activity... _mainactivitystarted = {0} _dbready = {1} _locationpermissionapproved = {2} _locationready = {3}", _mainActivityStarted, _dbReady, _locationPermissionApproved, _locationReady));
+            LogService.Log(
+                $"trying to start main activity... _mainactivitystarted = {_mainActivityStarted} _dbready = {_dbReady} _locationpermissionapproved = {_locationPermissionApproved} _locationready = {_locationReady}");
             if (!_mainActivityStarted & _dbReady & _locationPermissionApproved & _locationReady)
             {
                 _mainActivityStarted = true;

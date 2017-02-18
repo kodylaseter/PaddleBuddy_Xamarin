@@ -37,6 +37,7 @@ namespace PaddleBuddy.Droid.Fragments
         private MarkerOptions _currentMarkerOptions;
         private TextView _speedTextView;
 
+
         private const int NAV_ZOOM = 16;
         private const int BROWSE_ZOOM = 8;
         private const int NAV_TILT = 70;
@@ -135,32 +136,36 @@ namespace PaddleBuddy.Droid.Fragments
                 LogService.Log("No navigation update. tripData not configured correctly");
                 return;
             }
-            if (!TripManager.HasStarted)
+            if (TripManager.HasStarted)
             {
-                AnimateCameraBounds(new[] {CurrentLocation, TripManager.NextPoint});
-                if (!TripManager.CloseToStart(CurrentLocation))
+                if (TripManager.IsOnTrack(TripManager.PreviousPoint, TripManager.NextPoint, CurrentLocation))
                 {
-                    UpdateMapBar("Distance remaining " + TripManager.DistanceToNext(CurrentLocation) + " meters");
+                    NavigateCamera();
+                    UpdateMapBar(TripManager.NextPoint.Id.ToString());
+                    if (TripManager.CloseToNext(CurrentLocation))
+                    {
+                        if (TripManager.HasNext)
+                        {
+                            TripManager.Increment();
+                        }
+                        else
+                        {
+                            LogService.Log("Finished trip!");
+                            MapMode = MapModes.Browse;
+                        }
+                    }
+                    UpdateSpeed();
                 }
                 else
                 {
-                    //todo check if hasnext
-                    TripManager.Increment();
+                    HideSpeed();
+                    AnimateCameraBounds(new[] {CurrentLocation, TripManager.NextPoint});
+                    //string updateText = PBUtilities.DistanceInMetersFromPointToLine();
+                    UpdateMapBar($"Navigate to river - {updateText}");
                 }
             }
             else
             {
-                if (!TripManager.IsOnTrack(TripManager.LastPoint, TripManager.NextPoint, CurrentLocation))
-                {
-                    LogService.Log("Off track!");
-                    SimulatorService.Stop = true;
-                    //var nextDestination = DatabaseService.GetInstance().PickNextDestination(CurrentLocation, TripManager);
-                    //setup navigate for this
-                }
-                NavigateCamera();
-
-                //todo: fix this
-                UpdateMapBar(TripManager.NextPoint.Id.ToString());
                 if (TripManager.CloseToNext(CurrentLocation))
                 {
                     if (TripManager.HasNext)
@@ -173,9 +178,14 @@ namespace PaddleBuddy.Droid.Fragments
                         MapMode = MapModes.Browse;
                     }
                 }
-                UpdateSpeed();
+                else
+                {
+                    HideSpeed();
+                    AnimateCameraBounds(new[] { CurrentLocation, TripManager.NextPoint });
+                    UpdateMapBar("Navigate to river");
+                }
             }
-
+            
         }
 
         private void Setup()
@@ -484,7 +494,7 @@ namespace PaddleBuddy.Droid.Fragments
             }
         }
 
-        private void AnimateCameraBounds(Point[] points)
+        private void AnimateCameraBounds(Point[] points, bool useBearingBetweenFirstTwo = false)
         {
             if (MapIsNull) return;
             var builder = new LatLngBounds.Builder();
