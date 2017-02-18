@@ -20,7 +20,6 @@ namespace PaddleBuddy.Droid.Activities
         private Toolbar _toolbar;
         private DrawerLayout _drawer;
         private NavigationView _navigationView;
-        private LinearLayout _subBarLayout;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -39,8 +38,7 @@ namespace PaddleBuddy.Droid.Activities
 
             _navigationView = (NavigationView) FindViewById(Resource.Id.nav_view);
             _navigationView.SetNavigationItemSelectedListener(this);
-
-            _subBarLayout = (LinearLayout) FindViewById(Resource.Id.subbar_layout);
+            
             OnNavigationItemSelected();
         }
 
@@ -57,7 +55,7 @@ namespace PaddleBuddy.Droid.Activities
             {
                 //todo: fix this for search
                 //FindViewById(Resource.Id.search_linear_layout).Visibility = ViewStates.Visible;
-                _subBarLayout.Visibility = _subBarLayout.Visibility == ViewStates.Gone ? ViewStates.Visible : ViewStates.Gone;
+                var a = 5;
             }
             return base.OnOptionsItemSelected(item);
         }
