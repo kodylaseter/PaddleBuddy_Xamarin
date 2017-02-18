@@ -73,11 +73,11 @@ namespace PaddleBuddy.Core.Services
         {
             //list of points and their distances to the currentlocation
             var tripPoints = tripManager.Points;
-            List<Tuple<Point, double>> pointsToCheck = new List<Tuple<Point, double>>();
-            //pointsToCheck.RemoveAll(p => PBUtilities.DistanceInMeters(current, p) > POINT_TOO_FAR_AWAY);
-            for (int i = _points.Count - 1; i >= 0; i--)
+            var pointsToCheck = new List<Tuple<Point, double>>();
+            //tripPoints.RemoveAll(p => PBUtilities.DistanceInMeters(current, p) > POINT_TOO_FAR_AWAY);
+            for (var i = tripPoints.Count - 1; i >= 0; i--)
             {
-                var dist = PBUtilities.DistanceInMeters(current, _points[i]);
+                var dist = PBUtilities.DistanceInMeters(current, tripPoints[i]);
                 if (dist > POINT_TOO_FAR_AWAY)
                 {
                     tripPoints.RemoveAt(i);
@@ -92,8 +92,8 @@ namespace PaddleBuddy.Core.Services
             foreach (var tup in pointsToCheck)
             {
                 var point = tup.Item1;
-                var next = DatabaseService.GetInstance().GetNextPoint(point);
-                var dist = PBUtilities.DistanceInMetersFromPointToLine(point, next, current);
+                var next = GetInstance().GetNextPoint(point);
+                var dist = PBUtilities.DistanceInMetersFromPointToLineSegment(point, next, current);
                 if (dist < closestNextPoint.Item2)
                 {
                     closestNextPoint = new Tuple<Point, double>(next, dist);

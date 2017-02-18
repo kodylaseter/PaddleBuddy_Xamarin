@@ -125,7 +125,7 @@ namespace PaddleBuddy.Core.Utilities
         /// <param name="lineEnd"></param>
         /// <param name="point"></param>
         /// <returns></returns>
-        public static double DistanceInMetersFromPointToLine(Point lineStart, Point lineEnd, Point point)
+        public static double DistanceInMetersFromPointToLineSegment(Point lineStart, Point lineEnd, Point point)
         {
             var distanceInMeters = DistanceInMeters(lineStart, point);
             var startToPointBearing = deg2rad(BearingBetweenPoints(lineStart, point));
@@ -133,7 +133,7 @@ namespace PaddleBuddy.Core.Utilities
             var dXt =
                 Math.Asin(Math.Sin(distanceInMeters / EARTH_RADIUS_IN_METERS) * Math.Sin(startToPointBearing - lineBearing)) *
                 EARTH_RADIUS_IN_METERS;
-            return dXt;
+            return Math.Abs(dXt);
         }
 
         //returns in miles

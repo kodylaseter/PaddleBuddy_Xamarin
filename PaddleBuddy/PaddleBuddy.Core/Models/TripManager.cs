@@ -42,7 +42,10 @@ namespace PaddleBuddy.Core.Models
             get { return Index > 0; }
         }
 
-
+        public bool HasPrevious
+        {
+            get { return Index > 0 && Points.Count > 0 && Points.ElementAt(Index - 1) != null; }
+        }
 
         public void Increment()
         {
@@ -51,7 +54,7 @@ namespace PaddleBuddy.Core.Models
 
         public void UpdateForNewDestination(Point newDestination)
         {
-            Index = Points.IndexOf(newDestination);
+            Index = Points.IndexOf(Points.Single(p => p.Id == newDestination.Id));
         }
 
         /// <summary>
@@ -63,7 +66,7 @@ namespace PaddleBuddy.Core.Models
         /// <returns></returns>
         public bool IsOnTrack(Point lineStart, Point lineEnd, Point current)
         {
-            var dist = PBUtilities.DistanceInMetersFromPointToLine(lineStart, lineEnd, current);
+            var dist = PBUtilities.DistanceInMetersFromPointToLineSegment(lineStart, lineEnd, current);
             return Math.Abs(dist) < IS_CLOSE_THRESHOLD;
         }
 

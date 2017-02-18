@@ -24,6 +24,7 @@ namespace PaddleBuddy.Droid.Fragments
     public class MapFragment : BaseFragment, IOnMapReadyCallback, GoogleMap.IOnMarkerClickListener, GoogleMap.IOnMapClickListener, GoogleMap.IInfoWindowAdapter
     {
         private Marker _currentMarker;
+        private Marker _currentDestination;
         private GoogleMap _myMap;
         private MapView _mapView;
         public bool IsLoading { get; set; }
@@ -136,6 +137,8 @@ namespace PaddleBuddy.Droid.Fragments
                 LogService.Log("No navigation update. tripData not configured correctly");
                 return;
             }
+            DrawLine(TripManager.Points);
+            DrawCurrentDestination(TripManager.NextPoint);
             if (TripManager.HasStarted)
             {
                 if (TripManager.IsOnTrack(TripManager.PreviousPoint, TripManager.NextPoint, CurrentLocation))
@@ -159,9 +162,22 @@ namespace PaddleBuddy.Droid.Fragments
                 else
                 {
                     HideSpeed();
-                    AnimateCameraBounds(new[] {CurrentLocation, TripManager.NextPoint});
-                    //string updateText = PBUtilities.DistanceInMetersFromPointToLine();
-                    UpdateMapBar($"Navigate to river - {updateText}");
+                    var newDestination = DatabaseService.GetInstance().PickNextDestination(CurrentLocation, TripManager);
+                    AnimateCameraBounds(new[] {CurrentLocation, newDestination});
+                    TripManager.UpdateForNewDestination(newDestination);
+                    string distance;
+                    if (TripManager.HasPrevious)
+                    {
+                        distance =
+                            PBUtilities.DistanceInMetersFromPointToLineSegment(TripManager.PreviousPoint, TripManager.NextPoint,
+                                CurrentLocation).ToString();
+                    }
+                    else
+                    {
+                        distance = PBUtilities.DistanceInMeters(CurrentLocation, TripManager.NextPoint).ToString();
+                    }
+                    //string updateText = PBUtilities.DistanceInMetersFromPointToLineSegment();
+                    UpdateMapBar($"Navigate to river - {distance}m");
                 }
             }
             else
@@ -400,12 +416,12 @@ namespace PaddleBuddy.Droid.Fragments
         private void DrawMarker(Point p)
         {
             if (MapIsNull) return;
-            var marker = new MarkerOptions().SetPosition(new LatLng(p.Lat, p.Lng));
+            var marker = new MarkerOptions().SetPosition(AndroidUtils.ToLatLng(p));
             if (p.IsLaunchSite) marker.SetTitle(p.Label).SetSnippet(p.Id.ToString());
             MyMap.AddMarker(marker);
         }
 
-        private void DrawLine(Point[] points)
+        private void DrawLine(List<Point> points)
         {
             if (MapIsNull) return;
             var polyOpts = new PolylineOptions()
@@ -422,7 +438,7 @@ namespace PaddleBuddy.Droid.Fragments
         private void DrawLine(Path path)
         {
             if (MapIsNull || path == null || path.Points.Count < 2) return;
-            DrawLine(path.Points.ToArray());
+            DrawLine(path.Points);
         }
 
         private void DrawLine(Point start, Point end)
@@ -449,6 +465,20 @@ namespace PaddleBuddy.Droid.Fragments
             catch (Exception e)
             {
                 LogService.Log(e.Message);
+            }
+        }
+
+        private void DrawCurrentDestination(Point p)
+        {
+            if (MapIsNull) return;
+            var position = AndroidUtils.ToLatLng(p);
+            if (_currentDestination != null)
+            {
+                _currentDestination.Position = position;
+            }
+            else
+            {
+                _currentDestination = MyMap.AddMarker(new MarkerOptions().SetPosition(position));
             }
         }
 

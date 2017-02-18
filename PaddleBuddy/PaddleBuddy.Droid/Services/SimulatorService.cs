@@ -18,7 +18,7 @@ namespace PaddleBuddy.Droid.Services
         /// 
         /// </summary>
         private const int TIME_DELAY = 1100; //
-        private const double FRACTION_OFF_TRACK = 0.3;
+        private const double FRACTION_OFF_TRACK = 0.5;
 
         public static bool Stop { get; set; }
         private static Random Random { get; set; }
