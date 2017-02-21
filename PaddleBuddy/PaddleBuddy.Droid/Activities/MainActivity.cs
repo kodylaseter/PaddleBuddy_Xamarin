@@ -37,26 +37,25 @@ namespace PaddleBuddy.Droid.Activities
             _drawer.SetDrawerListener(toggle);
             toggle.SyncState();
 
-            _navigationView = (NavigationView) FindViewById(Resource.Id.nav_view);
+            _navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
             _navigationView.SetNavigationItemSelectedListener(this);
-            SetSearchBarHeight();
             OnNavigationItemSelected();
         }
 
-        private void SetSearchBarHeight()
-        {
-            var resourceId = Resources.GetIdentifier("status_bar_height", "dimen", "android");
-            var typedValue = new TypedValue();
-            if (resourceId > 0 && Theme.ResolveAttribute(Android.Resource.Attribute.ActionBarSize, typedValue, true))
-            {
-                var height = Resources.GetDimensionPixelSize(resourceId) + TypedValue.ComplexToDimensionPixelSize(typedValue.Data, Resources.DisplayMetrics);
-                FindViewById(Resource.Id.searchbar).SetMinimumHeight(height);
-            }
-            else
-            {
-                throw new Exception("unable to set searchbar height");
-            }
-        }
+        //private void SetSearchBarHeight()
+        //{
+        //    var resourceId = Resources.GetIdentifier("status_bar_height", "dimen", "android");
+        //    var typedValue = new TypedValue();
+        //    if (resourceId > 0 && Theme.ResolveAttribute(Android.Resource.Attribute.ActionBarSize, typedValue, true))
+        //    {
+        //        var height = Resources.GetDimensionPixelSize(resourceId) + TypedValue.ComplexToDimensionPixelSize(typedValue.Data, Resources.DisplayMetrics);
+        //        FindViewById(Resource.Id.searchbar).SetMinimumHeight(height);
+        //    }
+        //    else
+        //    {
+        //        throw new Exception("unable to set searchbar height");
+        //    }
+        //}
 
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
@@ -68,10 +67,8 @@ namespace PaddleBuddy.Droid.Activities
         {
             int id = item.ItemId;
             if (id == Resource.Id.action_search)
-            {
-                //todo: fix this for search
-                //FindViewById(Resource.Id.search_linear_layout).Visibility = ViewStates.Visible;
-                var a = 5;
+            { 
+                //blah
             }
             return base.OnOptionsItemSelected(item);
         }

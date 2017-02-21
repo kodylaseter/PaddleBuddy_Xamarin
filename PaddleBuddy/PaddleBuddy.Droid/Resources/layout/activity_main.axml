@@ -53,17 +53,30 @@
             app:itemIconTint="@color/gray"/>
 
     </android.support.v4.widget.DrawerLayout>    
-    <LinearLayout
+    <!--<RelativeLayout
         android:id="@+id/searchbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:background="@color/colorAccent">
-        <EditText 
-            android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:visibility="gone">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_gravity="bottom"+/>
-                
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@*android:dimen/status_bar_height">
+            <ImageButton
+                android:id="@+id/close_searchbar_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_clear_white_36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+            <EditText
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_toLeftOf="@id/close_searchbar_button"/>
+        </RelativeLayout>
+    </R-->elativeLayout>
 </RelativeLayout>
 
