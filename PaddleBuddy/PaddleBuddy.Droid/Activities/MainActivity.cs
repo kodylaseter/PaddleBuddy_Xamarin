@@ -22,6 +22,9 @@ namespace PaddleBuddy.Droid.Activities
         private NavigationView _navigationView;
         private ListView _searchListView;
         private ArrayAdapter<string> _searchArrayAdapter;
+        private ActionBarDrawerToggle _toggle;
+        private LinearLayout _searchLayout;
+        private SearchView _searchView;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -33,16 +36,19 @@ namespace PaddleBuddy.Droid.Activities
             SetSupportActionBar(_toolbar);
 
             _drawer = (DrawerLayout) FindViewById(Resource.Id.drawer_layout);
-            var toggle = new ActionBarDrawerToggle(this, _drawer, _toolbar, Resource.String.navigation_drawer_open,
+            _toggle = new ActionBarDrawerToggle(this, _drawer, _toolbar, Resource.String.navigation_drawer_open,
                 Resource.String.navigation_drawer_close);
-            _drawer.SetDrawerListener(toggle);
-            toggle.SyncState();
+            _drawer.SetDrawerListener(_toggle);
+            _toggle.SyncState();
 
             _navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
             _navigationView.SetNavigationItemSelectedListener(this);
             OnNavigationItemSelected();
 
             _searchListView = FindViewById<ListView>(Resource.Id.search_list_view);
+            _searchLayout = FindViewById<LinearLayout>(Resource.Id.search_results_layout);
+            _searchLayout.Clickable = true;
+            _searchLayout.Click += (s,e) => { SearchClosed(); };
             var _searchItems = new[] {"test1", "abc", "def", "testttt", "gerogia", "blah"};
             _searchArrayAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, _searchItems);
             _searchListView.Adapter = _searchArrayAdapter;
@@ -67,17 +73,20 @@ namespace PaddleBuddy.Droid.Activities
         {
             MenuInflater.Inflate(Resource.Menu.main_menu, menu);
             var searchItem = menu.FindItem(Resource.Id.action_search);
-            var searchView = (SearchView) searchItem.ActionView;
-            searchView.QueryTextChange += (s, e) =>
+            _searchView = (SearchView) searchItem.ActionView;
+
+            _searchView.QueryTextChange += (sender, args) =>
             {
-                LogService.Log("typing: " + e.NewText);
-                _searchArrayAdapter.Filter.InvokeFilter(e.NewText);
+                LogService.Log("typing: " + args.NewText);
+                _searchArrayAdapter.Filter.InvokeFilter(args.NewText);
             };
-            searchView.QueryTextSubmit += (s, e) =>
+            _searchView.QueryTextSubmit += (sender, args) =>
             {
-                LogService.Log("query text submitted: " + e.Query);
-                e.Handled = true;
+                LogService.Log("query text submitted: " + args.Query);
+                args.Handled = true;
             };
+            _searchView.Focusable = true;
+            _searchView.Iconified = false;
             return base.OnCreateOptionsMenu(menu);
         }
 
@@ -85,8 +94,9 @@ namespace PaddleBuddy.Droid.Activities
         {
             int id = item.ItemId;
             if (id == Resource.Id.action_search)
-            { 
-                
+            {
+                _searchView.RequestFocusFromTouch();
+                SearchOpened();
             }
             return base.OnOptionsItemSelected(item);
         }
@@ -132,11 +142,25 @@ namespace PaddleBuddy.Droid.Activities
             }
         }
 
+        private void SearchOpened()
+        {
+            _searchLayout.Visibility = ViewStates.Visible;
+        }
+
+        private void SearchClosed()
+        {
+            _searchLayout.Visibility = ViewStates.Gone;
+             _searchView.Iconified = true;
+        }
+
         public override void OnBackPressed()
         {
             if (_drawer.IsDrawerOpen(GravityCompat.Start))
             {
                 _drawer.CloseDrawer(GravityCompat.Start);
+            } else if (!_searchView.Iconified)
+            {
+                _searchView.Iconified = true;
             }
             else
             {
