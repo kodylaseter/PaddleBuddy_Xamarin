@@ -5,7 +5,6 @@ using Android.Support.Design.Widget;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
-using Android.Util;
 using Android.Views;
 using Android.Widget;
 using PaddleBuddy.Core.Services;
@@ -21,6 +20,8 @@ namespace PaddleBuddy.Droid.Activities
         private Toolbar _toolbar;
         private DrawerLayout _drawer;
         private NavigationView _navigationView;
+        private ListView _searchListView;
+        private ArrayAdapter<string> _searchArrayAdapter;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -40,6 +41,11 @@ namespace PaddleBuddy.Droid.Activities
             _navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
             _navigationView.SetNavigationItemSelectedListener(this);
             OnNavigationItemSelected();
+
+            _searchListView = FindViewById<ListView>(Resource.Id.search_list_view);
+            var _searchItems = new[] {"test1", "abc", "def", "testttt", "gerogia", "blah"};
+            _searchArrayAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, _searchItems);
+            _searchListView.Adapter = _searchArrayAdapter;
         }
 
         //private void SetSearchBarHeight()
@@ -60,6 +66,18 @@ namespace PaddleBuddy.Droid.Activities
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
             MenuInflater.Inflate(Resource.Menu.main_menu, menu);
+            var searchItem = menu.FindItem(Resource.Id.action_search);
+            var searchView = (SearchView) searchItem.ActionView;
+            searchView.QueryTextChange += (s, e) =>
+            {
+                LogService.Log("typing: " + e.NewText);
+                _searchArrayAdapter.Filter.InvokeFilter(e.NewText);
+            };
+            searchView.QueryTextSubmit += (s, e) =>
+            {
+                LogService.Log("query text submitted: " + e.Query);
+                e.Handled = true;
+            };
             return base.OnCreateOptionsMenu(menu);
         }
 
@@ -68,7 +86,7 @@ namespace PaddleBuddy.Droid.Activities
             int id = item.ItemId;
             if (id == Resource.Id.action_search)
             { 
-                //blah
+                
             }
             return base.OnOptionsItemSelected(item);
         }

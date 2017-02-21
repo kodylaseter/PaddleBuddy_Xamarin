@@ -39,6 +39,20 @@
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
                 android:layout_marginTop="?attr/actionBarSize"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="?attr/actionBarSize"
+                android:orientation="vertical">
+                <ListView
+                    android:id="@+id/search_list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/gray">
+                    
+                </ListView>
+            </LinearLayout>
         </android.support.design.widget.CoordinatorLayout>
 
         <android.support.design.widget.NavigationView
@@ -77,6 +91,6 @@
                 android:layout_width="match_parent"
                 android:layout_toLeftOf="@id/close_searchbar_button"/>
         </RelativeLayout>
-    </R-->elativeLayout>
+    </RelativeLayout>-->
 </RelativeLayout>
 
