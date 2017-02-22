@@ -41,8 +41,8 @@ namespace PaddleBuddy.Droid.Activities
         private void SetupSysPrefs()
         {
             SysPrefs.Device = SysPrefs.Devices.Android;
-            SysPrefs.TestOffline = false;
-            SysPrefs.DisableMap = false;
+            SysPrefs.TestOffline = true;
+            SysPrefs.DisableMap = true;
             SysPrefs.Simulate = true;
         }
 

@@ -2,6 +2,7 @@ using System;
 using Android.App;
 using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -15,7 +16,7 @@ using Toolbar = Android.Support.V7.Widget.Toolbar;
 namespace PaddleBuddy.Droid.Activities
 {
     [Activity(Label = "PaddleBuddy", Theme = "@style/AppTheme")]
-    public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener
+    public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, MenuItemCompat.IOnActionExpandListener
     {
         private Toolbar _toolbar;
         private DrawerLayout _drawer;
@@ -25,6 +26,7 @@ namespace PaddleBuddy.Droid.Activities
         private ActionBarDrawerToggle _toggle;
         private LinearLayout _searchLayout;
         private SearchView _searchView;
+        private IMenuItem _searchItem;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -48,8 +50,8 @@ namespace PaddleBuddy.Droid.Activities
             _searchListView = FindViewById<ListView>(Resource.Id.search_list_view);
             _searchLayout = FindViewById<LinearLayout>(Resource.Id.search_results_layout);
             _searchLayout.Clickable = true;
-            _searchLayout.Click += (s,e) => { SearchClosed(); };
-            var _searchItems = new[] {"test1", "abc", "def", "testttt", "gerogia", "blah"};
+            _searchLayout.Click += (s,e) => { CloseSearch(); };
+            var _searchItems = new[] {"test1", "abc", "def", "testttt"};
             _searchArrayAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, _searchItems);
             _searchListView.Adapter = _searchArrayAdapter;
         }
@@ -72,8 +74,11 @@ namespace PaddleBuddy.Droid.Activities
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
             MenuInflater.Inflate(Resource.Menu.main_menu, menu);
-            var searchItem = menu.FindItem(Resource.Id.action_search);
-            _searchView = (SearchView) searchItem.ActionView;
+            _searchItem = menu.FindItem(Resource.Id.action_search);
+            _searchView = (SearchView) _searchItem.ActionView;
+            MenuItemCompat.SetOnActionExpandListener(_searchItem, this);
+
+
 
             _searchView.QueryTextChange += (sender, args) =>
             {
@@ -86,7 +91,6 @@ namespace PaddleBuddy.Droid.Activities
                 args.Handled = true;
             };
             _searchView.Focusable = true;
-            _searchView.Iconified = false;
             return base.OnCreateOptionsMenu(menu);
         }
 
@@ -95,8 +99,7 @@ namespace PaddleBuddy.Droid.Activities
             int id = item.ItemId;
             if (id == Resource.Id.action_search)
             {
-                _searchView.RequestFocusFromTouch();
-                SearchOpened();
+                OpenSearch();
             }
             return base.OnOptionsItemSelected(item);
         }
@@ -142,30 +145,49 @@ namespace PaddleBuddy.Droid.Activities
             }
         }
 
-        private void SearchOpened()
+        private void OpenSearch()
         {
             _searchLayout.Visibility = ViewStates.Visible;
+            _searchView.Iconified = false;
         }
 
-        private void SearchClosed()
+        private void CloseSearch()
         {
             _searchLayout.Visibility = ViewStates.Gone;
-             _searchView.Iconified = true;
+            _searchView.Iconified = true;
         }
 
+
+        //todo: figure out why this doesnt call when the search view is open
         public override void OnBackPressed()
         {
             if (_drawer.IsDrawerOpen(GravityCompat.Start))
             {
                 _drawer.CloseDrawer(GravityCompat.Start);
-            } else if (!_searchView.Iconified)
+            }
+            else if (_searchItem.IsVisible)
             {
-                _searchView.Iconified = true;
+                CloseSearch();
             }
             else
             {
                 base.OnBackPressed();
             }
+        }
+
+        public bool OnMenuItemActionCollapse(IMenuItem item)
+        {
+            var id = item.ItemId;
+            if (id == Resource.Id.action_search)
+            {
+                CloseSearch();
+            }
+            return true;
+        }
+
+        public bool OnMenuItemActionExpand(IMenuItem item)
+        {
+            return true;
         }
 
         private enum NavDraweritems

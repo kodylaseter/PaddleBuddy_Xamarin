@@ -119,7 +119,7 @@ namespace PaddleBuddy.Core.Utilities
 
         /// <summary>
         /// http://www.movable-type.co.uk/scripts/latlong.html
-        /// cross-track distance
+        /// 
         /// </summary>
         /// <param name="lineStart"></param>
         /// <param name="lineEnd"></param>
@@ -127,13 +127,30 @@ namespace PaddleBuddy.Core.Utilities
         /// <returns></returns>
         public static double DistanceInMetersFromPointToLineSegment(Point lineStart, Point lineEnd, Point point)
         {
+            //var pointToLineCrossTrack = CrossTrackError(lineStart, lineEnd, point);
+            //todo: fix
+            return 0;
+
+        }
+
+        /// <summary>
+        /// Calculates the distance from a point to a line around a sphere
+        /// line is defined by start and end points, but continues forever
+        /// http://www.movable-type.co.uk/scripts/latlong.html
+        /// </summary>
+        /// <param name="lineStart"></param>
+        /// <param name="lineEnd"></param>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        private static double CrossTrackError(Point lineStart, Point lineEnd, Point point)
+        {
             var distanceInMeters = DistanceInMeters(lineStart, point);
             var startToPointBearing = deg2rad(BearingBetweenPoints(lineStart, point));
             var lineBearing = deg2rad(BearingBetweenPoints(lineStart, lineEnd));
             var dXt =
                 Math.Asin(Math.Sin(distanceInMeters / EARTH_RADIUS_IN_METERS) * Math.Sin(startToPointBearing - lineBearing)) *
                 EARTH_RADIUS_IN_METERS;
-            return Math.Abs(dXt);
+            return dXt;
         }
 
         //returns in miles
