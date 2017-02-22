@@ -162,7 +162,6 @@
   <ItemGroup>
     <Compile Include="Activities\MainActivity.cs" />
     <Compile Include="Activities\SetupActivity.cs" />
-    <Compile Include="CustomControls\CustomSearchView.cs" />
     <Compile Include="Fragments\BaseFragment.cs" />
     <Compile Include="Fragments\PlanFragment.cs" />
     <Compile Include="Fragments\MapFragment.cs" />

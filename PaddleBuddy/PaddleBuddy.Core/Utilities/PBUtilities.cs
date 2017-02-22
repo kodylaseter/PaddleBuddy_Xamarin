@@ -15,6 +15,7 @@ namespace PaddleBuddy.Core.Utilities
         private static double EARTH_RADIUS_IN_KM = 6371;
 
         /// <summary>
+        /// returns degrees
         /// credit: http://www.movable-type.co.uk/scripts/latlong.html
         /// </summary>
         /// <param name="start"></param>
@@ -127,10 +128,55 @@ namespace PaddleBuddy.Core.Utilities
         /// <returns></returns>
         public static double DistanceInMetersFromPointToLineSegment(Point lineStart, Point lineEnd, Point point)
         {
-            //var pointToLineCrossTrack = CrossTrackError(lineStart, lineEnd, point);
-            //todo: fix
-            return 0;
+            var angleFromPointToStartToEnd = AngleBetweenPoints(point, lineStart, lineEnd);
+            var angleFromPointToEndToStart = AngleBetweenPoints(point, lineEnd, lineStart);
+            //need to determine distance from 
+            if (angleFromPointToStartToEnd > 90 && angleFromPointToEndToStart > 90)
+            {
+                throw new Exception("Something wrong in DistanceInMetersFromPointToLineSegment");
+                return double.MaxValue;
+            }
+            if (angleFromPointToStartToEnd > 90) //return distance from point to start
+            {
+                return DistanceInMeters(point, lineStart);
+            }
+            if (angleFromPointToEndToStart > 90) //return distance from point to end
+            {
+                return DistanceInMeters(point, lineEnd);
+            }
+            //return crosstrack
+            return CrossTrackError(lineStart, lineEnd, point);
+        }
 
+        /// <summary>
+        /// Angle in degrees between 3 points
+        /// From A-B-C
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        private static double AngleBetweenPoints(Point a, Point b, Point c)
+        {
+            var baBearing = BearingBetweenPoints(b, a);
+            var bcBearing = BearingBetweenPoints(b, c);
+            return AngleBetweenBearings(baBearing, bcBearing);
+        }
+
+        /// <summary>
+        /// Angle in degrees between 2 bearings
+        /// </summary>
+        /// <param name="b1"></param>
+        /// <param name="b2"></param>
+        /// <returns></returns>
+        private static double AngleBetweenBearings(double b1, double b2)
+        {
+            var angle = Math.Abs(b1 - b2);
+            if (angle > 180)
+            {
+                angle = 360 - angle;
+            }
+            return angle;
         }
 
         /// <summary>
