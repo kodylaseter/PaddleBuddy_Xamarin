@@ -50,10 +50,12 @@ namespace PaddleBuddy.Droid.Activities
             _searchListView = FindViewById<ListView>(Resource.Id.search_list_view);
             _searchLayout = FindViewById<LinearLayout>(Resource.Id.search_results_layout);
             _searchLayout.Clickable = true;
-            _searchLayout.Click += (s,e) => { CloseSearch(); };
+            _searchLayout.Click += (s,e) => { CloseSearch(true); };
             var _searchItems = new[] {"test1", "abc", "def", "testttt"};
             _searchArrayAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, _searchItems);
             _searchListView.Adapter = _searchArrayAdapter;
+
+            Window.SetSoftInputMode(SoftInput.AdjustNothing);
         }
 
         //private void SetSearchBarHeight()
@@ -141,7 +143,7 @@ namespace PaddleBuddy.Droid.Activities
             }
             catch (Exception e)
             {
-                LogService.Log(e);
+                LogService.Log(e.Message);
             }
         }
 
@@ -151,10 +153,14 @@ namespace PaddleBuddy.Droid.Activities
             _searchView.Iconified = false;
         }
 
-        private void CloseSearch()
+        private void CloseSearch(bool shouldCollapse)
         {
             _searchLayout.Visibility = ViewStates.Gone;
             _searchView.Iconified = true;
+            if (shouldCollapse)
+            {
+                _searchItem.CollapseActionView();
+            }
         }
 
 
@@ -165,9 +171,9 @@ namespace PaddleBuddy.Droid.Activities
             {
                 _drawer.CloseDrawer(GravityCompat.Start);
             }
-            else if (_searchItem.IsVisible)
+            else if (_searchItem.IsActionViewExpanded)
             {
-                CloseSearch();
+                CloseSearch(true);
             }
             else
             {
@@ -180,7 +186,7 @@ namespace PaddleBuddy.Droid.Activities
             var id = item.ItemId;
             if (id == Resource.Id.action_search)
             {
-                CloseSearch();
+                CloseSearch(false);
             }
             return true;
         }

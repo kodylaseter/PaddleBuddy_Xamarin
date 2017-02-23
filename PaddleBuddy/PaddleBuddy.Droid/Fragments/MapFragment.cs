@@ -75,7 +75,7 @@ namespace PaddleBuddy.Droid.Fragments
             }
             view.FindViewById<Button>(Resource.Id.plan_trip_button).Click += OnPlanTripButtonClicked;
             view.FindViewById<Button>(Resource.Id.test_simulate_button).Click += OnSimulateButtonClicked;
-            view.FindViewById<Button>(Resource.Id.cancel_trip_button).Click += OnCancelTripClicked;
+            view.FindViewById<ImageButton>(Resource.Id.cancel_trip_button).Click += OnCancelTripClicked;
             _speedTextView = view.FindViewById<TextView>(Resource.Id.speed_textview);
             _mapBarLayout = view.FindViewById<LinearLayout>(Resource.Id.mapbar_layout);
             _mapBarTextView1 = view.FindViewById<TextView>(Resource.Id.mapbar_text1);
@@ -141,11 +141,11 @@ namespace PaddleBuddy.Droid.Fragments
             DrawCurrentTrip();
             if (TripManager.HasStarted)
             {
-                if (TripManager.IsOnTrack(TripManager.PreviousPoint, TripManager.NextPoint, CurrentLocation))
+                if (TripManager.IsOnTrack(TripManager.PreviousPoint, TripManager.CurrentPoint, CurrentLocation))
                 {
-                    DrawCurrentDestination(TripManager.NextPoint);
+                    DrawCurrentDestination(TripManager.CurrentPoint);
                     NavigateCamera();
-                    UpdateMapBar(TripManager.NextPoint.Id.ToString());
+                    UpdateMapBar(TripManager.CurrentPoint.Id.ToString());
                     if (TripManager.CloseToNext(CurrentLocation))
                     {
                         if (TripManager.HasNext)
@@ -171,12 +171,12 @@ namespace PaddleBuddy.Droid.Fragments
                     {
                         distance =
                             PBUtilities.DistanceInMetersFromPointToLineSegment(TripManager.PreviousPoint,
-                                TripManager.NextPoint,
+                                TripManager.CurrentPoint,
                                 CurrentLocation);
                     }
                     else
                     {
-                        distance = PBUtilities.DistanceInMeters(CurrentLocation, TripManager.NextPoint);
+                        distance = PBUtilities.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint);
                     }
                     UpdateMapBar($"Navigate to river - {PBUtilities.FormatDistanceToMilesOrMeters(distance)}");
                 }
@@ -198,8 +198,8 @@ namespace PaddleBuddy.Droid.Fragments
                 else
                 {
                     HideSpeed();
-                    DrawCurrentDestination(TripManager.NextPoint);
-                    AnimateCameraBounds(new[] { CurrentLocation, TripManager.NextPoint });
+                    DrawCurrentDestination(TripManager.CurrentPoint);
+                    AnimateCameraBounds(new[] { CurrentLocation, TripManager.CurrentPoint });
                     UpdateMapBar("Navigate to river");
                 }
             }
@@ -228,6 +228,7 @@ namespace PaddleBuddy.Droid.Fragments
         private void SetupBrowse()
         {
             HideSpeed();
+            SimulatorService.GetInstance().StopSimulating();
             ClearTripData();
             try
             {
@@ -282,12 +283,12 @@ namespace PaddleBuddy.Droid.Fragments
                     p.Add(DatabaseService.GetInstance().GetPoint(88));
                     p.Add(DatabaseService.GetInstance().GetPoint(89));
                     SetupTripData(p);
-                    SimulatorService.StartSimulating(TripManager.Points);
+                    SimulatorService.GetInstance().StartSimulating(TripManager.Points);
                     break;
                 case 1: //chat test 7-42
                     p = DatabaseService.GetInstance().GetPath(2).Points;
                     SetupTripData(p);
-                    SimulatorService.StartSimulating(TripManager.Points);
+                    SimulatorService.GetInstance().StartSimulating(TripManager.Points);
                     break;
                 default:
                     break;
@@ -355,7 +356,7 @@ namespace PaddleBuddy.Droid.Fragments
             set
             {
                 _selectedMarkerPoint = value;
-                _planTripButton.Visibility = _selectedMarkerPoint != null ? ViewStates.Visible : ViewStates.Gone;
+                //_planTripButton?.Visibility = _selectedMarkerPoint != null ? ViewStates.Visible : ViewStates.Gone;
             }
         }
 
@@ -429,7 +430,7 @@ namespace PaddleBuddy.Droid.Fragments
         private void DrawCurrentTrip()
         {
             if (MapIsNull) return;
-            if (_currentTripPolyline == null) return;
+            if (_currentTripPolyline != null) return;
             _currentTripPolyline = DrawLine(TripManager.Points);
         }
 
@@ -509,9 +510,9 @@ namespace PaddleBuddy.Droid.Fragments
             if (MapIsNull) return;
             //trying to avoid setting bearing when points are too close to accurately calulate it
             var bearing = float.NaN;
-            if (PBUtilities.DistanceInMeters(CurrentLocation, TripManager.NextPoint) > SysPrefs.TripPointsCloseThreshold)
+            if (PBUtilities.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint) > SysPrefs.TripPointsCloseThreshold)
             {
-               bearing = PBUtilities.BearingBetweenPoints(CurrentLocation, TripManager.NextPoint);
+               bearing = PBUtilities.BearingBetweenPoints(CurrentLocation, TripManager.CurrentPoint);
             }
             var camPos = CameraUpdateBuilder(CurrentLocation, NAV_TILT, NAV_ZOOM, bearing);
             MyMap.AnimateCamera(camPos);

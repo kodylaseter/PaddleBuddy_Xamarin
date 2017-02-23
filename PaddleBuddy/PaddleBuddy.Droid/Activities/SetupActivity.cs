@@ -121,8 +121,8 @@ namespace PaddleBuddy.Droid.Activities
             get { return _locationPermissionApproved; }
             set
             {
-                Core.Services.LocationService.SetupLocation();
                 _locationPermissionApproved = value;
+                Core.Services.LocationService.GetInstance().SetupLocation();
                 TryToStartMainActivity();
             }
         }
@@ -138,7 +138,7 @@ namespace PaddleBuddy.Droid.Activities
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
-        {
+        { 
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             switch (requestCode)
             {

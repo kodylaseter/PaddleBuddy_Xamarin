@@ -6,12 +6,12 @@ namespace PaddleBuddy.Core.Services
     {
         public static void Log(string msg)
         {
-            Debug.WriteLine(msg);
+            Debug.WriteLine($"PB-G: {msg}");
         }
 
-        public static void Log(object o)
+        public static void TagAndLog(string tag, string msg)
         {
-            Debug.WriteLine(o);
+            Debug.WriteLine($"PB-{tag} {msg}");
         }
     }
 }

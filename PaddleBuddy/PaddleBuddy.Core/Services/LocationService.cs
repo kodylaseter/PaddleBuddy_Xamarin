@@ -22,7 +22,6 @@ namespace PaddleBuddy.Core.Services
             Geolocator.DesiredAccuracy = 5;
         }
 
-
         public static LocationService GetInstance()
         {
             return _locationService ?? (_locationService = new LocationService());
@@ -39,7 +38,7 @@ namespace PaddleBuddy.Core.Services
                 if (_currentLocation != null && _currentLocation.Time > 0 && time > 0)
                 {
                     var speed = PBUtilities.DistanceInMeters(tempLocation, CurrentLocation) / (tempLocation.Time - CurrentLocation.Time);
-                    if (speed > 0) //todo: attempting to filter out bad speeds
+                    if (speed > 0) //todo: filter out bad speeds
                     {
                         tempLocation.Speed = speed;
                     }
@@ -52,6 +51,7 @@ namespace PaddleBuddy.Core.Services
         public void StartListening()
         {
             if (Geolocator.IsListening) return;
+            Log("start listening");
             //parameters are milliseconds, meters
             Geolocator.StartListeningAsync(2000, 5, true);
             Geolocator.PositionChanged += OnPositionChanged;
@@ -59,22 +59,21 @@ namespace PaddleBuddy.Core.Services
 
         public void StopListening()
         {
+            Log("stop listening");
             Geolocator.StopListeningAsync();
         }
 
         private void OnPositionChanged(object sender, object eventArgs)
         {
-            LogService.Log("location updated");
-            var point = new Point();
+            Log("location updated");
             if (eventArgs.GetType() == typeof(PositionEventArgs))
             {
                 var args = (PositionEventArgs)eventArgs;
-                point = new Point
+                CurrentLocation = new Point
                 {
                     Lat = args.Position.Latitude,
                     Lng = args.Position.Longitude
                 };
-                CurrentLocation = point;
             }
             else if (eventArgs.GetType() == typeof(Point))
             {
@@ -83,15 +82,20 @@ namespace PaddleBuddy.Core.Services
             }
             else
             {
-                LogService.Log("OnPositionChanged error");
+                Log("OnPositionChanged error");
             }
         }
 
-        public static void SetupLocation()
+        public void SetupLocation()
         {
-            LogService.Log("Setting up location service");
+            Log("Setting up location service");
             GetInstance().StartListening();
             //GetInstance().GetLocationAsync();
+        }
+
+        private void Log(string msg)
+        {
+            LogService.TagAndLog("LOCSERV", msg);
         }
     }
 }

@@ -6,14 +6,12 @@ using PaddleBuddy.Core.Services;
 using PaddleBuddy.Core.Utilities;
 
 namespace PaddleBuddy.Core.Models
-{
-
-
+{ 
     public class TripManager
     {
-        private int Index { get; set; }
-        public List<Point> Points { get; set; }
 
+        private int _index;
+        private List<Point> _points;
         private const double IS_CLOSE_THRESHOLD = 100; //meters
 
         public TripManager()
@@ -22,12 +20,36 @@ namespace PaddleBuddy.Core.Models
         }
 
 
+        public int Index
+        {
+            get { return _index; }
+            set
+            {
+                _index = value;
+                if (HasCurrentPoint)
+                {
+                    LogService.Log($"Nextpoint changed to {Points[_index].Id}");
+                }
+            }
+        }
+
+
+        public List<Point> Points
+        {
+            get { return _points; }
+            set
+            {
+                _points = value; 
+                
+            }
+        }
+
         public Point StartPoint
         {
             get { return Points.First(); }
         }
 
-        public Point NextPoint
+        public Point CurrentPoint
         {
             get { return PointAt(Index); }
         }
@@ -45,6 +67,11 @@ namespace PaddleBuddy.Core.Models
         public bool HasPrevious
         {
             get { return Index > 0 && Points.Count > 0 && Points.ElementAt(Index - 1) != null; }
+        }
+
+        public bool HasCurrentPoint
+        {
+            get { return Points != null && Points.Count > 0 && Points.ElementAt(Index) != null; }
         }
 
         public void Increment()
@@ -87,7 +114,7 @@ namespace PaddleBuddy.Core.Models
 
         public double DistanceToNext(Point current)
         {
-            return PBUtilities.DistanceInMeters(current, NextPoint);
+            return PBUtilities.DistanceInMeters(current, CurrentPoint);
         }
 
         private Point PointAt(int index)

@@ -72,7 +72,7 @@ namespace PaddleBuddy.Core.Services
         public Point PickNextDestination(Point current, TripManager tripManager)
         {
             //list of points and their distances to the currentlocation
-            var tripPoints = tripManager.Points;
+            var tripPoints = tripManager.Points.ToList();
             var pointsToCheck = new List<Tuple<Point, double>>();
             //tripPoints.RemoveAll(p => PBUtilities.DistanceInMeters(current, p) > POINT_TOO_FAR_AWAY);
             for (var i = tripPoints.Count - 1; i >= 0; i--)
