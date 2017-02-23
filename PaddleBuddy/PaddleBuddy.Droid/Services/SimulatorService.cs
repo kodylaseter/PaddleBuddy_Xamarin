@@ -18,34 +18,35 @@ namespace PaddleBuddy.Droid.Services
         /// 
         /// </summary>
         private const int TIME_DELAY = 1100; //
-        private const double FRACTION_OFF_TRACK = 0.5;
+        private const double FRACTION_OFF_TRACK = 0.3;
 
-        public static bool Stop { get; set; }
+        public static bool StopSimulating { get; set; }
         private static Random Random { get; set; }
 
         public static void StartSimulating(List<Point> points)
         {
             LogService.Log("Started simulating");
             LS.StopListening();
-            Stop = false;
+            StopSimulating = false;
             Random = new Random();
             Task.Run(() => Simulate(points, FRACTION_OFF_TRACK));
         }
 
         public static async void Simulate(List<Point> points, double fractionTestOffTrack)
         {
-            if (Stop) return;
+            if (StopSimulating) return;
             LS.StopListening();
             SetCurrent(points.First());
+            int rand;
+            var tempPoints = points;
             await Task.Delay(TIME_DELAY);
-            foreach (var point in points)
+            foreach (var point in tempPoints)
             {
-                if (Stop) return;
+                if (StopSimulating) return;
                 var inc = PBUtilities.DistanceInMeters(LS.CurrentLocation, point)/SIM_INC;
                 while (PBUtilities.DistanceInMeters(LS.CurrentLocation, point) > SysPrefs.TripPointsCloseThreshold)
                 {
-                    if (Stop) return;
-                    //var newPoint = PBUtilities.PointBetween(LS.CurrentLocation, point, 0.7);
+                    if (StopSimulating) return;
                     var bearing = PBUtilities.BearingBetweenPoints(LS.CurrentLocation, point);
                     var newPoint = PBUtilities.PointAtDistanceAlongBearing(LS.CurrentLocation, inc, bearing);
                     SetCurrent(newPoint);
@@ -53,10 +54,10 @@ namespace PaddleBuddy.Droid.Services
                 }
                 SetCurrent(point);
                 await Task.Delay(TIME_DELAY);
-                var rand = Random.Next(1, 11);
+                rand = Random.Next(1, 11);
                 if (rand <= (int)(fractionTestOffTrack * 10))
                 {
-                    await TestOffTrack();
+                    await Task.Run(TestOffTrack);
                 }
             }
             LogService.Log("Finished simulating");
@@ -65,19 +66,25 @@ namespace PaddleBuddy.Droid.Services
 
         private static async Task TestOffTrack()
         {
+            var numberOfOffTrackIncrements = Random.Next(1, 10);
+            var offTrackIncs = 0;
             var bearing = Random.Next(0, 360);
-            while (!Stop)
+            while (!StopSimulating)
             {
-                var newPoint = PBUtilities.PointAtDistanceAlongBearing(LS.CurrentLocation, 60, bearing);
-                SetCurrent(newPoint);
+                SetCurrent(PBUtilities.PointAtDistanceAlongBearing(LS.CurrentLocation, 60, bearing));
                 await Task.Delay(TIME_DELAY);
+                offTrackIncs++;
+                if (offTrackIncs >= numberOfOffTrackIncrements) return;
             }
 
         }
 
         private static void SetCurrent(Point p)
         {
-            CrossCurrentActivity.Current.Activity.RunOnUiThread(() => LS.CurrentLocation = p);
+            if (p != null)
+            {
+                CrossCurrentActivity.Current.Activity.RunOnUiThread(() => LS.CurrentLocation = p);
+            }
         }
 
         private static LocationService LS => LocationService.GetInstance();

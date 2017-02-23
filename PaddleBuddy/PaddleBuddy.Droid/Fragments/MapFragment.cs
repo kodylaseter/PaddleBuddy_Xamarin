@@ -23,20 +23,17 @@ namespace PaddleBuddy.Droid.Fragments
 {
     public class MapFragment : BaseFragment, IOnMapReadyCallback, GoogleMap.IOnMarkerClickListener, GoogleMap.IOnMapClickListener, GoogleMap.IInfoWindowAdapter
     {
-        private Marker _currentMarker;
-        private Marker _currentDestination;
         private GoogleMap _myMap;
         private MapView _mapView;
-        public bool IsLoading { get; set; }
-        public TripManager TripManager { get; set; }
         private MapModes _mapMode;
         private Point _selectedMarkerPoint;
         private Button _planTripButton;
         private LinearLayout _mapBarLayout;
         private TextView _mapBarTextView1;
-        private TextView _mapBarTextView2;
         private MarkerOptions _currentMarkerOptions;
-        private TextView _speedTextView;
+        private Marker _currentMarker;
+        private Marker _currentDestinationMarker;
+        private Polyline _currentTripPolyline;
 
 
         private const int NAV_ZOOM = 16;
@@ -46,10 +43,14 @@ namespace PaddleBuddy.Droid.Fragments
 
         //speed variables
         private const int SPEED_CUTOFF_TIME_IN_SECONDS = 10;
+        private TextView _speedTextView;
         /// <summary>
         /// speed, time of day in totalseconds
         /// </summary>
-        private List<Tuple<double, double>> _speeds; 
+        private List<Tuple<double, double>> _speeds;
+
+        public bool IsLoading { get; set; }
+        public TripManager TripManager { get; set; }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -137,12 +138,12 @@ namespace PaddleBuddy.Droid.Fragments
                 LogService.Log("No navigation update. tripData not configured correctly");
                 return;
             }
-            DrawLine(TripManager.Points);
-            DrawCurrentDestination(TripManager.NextPoint);
+            DrawCurrentTrip();
             if (TripManager.HasStarted)
             {
                 if (TripManager.IsOnTrack(TripManager.PreviousPoint, TripManager.NextPoint, CurrentLocation))
                 {
+                    DrawCurrentDestination(TripManager.NextPoint);
                     NavigateCamera();
                     UpdateMapBar(TripManager.NextPoint.Id.ToString());
                     if (TripManager.CloseToNext(CurrentLocation))
@@ -165,19 +166,19 @@ namespace PaddleBuddy.Droid.Fragments
                     var newDestination = DatabaseService.GetInstance().PickNextDestination(CurrentLocation, TripManager);
                     AnimateCameraBounds(new[] {CurrentLocation, newDestination});
                     TripManager.UpdateForNewDestination(newDestination);
-                    string distance;
+                    double distance;
                     if (TripManager.HasPrevious)
                     {
                         distance =
-                            PBUtilities.DistanceInMetersFromPointToLineSegment(TripManager.PreviousPoint, TripManager.NextPoint,
-                                CurrentLocation).ToString();
+                            PBUtilities.DistanceInMetersFromPointToLineSegment(TripManager.PreviousPoint,
+                                TripManager.NextPoint,
+                                CurrentLocation);
                     }
                     else
                     {
-                        distance = PBUtilities.DistanceInMeters(CurrentLocation, TripManager.NextPoint).ToString();
+                        distance = PBUtilities.DistanceInMeters(CurrentLocation, TripManager.NextPoint);
                     }
-                    //string updateText = PBUtilities.DistanceInMetersFromPointToLineSegment();
-                    UpdateMapBar($"Navigate to river - {distance}m");
+                    UpdateMapBar($"Navigate to river - {PBUtilities.FormatDistanceToMilesOrMeters(distance)}");
                 }
             }
             else
@@ -197,6 +198,7 @@ namespace PaddleBuddy.Droid.Fragments
                 else
                 {
                     HideSpeed();
+                    DrawCurrentDestination(TripManager.NextPoint);
                     AnimateCameraBounds(new[] { CurrentLocation, TripManager.NextPoint });
                     UpdateMapBar("Navigate to river");
                 }
@@ -264,6 +266,9 @@ namespace PaddleBuddy.Droid.Fragments
         private void ClearTripData()
         {
             TripManager = null;
+            _currentTripPolyline = null;
+            _currentDestinationMarker = null;
+            
         }
 
         private void StartSimulating(int type)
@@ -416,35 +421,40 @@ namespace PaddleBuddy.Droid.Fragments
         private void DrawMarker(Point p)
         {
             if (MapIsNull) return;
-            var marker = new MarkerOptions().SetPosition(AndroidUtils.ToLatLng(p));
+            var marker = new MarkerOptions().SetPosition(AndroidUtils.PointToLatLng(p));
             if (p.IsLaunchSite) marker.SetTitle(p.Label).SetSnippet(p.Id.ToString());
             MyMap.AddMarker(marker);
         }
 
-        private void DrawLine(List<Point> points)
+        private void DrawCurrentTrip()
         {
             if (MapIsNull) return;
+            if (_currentTripPolyline == null) return;
+            _currentTripPolyline = DrawLine(TripManager.Points);
+        }
+
+        private Polyline DrawLine(List<Point> points)
+        {
+            if (MapIsNull) return null;
             var polyOpts = new PolylineOptions()
                 .InvokeColor(Resource.Color.black)
                 .InvokeWidth(9)
                 .InvokeZIndex(1);
-            foreach (var p in points)
-            {
-                polyOpts.Add(AndroidUtils.ToLatLng(p));
-            }
-            MyMap.AddPolyline(polyOpts);
+            polyOpts.Add(AndroidUtils.PointsToLatLngs(points));
+            return MyMap.AddPolyline(polyOpts);
         }
 
-        private void DrawLine(Path path)
+        private Polyline DrawLine(Path path)
         {
-            if (MapIsNull || path == null || path.Points.Count < 2) return;
-            DrawLine(path.Points);
+            if (MapIsNull || path == null || path.Points.Count < 2) return null;
+            return DrawLine(path.Points);
         }
 
-        private void DrawLine(Point start, Point end)
+        private Polyline DrawLine(Point start, Point end)
         {
             var path = DatabaseService.GetInstance().GetPath(start, end);
-            DrawLine(path);
+            if (path == null) return null;
+            return DrawLine(path);
         }
 
         private void DrawCurrent()
@@ -452,7 +462,7 @@ namespace PaddleBuddy.Droid.Fragments
             try
             {
                 if (MapIsNull) return;
-                var position = AndroidUtils.ToLatLng(CurrentLocation);
+                var position = AndroidUtils.PointToLatLng(CurrentLocation);
                 if (_currentMarker != null)
                 {
                     _currentMarker.Position = position;
@@ -471,14 +481,14 @@ namespace PaddleBuddy.Droid.Fragments
         private void DrawCurrentDestination(Point p)
         {
             if (MapIsNull) return;
-            var position = AndroidUtils.ToLatLng(p);
-            if (_currentDestination != null)
+            var position = AndroidUtils.PointToLatLng(p);
+            if (_currentDestinationMarker != null)
             {
-                _currentDestination.Position = position;
+                _currentDestinationMarker.Position = position;
             }
             else
             {
-                _currentDestination = MyMap.AddMarker(new MarkerOptions().SetPosition(position));
+                _currentDestinationMarker = MyMap.AddMarker(new MarkerOptions().SetPosition(position));
             }
         }
 
@@ -524,13 +534,13 @@ namespace PaddleBuddy.Droid.Fragments
             }
         }
 
-        private void AnimateCameraBounds(Point[] points, bool useBearingBetweenFirstTwo = false)
+        private void AnimateCameraBounds(Point[] points)
         {
             if (MapIsNull) return;
             var builder = new LatLngBounds.Builder();
             foreach (var p in points)
             {
-                builder.Include(new LatLng(p.Lat, p.Lng));
+                builder.Include(AndroidUtils.PointToLatLng(p));
             }
             var bounds = builder.Build();
             var cameraUpdate = CameraUpdateFactory.NewLatLngBounds(bounds, 80);

@@ -4,8 +4,6 @@ using PaddleBuddy.Core.Models.Map;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices.ComTypes;
-using PaddleBuddy.Core.Services;
 
 namespace PaddleBuddy.Core.Utilities
 {
@@ -27,7 +25,7 @@ namespace PaddleBuddy.Core.Utilities
             var y = Math.Cos(start.Lat)*Math.Sin(end.Lat) -
                     Math.Sin(start.Lat)*Math.Cos(end.Lat)*Math.Cos(start.Lng - end.Lng);
             var b = Math.Atan2(x, y);
-            return (float) rad2deg(b);
+            return (float) Radians2Degrees(b);
         }
 
         /// <summary>
@@ -40,13 +38,13 @@ namespace PaddleBuddy.Core.Utilities
         public static Point PointAtDistanceAlongBearing(Point start, double distance, double bearing)
         {
             var distanceKm = distance / 1000; //converting to km
-            var bearingRad = deg2rad(bearing);
+            var bearingRad = Degrese2Radians(bearing);
             var distRatio = distanceKm / EARTH_RADIUS_IN_KM;
             var distRatioSine = Math.Sin(distRatio);
             var distRatioCosine = Math.Cos(distRatio);
 
-            var startLatRad = deg2rad(start.Lat);
-            var startLonRad = deg2rad(start.Lng);
+            var startLatRad = Degrese2Radians(start.Lat);
+            var startLonRad = Degrese2Radians(start.Lng);
 
             var startLatCos = Math.Cos(startLatRad);
             var startLatSin = Math.Sin(startLatRad);
@@ -57,8 +55,8 @@ namespace PaddleBuddy.Core.Utilities
                 + Math.Atan2(
                     Math.Sin(bearingRad) * distRatioSine * startLatCos,
                     distRatioCosine - startLatSin * Math.Sin(endLatRads));
-            var endLatDeg = rad2deg(endLatRads);
-            var endLonDeg = rad2deg(endLonRads);
+            var endLatDeg = Radians2Degrees(endLatRads);
+            var endLonDeg = Radians2Degrees(endLonRads);
             return new Point
             {
                 Lat = endLatDeg,
@@ -134,7 +132,6 @@ namespace PaddleBuddy.Core.Utilities
             if (angleFromPointToStartToEnd > 90 && angleFromPointToEndToStart > 90)
             {
                 throw new Exception("Something wrong in DistanceInMetersFromPointToLineSegment");
-                return double.MaxValue;
             }
             if (angleFromPointToStartToEnd > 90) //return distance from point to start
             {
@@ -191,8 +188,8 @@ namespace PaddleBuddy.Core.Utilities
         private static double CrossTrackError(Point lineStart, Point lineEnd, Point point)
         {
             var distanceInMeters = DistanceInMeters(lineStart, point);
-            var startToPointBearing = deg2rad(BearingBetweenPoints(lineStart, point));
-            var lineBearing = deg2rad(BearingBetweenPoints(lineStart, lineEnd));
+            var startToPointBearing = Degrese2Radians(BearingBetweenPoints(lineStart, point));
+            var lineBearing = Degrese2Radians(BearingBetweenPoints(lineStart, lineEnd));
             var dXt =
                 Math.Asin(Math.Sin(distanceInMeters / EARTH_RADIUS_IN_METERS) * Math.Sin(startToPointBearing - lineBearing)) *
                 EARTH_RADIUS_IN_METERS;
@@ -221,10 +218,10 @@ namespace PaddleBuddy.Core.Utilities
 
         public static double DistanceInRadians(double lat1, double lon1, double lat2, double lon2)
         {
-            var l1 = deg2rad(lat1);
-            var l2 = deg2rad(lat2);
-            var deltaLat = deg2rad(lat2 - lat1);
-            var deltaLong = deg2rad(lon2 - lon1);
+            var l1 = Degrese2Radians(lat1);
+            var l2 = Degrese2Radians(lat2);
+            var deltaLat = Degrese2Radians(lat2 - lat1);
+            var deltaLong = Degrese2Radians(lon2 - lon1);
 
             var a = Math.Sin(deltaLat / 2) * Math.Sin(deltaLat / 2) + Math.Cos(l1) * Math.Cos(l2) * Math.Sin(deltaLong / 2) * Math.Sin(deltaLong / 2);
             return 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
@@ -240,7 +237,7 @@ namespace PaddleBuddy.Core.Utilities
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         //::  This function converts decimal degrees to radians             :::
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        public static double deg2rad(double deg)
+        public static double Degrese2Radians(double deg)
         {
             return (deg * Math.PI / 180.0);
         }
@@ -248,9 +245,24 @@ namespace PaddleBuddy.Core.Utilities
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         //::  This function converts radians to decimal degrees             :::
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        public static double rad2deg(double rad)
+        public static double Radians2Degrees(double rad)
         {
             return (rad / Math.PI * 180.0);
+        }
+
+        /// <summary>
+        /// Takes a distance in meters and returns string representation in meters or miles plus unit text
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <returns></returns>
+        public static string FormatDistanceToMilesOrMeters(double distance)
+        {
+            var miles = distance/1609.34;
+            if (miles > 0.1)
+            {
+                return miles.ToString("0.00") + "mi";
+            }
+            return distance.ToString("0.0") + "m";
         }
     }
 }
