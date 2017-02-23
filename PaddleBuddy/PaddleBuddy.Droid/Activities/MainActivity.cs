@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Android.App;
 using Android.OS;
 using Android.Support.Design.Widget;
@@ -27,6 +28,7 @@ namespace PaddleBuddy.Droid.Activities
         private LinearLayout _searchLayout;
         private SearchView _searchView;
         private IMenuItem _searchItem;
+        private SearchService _searchService;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -46,6 +48,10 @@ namespace PaddleBuddy.Droid.Activities
             _navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
             _navigationView.SetNavigationItemSelectedListener(this);
             OnNavigationItemSelected();
+
+            _searchService = new SearchService();
+            _searchService.AddData(DatabaseService.GetInstance().Points.ToArray<object>());
+            _searchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
 
             _searchListView = FindViewById<ListView>(Resource.Id.search_list_view);
             _searchLayout = FindViewById<LinearLayout>(Resource.Id.search_results_layout);
@@ -79,9 +85,6 @@ namespace PaddleBuddy.Droid.Activities
             _searchItem = menu.FindItem(Resource.Id.action_search);
             _searchView = (SearchView) _searchItem.ActionView;
             MenuItemCompat.SetOnActionExpandListener(_searchItem, this);
-
-
-
             _searchView.QueryTextChange += (sender, args) =>
             {
                 LogService.Log("typing: " + args.NewText);
