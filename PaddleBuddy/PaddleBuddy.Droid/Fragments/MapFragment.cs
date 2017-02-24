@@ -98,6 +98,7 @@ namespace PaddleBuddy.Droid.Fragments
             _selectedMarkerPoint = null;
             if (CurrentLocation != null)
             {
+                LocationUpdatedReceived(null);
                 IsLoading = false;
             }
         }
