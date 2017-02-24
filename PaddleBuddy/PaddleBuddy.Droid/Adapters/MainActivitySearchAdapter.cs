@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.App;
@@ -20,23 +21,23 @@ namespace PaddleBuddy.Droid.Adapters
         {
             _activity = activity;
             SearchService = new SearchService();
+            Filter = new SearchItemFilter(this);
             SearchService.AddData(DatabaseService.GetInstance().Points.ToArray<object>());
             SearchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
         }
 
-        public override int Count => SearchService.Data.Count;
+        public override int Count => SearchService.Items.Count;
 
         public override long GetItemId(int position)
         {
-            var element = SearchService.Data.ElementAtOrDefault(position);
-            return element?.Id ?? int.MaxValue;
+            return SearchService.Items[position].Id;
         }
 
         public override View GetView(int position, View convertView, ViewGroup parent)
         {
             var view = convertView ??
                        _activity.LayoutInflater.Inflate(Resource.Layout.list_item_searchitem, parent, false);
-            view.FindViewById<TextView>(Resource.Id.text1).Text = SearchService.Data[position].SearchString;
+            view.FindViewById<TextView>(Resource.Id.text1).Text = SearchService.Items[position].SearchString;
             return view;
         }
 
@@ -63,13 +64,17 @@ namespace PaddleBuddy.Droid.Adapters
             {
                 var returnObj = new FilterResults();
                 var results = new List<SearchItem>();
-                if (_adapter.SearchService.Data == null || constraint == null)
+                if (_adapter.SearchService.OriginalData == null || constraint == null)
                 {
                     return returnObj;
                 }
-                if (_adapter.SearchService.Data.Any())
+                if (_adapter.SearchService.OriginalData.Any())
                 {
                     results.AddRange(_adapter.SearchService.Filter(constraint.ToString()));
+                }
+                else
+                {
+                    throw new NotImplementedException();
                 }
                 returnObj.Values = FromArray(results.Select(a => a.ToJavaObject()).ToArray());
                 returnObj.Count = results.Count;
@@ -79,7 +84,15 @@ namespace PaddleBuddy.Droid.Adapters
 
             protected override void PublishResults(ICharSequence constraint, FilterResults results)
             {
-                throw new System.NotImplementedException();
+                using (var values = results.Values)
+                {
+                    _adapter.SearchService.Items =
+                        values.ToArray<Java.Lang.Object>().Select(a => a.ToNetObject<SearchItem>()).ToList();
+
+                    _adapter.NotifyDataSetChanged();
+                    constraint.Dispose();
+                    results.Dispose();
+                }
             }
         }
     }

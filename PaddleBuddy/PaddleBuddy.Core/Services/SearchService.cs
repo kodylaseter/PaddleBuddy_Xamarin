@@ -8,21 +8,27 @@ namespace PaddleBuddy.Core.Services
 {
     public class SearchService
     {
-        public List<SearchItem> Data { get; set; }
+        public List<SearchItem> OriginalData { get; }
+        public List<SearchItem> Items { get; set; } 
+
 
         public SearchService()
         {
-            Data = new List<SearchItem>();
+            OriginalData = new List<SearchItem>();
+            Items = new List<SearchItem>();
         }
 
         public List<SearchItem> Filter(string searchText)
         {
-            searchText = searchText.ToLower();
+            searchText = searchText.Trim().ToLower();
             var filteredList = new List<SearchItem>();
-            if (string.IsNullOrWhiteSpace(searchText)) return filteredList;
+            if (searchText == null)
+            {
+                throw new NotImplementedException();
+            }
             try
             {
-                filteredList = new List<SearchItem>(Data.ToList().Where(w => w.SearchString.ToLower().Contains(searchText)));
+                filteredList = new List<SearchItem>(OriginalData.ToList().Where(w => w.SearchString.ToLower().Contains(searchText)));
             }
             catch (Exception e)
             {
@@ -40,7 +46,7 @@ namespace PaddleBuddy.Core.Services
                     var river = item as River;
                     if (river != null)
                     {
-                        Data.Add(new SearchItem
+                        OriginalData.Add(new SearchItem
                         {
                             SearchString = river.Name,
                             Item = river
@@ -52,7 +58,7 @@ namespace PaddleBuddy.Core.Services
                     var point = item as Point;
                     if (point != null)
                     {
-                        Data.Add(new SearchItem
+                        OriginalData.Add(new SearchItem
                         {
                             SearchString = point.Label ?? point.Id.ToString(),
                             Item = point
@@ -64,7 +70,8 @@ namespace PaddleBuddy.Core.Services
                     throw new NotImplementedException();
                 }
             }
-            Data.Sort();
+            OriginalData.Sort();
+            Items = OriginalData.ToList();
         }
     }
 }

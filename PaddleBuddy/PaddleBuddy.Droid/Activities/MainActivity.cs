@@ -84,6 +84,7 @@ namespace PaddleBuddy.Droid.Activities
             {
                 LogService.Log("typing: " + args.NewText);
                 mainActivitySearchAdapter.Filter.InvokeFilter(args.NewText);
+                args.Handled = true;
             };
             _searchView.QueryTextSubmit += (sender, args) =>
             {

@@ -1,8 +1,9 @@
-﻿using PaddleBuddy.Core.Utilities;
+﻿using System;
+using PaddleBuddy.Core.Utilities;
 
 namespace PaddleBuddy.Core.Models
 {
-    public class SearchItem
+    public class SearchItem : IComparable<SearchItem>
     {
         public long Id { get; set; }
         public string SearchString { get; set; }
@@ -11,6 +12,11 @@ namespace PaddleBuddy.Core.Models
         public SearchItem()
         {
             Id = PBUtilities.GetNextId();
+        }
+
+        public int CompareTo(SearchItem other)
+        {
+            return string.Compare(SearchString, other.SearchString, StringComparison.Ordinal);
         }
     }
 }
