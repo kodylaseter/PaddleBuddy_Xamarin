@@ -13,6 +13,15 @@ namespace PaddleBuddy.Droid.Utilities
             return new LatLng(value.Lat, value.Lng);
         }
 
+        public static Point ToPoint(this LatLng value)
+        {
+            return new Point
+            {
+                Lat = value.Latitude,
+                Lng = value.Longitude
+            };
+        }
+
         public static LatLng[] ToLatLngs(this List<Point> points)
         {
             return points.Select(a => a.ToLatLng()).ToArray();

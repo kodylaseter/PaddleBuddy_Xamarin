@@ -495,29 +495,15 @@ namespace PaddleBuddy.Droid.Fragments
             }
         }
 
-        private void SetTilt()
-        {
-            var camPos = new CameraPosition.Builder(MyMap.CameraPosition).Tilt(NAV_TILT).Build();
-            MyMap.MoveCamera(CameraUpdateFactory.NewCameraPosition(camPos));
-        }
-
-        private void RemoveTilt()
-        {
-            var camPos = new CameraPosition.Builder(MyMap.CameraPosition).Tilt(BROWSE_TILT).Build();
-            MyMap.MoveCamera(CameraUpdateFactory.NewCameraPosition(camPos));
-        }
-
         public void NavigateCamera()
         {
             if (MapIsNull) return;
             //trying to avoid setting bearing when points are too close to accurately calulate it
-            var bearing = float.NaN;
-            if (PBMath.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint) > SysPrefs.TripPointsCloseThreshold)
-            {
-               bearing = PBMath.BearingBetweenPoints(CurrentLocation, TripManager.CurrentPoint);
-            }
-            //var mapPoint = MyMap.Projection.ToScreenLocation(CurrentLocation.ToLatLng())
-            var camPos = CameraUpdateBuilder(CurrentLocation, NAV_TILT, NAV_ZOOM, bearing);
+            if (PBMath.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint) < SysPrefs.TripPointsCloseThreshold)
+                return;
+            var bearing = PBMath.BearingBetweenPoints(CurrentLocation, TripManager.CurrentPoint);
+            var camTarget = PBMath.PointAtDistanceAlongBearing(CurrentLocation, SysPrefs.MetersAheadToAim, bearing);
+            var camPos = CameraUpdateBuilder(camTarget, NAV_TILT, NAV_ZOOM, bearing);
             MyMap.AnimateCamera(camPos);
         }
         

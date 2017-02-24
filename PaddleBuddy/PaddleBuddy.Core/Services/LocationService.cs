@@ -45,6 +45,7 @@ namespace PaddleBuddy.Core.Services
                 }
                 _currentLocation = tempLocation;
                 MessengerService.Messenger.Send(new LocationUpdatedMessage());
+                Log("Location Updated");
             }
         }
 
@@ -64,7 +65,6 @@ namespace PaddleBuddy.Core.Services
 
         private void OnPositionChanged(object sender, object eventArgs)
         {
-            Log("location updated");
             if (eventArgs.GetType() == typeof(PositionEventArgs))
             {
                 var args = (PositionEventArgs)eventArgs;
@@ -85,9 +85,15 @@ namespace PaddleBuddy.Core.Services
             }
         }
 
+        private void OnPositionError(object sender, PositionErrorEventArgs e)
+        {
+            Log(e.ToString());
+        }
+
         public void SetupLocation()
         {
             Log("Setting up location service");
+            Geolocator.PositionError += OnPositionError;
             Geolocator.PositionChanged += OnPositionChanged;
             GetInstance().StartListening();
             GetInstance().GetLocationAsync();

@@ -13,6 +13,8 @@
         public static bool DisableMap = false;
         public static bool Simulate = false;
         public static double TripPointsCloseThreshold = 70;
+        //used in camera updates to make current location appear closer to bottom of screen
+        public static int MetersAheadToAim = 500; 
 
         public enum Devices
         {
