@@ -3,13 +3,13 @@ using System.Linq;
 using Android.App;
 using Android.OS;
 using Android.Support.Design.Widget;
-using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
 using PaddleBuddy.Core.Services;
+using PaddleBuddy.Droid.Adapters;
 using PaddleBuddy.Droid.Fragments;
 using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
 using Toolbar = Android.Support.V7.Widget.Toolbar;
@@ -28,7 +28,6 @@ namespace PaddleBuddy.Droid.Activities
         private LinearLayout _searchLayout;
         private SearchView _searchView;
         private IMenuItem _searchItem;
-        private SearchService _searchService;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -49,19 +48,22 @@ namespace PaddleBuddy.Droid.Activities
             _navigationView.SetNavigationItemSelectedListener(this);
             OnNavigationItemSelected();
 
-            _searchService = new SearchService();
-            _searchService.AddData(DatabaseService.GetInstance().Points.ToArray<object>());
-            _searchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
-
-            _searchListView = FindViewById<ListView>(Resource.Id.search_list_view);
-            _searchLayout = FindViewById<LinearLayout>(Resource.Id.search_results_layout);
-            _searchLayout.Clickable = true;
-            _searchLayout.Click += (s,e) => { CloseSearch(true); };
-            var _searchItems = new[] {"test1", "abc", "def", "testttt"};
-            _searchArrayAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, _searchItems);
-            _searchListView.Adapter = _searchArrayAdapter;
+            SetupSearchStuff();
 
             Window.SetSoftInputMode(SoftInput.AdjustNothing);
+        }
+
+        private void SetupSearchStuff()
+        {
+            _searchListView = FindViewById<ListView>(Resource.Id.search_list_view);
+            _searchLayout = FindViewById<LinearLayout>(Resource.Id.search_results_layout);
+
+            var _mainActivitySearchAdapter = new MainActivitySearchAdapter();
+
+            _searchLayout.Clickable = true;
+            _searchLayout.Click += (s, e) => { CloseSearch(true); };
+            _
+            _searchListView.Adapter = _searchArrayAdapter;
         }
 
         //private void SetSearchBarHeight()
