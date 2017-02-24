@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Models.Map;
 
@@ -13,6 +14,22 @@ namespace PaddleBuddy.Core.Services
         {
             Data = new List<SearchItem>();
         }
+
+        public List<SearchItem> Filter(string searchText)
+        {
+            searchText = searchText.ToLower();
+            var filteredList = new List<SearchItem>();
+            if (string.IsNullOrWhiteSpace(searchText)) return filteredList;
+            try
+            {
+                filteredList = new List<SearchItem>(Data.ToList().Where(w => w.SearchString.ToLower().Contains(searchText)));
+            }
+            catch (Exception e)
+            {
+                LogService.Log(e.Message);
+            }
+            return filteredList;
+        } 
 
         public void AddData(object[] arr)
         {
@@ -37,7 +54,7 @@ namespace PaddleBuddy.Core.Services
                     {
                         Data.Add(new SearchItem
                         {
-                            SearchString = point.Label,
+                            SearchString = point.Label ?? point.Id.ToString(),
                             Item = point
                         });
                     }
@@ -47,6 +64,7 @@ namespace PaddleBuddy.Core.Services
                     throw new NotImplementedException();
                 }
             }
+            Data.Sort();
         }
     }
 }

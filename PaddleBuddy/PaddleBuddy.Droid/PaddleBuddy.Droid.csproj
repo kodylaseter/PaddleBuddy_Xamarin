@@ -162,17 +162,19 @@
   <ItemGroup>
     <Compile Include="Activities\MainActivity.cs" />
     <Compile Include="Activities\SetupActivity.cs" />
+    <Compile Include="Adapters\MainActivitySearchAdapter.cs" />
     <Compile Include="Fragments\BaseFragment.cs" />
     <Compile Include="Fragments\PlanFragment.cs" />
     <Compile Include="Fragments\MapFragment.cs" />
     <Compile Include="MainApplication.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\AndroidUtils.cs" />
+    <Compile Include="Utilities\AndroidUtils.cs" />
     <Compile Include="Services\BaseAndroidService.cs" />
     <Compile Include="Services\PermissionService.cs" />
     <Compile Include="Services\SimulatorService.cs" />
     <Compile Include="Services\StorageService.cs" />
+    <Compile Include="Utilities\JavaHolder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -293,6 +295,9 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-hdpi\ic_clear_white_36dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\list_item_searchitem.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

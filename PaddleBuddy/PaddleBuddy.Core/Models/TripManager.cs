@@ -93,7 +93,7 @@ namespace PaddleBuddy.Core.Models
         /// <returns></returns>
         public bool IsOnTrack(Point lineStart, Point lineEnd, Point current)
         {
-            var dist = PBUtilities.DistanceInMetersFromPointToLineSegment(lineStart, lineEnd, current);
+            var dist = PBMath.DistanceInMetersFromPointToLineSegment(lineStart, lineEnd, current);
             return Math.Abs(dist) < IS_CLOSE_THRESHOLD;
         }
 
@@ -114,7 +114,7 @@ namespace PaddleBuddy.Core.Models
 
         public double DistanceToNext(Point current)
         {
-            return PBUtilities.DistanceInMeters(current, CurrentPoint);
+            return PBMath.DistanceInMeters(current, CurrentPoint);
         }
 
         private Point PointAt(int index)

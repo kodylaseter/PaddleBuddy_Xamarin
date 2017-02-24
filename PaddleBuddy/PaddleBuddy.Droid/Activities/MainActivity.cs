@@ -23,7 +23,6 @@ namespace PaddleBuddy.Droid.Activities
         private DrawerLayout _drawer;
         private NavigationView _navigationView;
         private ListView _searchListView;
-        private ArrayAdapter<string> _searchArrayAdapter;
         private ActionBarDrawerToggle _toggle;
         private LinearLayout _searchLayout;
         private SearchView _searchView;
@@ -48,22 +47,10 @@ namespace PaddleBuddy.Droid.Activities
             _navigationView.SetNavigationItemSelectedListener(this);
             OnNavigationItemSelected();
 
-            SetupSearchStuff();
-
-            Window.SetSoftInputMode(SoftInput.AdjustNothing);
-        }
-
-        private void SetupSearchStuff()
-        {
             _searchListView = FindViewById<ListView>(Resource.Id.search_list_view);
             _searchLayout = FindViewById<LinearLayout>(Resource.Id.search_results_layout);
 
-            var _mainActivitySearchAdapter = new MainActivitySearchAdapter();
-
-            _searchLayout.Clickable = true;
-            _searchLayout.Click += (s, e) => { CloseSearch(true); };
-            _
-            _searchListView.Adapter = _searchArrayAdapter;
+            Window.SetSoftInputMode(SoftInput.AdjustNothing);
         }
 
         //private void SetSearchBarHeight()
@@ -83,6 +70,12 @@ namespace PaddleBuddy.Droid.Activities
 
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
+
+            var mainActivitySearchAdapter = new MainActivitySearchAdapter(this);
+            _searchListView.Adapter = mainActivitySearchAdapter;
+            _searchLayout.Clickable = true;
+            _searchLayout.Click += (s, e) => { CloseSearch(true); };
+
             MenuInflater.Inflate(Resource.Menu.main_menu, menu);
             _searchItem = menu.FindItem(Resource.Id.action_search);
             _searchView = (SearchView) _searchItem.ActionView;
@@ -90,7 +83,7 @@ namespace PaddleBuddy.Droid.Activities
             _searchView.QueryTextChange += (sender, args) =>
             {
                 LogService.Log("typing: " + args.NewText);
-                _searchArrayAdapter.Filter.InvokeFilter(args.NewText);
+                mainActivitySearchAdapter.Filter.InvokeFilter(args.NewText);
             };
             _searchView.QueryTextSubmit += (sender, args) =>
             {

@@ -77,7 +77,7 @@ namespace PaddleBuddy.Core.Services
             //tripPoints.RemoveAll(p => PBUtilities.DistanceInMeters(current, p) > POINT_TOO_FAR_AWAY);
             for (var i = tripPoints.Count - 1; i >= 0; i--)
             {
-                var dist = PBUtilities.DistanceInMeters(current, tripPoints[i]);
+                var dist = PBMath.DistanceInMeters(current, tripPoints[i]);
                 if (dist > POINT_TOO_FAR_AWAY)
                 {
                     tripPoints.RemoveAt(i);
@@ -93,7 +93,7 @@ namespace PaddleBuddy.Core.Services
             {
                 var point = tup.Item1;
                 var next = GetInstance().GetNextPoint(point);
-                var dist = PBUtilities.DistanceInMetersFromPointToLineSegment(point, next, current);
+                var dist = PBMath.DistanceInMetersFromPointToLineSegment(point, next, current);
                 if (dist < closestNextPoint.Item2)
                 {
                     closestNextPoint = new Tuple<Point, double>(next, dist);
@@ -111,7 +111,7 @@ namespace PaddleBuddy.Core.Services
         public Path GetClosestRiver()
         {
             var curr = LocationService.GetInstance().CurrentLocation;
-            var point = (from p in Points let dist = PBUtilities.DistanceInMiles(curr, p) orderby dist ascending select p).First();
+            var point = (from p in Points let dist = PBMath.DistanceInMiles(curr, p) orderby dist ascending select p).First();
             ClosestRiverId = point.RiverId;
             return GetPath(point.RiverId);
         }

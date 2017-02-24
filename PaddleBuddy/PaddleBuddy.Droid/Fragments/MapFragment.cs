@@ -16,6 +16,7 @@ using PaddleBuddy.Core.Services;
 using PaddleBuddy.Core.Utilities;
 using PaddleBuddy.Droid.Activities;
 using PaddleBuddy.Droid.Services;
+using PaddleBuddy.Droid.Utilities;
 using Path = PaddleBuddy.Core.Models.Map.Path;
 using Point = PaddleBuddy.Core.Models.Map.Point;
 
@@ -170,15 +171,15 @@ namespace PaddleBuddy.Droid.Fragments
                     if (TripManager.HasPrevious)
                     {
                         distance =
-                            PBUtilities.DistanceInMetersFromPointToLineSegment(TripManager.PreviousPoint,
+                            PBMath.DistanceInMetersFromPointToLineSegment(TripManager.PreviousPoint,
                                 TripManager.CurrentPoint,
                                 CurrentLocation);
                     }
                     else
                     {
-                        distance = PBUtilities.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint);
+                        distance = PBMath.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint);
                     }
-                    UpdateMapBar($"Navigate to river - {PBUtilities.FormatDistanceToMilesOrMeters(distance)}");
+                    UpdateMapBar($"Navigate to river - {PBMath.FormatDistanceToMilesOrMeters(distance)}");
                 }
             }
             else
@@ -510,9 +511,9 @@ namespace PaddleBuddy.Droid.Fragments
             if (MapIsNull) return;
             //trying to avoid setting bearing when points are too close to accurately calulate it
             var bearing = float.NaN;
-            if (PBUtilities.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint) > SysPrefs.TripPointsCloseThreshold)
+            if (PBMath.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint) > SysPrefs.TripPointsCloseThreshold)
             {
-               bearing = PBUtilities.BearingBetweenPoints(CurrentLocation, TripManager.CurrentPoint);
+               bearing = PBMath.BearingBetweenPoints(CurrentLocation, TripManager.CurrentPoint);
             }
             var camPos = CameraUpdateBuilder(CurrentLocation, NAV_TILT, NAV_ZOOM, bearing);
             MyMap.AnimateCamera(camPos);

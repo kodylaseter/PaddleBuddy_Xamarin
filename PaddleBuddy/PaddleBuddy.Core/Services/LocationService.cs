@@ -37,7 +37,7 @@ namespace PaddleBuddy.Core.Services
                 tempLocation.Time = time;
                 if (_currentLocation != null && _currentLocation.Time > 0 && time > 0)
                 {
-                    var speed = PBUtilities.DistanceInMeters(tempLocation, CurrentLocation) / (tempLocation.Time - CurrentLocation.Time);
+                    var speed = PBMath.DistanceInMeters(tempLocation, CurrentLocation) / (tempLocation.Time - CurrentLocation.Time);
                     if (speed > 0) //todo: filter out bad speeds
                     {
                         tempLocation.Speed = speed;

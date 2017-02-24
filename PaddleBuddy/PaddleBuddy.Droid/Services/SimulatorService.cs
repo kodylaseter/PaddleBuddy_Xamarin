@@ -72,16 +72,16 @@ namespace PaddleBuddy.Droid.Services
                         StopSimulating();
                         return;
                     }
-                    var inc = PBUtilities.DistanceInMeters(LS.CurrentLocation, point)/SIM_INC;
-                    while (PBUtilities.DistanceInMeters(LS.CurrentLocation, point) > SysPrefs.TripPointsCloseThreshold)
+                    var inc = PBMath.DistanceInMeters(LS.CurrentLocation, point)/SIM_INC;
+                    while (PBMath.DistanceInMeters(LS.CurrentLocation, point) > SysPrefs.TripPointsCloseThreshold)
                     {
                         if (_stop)
                         {
                             StopSimulating();
                             return;
                         }
-                        var bearing = PBUtilities.BearingBetweenPoints(LS.CurrentLocation, point);
-                        var newPoint = PBUtilities.PointAtDistanceAlongBearing(LS.CurrentLocation, inc, bearing);
+                        var bearing = PBMath.BearingBetweenPoints(LS.CurrentLocation, point);
+                        var newPoint = PBMath.PointAtDistanceAlongBearing(LS.CurrentLocation, inc, bearing);
                         SetCurrent(newPoint);
                         await Task.Delay(TIME_DELAY);
                     }
@@ -111,7 +111,7 @@ namespace PaddleBuddy.Droid.Services
             var bearing = Random.Next(0, 360);
             while (!_stop)
             {
-                SetCurrent(PBUtilities.PointAtDistanceAlongBearing(LS.CurrentLocation, 60, bearing));
+                SetCurrent(PBMath.PointAtDistanceAlongBearing(LS.CurrentLocation, 60, bearing));
                 await Task.Delay(TIME_DELAY);
                 offTrackIncs++;
                 if (offTrackIncs >= numberOfOffTrackIncrements)

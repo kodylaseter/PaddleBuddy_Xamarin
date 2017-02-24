@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PaddleBuddy.Core.Utilities;
 
 namespace PaddleBuddy.Core.Models
 {
     public class SearchItem
     {
+        public long Id { get; set; }
         public string SearchString { get; set; }
         public object Item { get; set; }
+
+        public SearchItem()
+        {
+            Id = PBUtilities.GetNextId();
+        }
     }
 }
