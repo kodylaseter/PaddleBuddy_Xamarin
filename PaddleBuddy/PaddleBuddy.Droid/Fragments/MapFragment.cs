@@ -80,7 +80,7 @@ namespace PaddleBuddy.Droid.Fragments
             _speedTextView = view.FindViewById<TextView>(Resource.Id.speed_textview);
             _mapBarLayout = view.FindViewById<LinearLayout>(Resource.Id.mapbar_layout);
             _mapBarTextView1 = view.FindViewById<TextView>(Resource.Id.mapbar_text1);
-            _progressBarLayout = view.FindViewById<RelativeLayout>(Resource.Id.progress_bar_layout);
+            _progressBarLayout = view.FindViewById<RelativeLayout>(Resource.Id.map_isloading_overlay);
             IsLoading = true;
             MapMode = MapModes.Browse;
             _speeds = new List<Tuple<double, double>>();
@@ -96,6 +96,10 @@ namespace PaddleBuddy.Droid.Fragments
             MyMap.SetInfoWindowAdapter(this);
             _currentMarker = null;
             _selectedMarkerPoint = null;
+            if (CurrentLocation != null)
+            {
+                IsLoading = false;
+            }
         }
 
 

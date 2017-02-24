@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.App;
+using Android.Views;
+using Android.Views.InputMethods;
 using PaddleBuddy.Core;
 using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Models.Messages;
@@ -30,6 +33,8 @@ namespace PaddleBuddy.Droid.Activities
             _locationReady = false;
             SetupSysPrefs();
             SetContentView(Resource.Layout.activity_setup);
+            //hide keyboard
+            Window.SetSoftInputMode(SoftInput.StateAlwaysHidden);
         }
 
         protected override void OnResume()

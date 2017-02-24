@@ -15,7 +15,6 @@ namespace PaddleBuddy.Core.Services
         private List<River> _rivers;
         private List<Point> _points;
         private List<Link> _links;
-        public int ClosestRiverId { get; set; }
         private bool _isReady;
         /// <summary>
         /// Used for IsOnTrack calculation for filtering out points
@@ -39,13 +38,19 @@ namespace PaddleBuddy.Core.Services
                     (_links != null && _links.Count > 0);
         }
 
+
+        public int ClosestRiverId { get; set; }
+
         public bool IsReady
         {
             get { return _isReady; }
             set
             {
                 _isReady = value;
-                MessengerService.Messenger.Send(new DbReadyMessage());
+                if (_isReady)
+                {
+                    MessengerService.Messenger.Send(new DbReadyMessage());
+                }
             }
         }
 

@@ -54,7 +54,6 @@ namespace PaddleBuddy.Core.Services
             Log("start listening");
             //parameters are milliseconds, meters
             Geolocator.StartListeningAsync(2000, 5, true);
-            Geolocator.PositionChanged += OnPositionChanged;
         }
 
         public void StopListening()
@@ -89,8 +88,21 @@ namespace PaddleBuddy.Core.Services
         public void SetupLocation()
         {
             Log("Setting up location service");
+            Geolocator.PositionChanged += OnPositionChanged;
             GetInstance().StartListening();
-            //GetInstance().GetLocationAsync();
+            GetInstance().GetLocationAsync();
+        }
+
+        public async Task<Point> GetLocationAsync()
+        {
+            var position = await Geolocator.GetPositionAsync();
+            var point = new Point
+            {
+                Lat = position.Latitude,
+                Lng = position.Longitude
+            };
+            CurrentLocation = point;
+            return point;
         }
 
         private void Log(string msg)
