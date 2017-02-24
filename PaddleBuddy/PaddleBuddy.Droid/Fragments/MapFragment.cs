@@ -25,11 +25,13 @@ namespace PaddleBuddy.Droid.Fragments
     public class MapFragment : BaseFragment, IOnMapReadyCallback, GoogleMap.IOnMarkerClickListener, GoogleMap.IOnMapClickListener, GoogleMap.IInfoWindowAdapter
     {
         private GoogleMap _myMap;
+        private bool _isLoading;
         private MapView _mapView;
         private MapModes _mapMode;
         private Point _selectedMarkerPoint;
         private Button _planTripButton;
         private LinearLayout _mapBarLayout;
+        private RelativeLayout _progressBarLayout;
         private TextView _mapBarTextView1;
         private MarkerOptions _currentMarkerOptions;
         private Marker _currentMarker;
@@ -49,8 +51,6 @@ namespace PaddleBuddy.Droid.Fragments
         /// speed, time of day in totalseconds
         /// </summary>
         private List<Tuple<double, double>> _speeds;
-
-        public bool IsLoading { get; set; }
         public TripManager TripManager { get; set; }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -80,6 +80,8 @@ namespace PaddleBuddy.Droid.Fragments
             _speedTextView = view.FindViewById<TextView>(Resource.Id.speed_textview);
             _mapBarLayout = view.FindViewById<LinearLayout>(Resource.Id.mapbar_layout);
             _mapBarTextView1 = view.FindViewById<TextView>(Resource.Id.mapbar_text1);
+            _progressBarLayout = view.FindViewById<RelativeLayout>(Resource.Id.progress_bar_layout);
+            IsLoading = true;
             MapMode = MapModes.Browse;
             _speeds = new List<Tuple<double, double>>();
             return view;
@@ -92,7 +94,8 @@ namespace PaddleBuddy.Droid.Fragments
             MyMap.SetOnMarkerClickListener(this);
             MyMap.SetOnMapClickListener(this);
             MyMap.SetInfoWindowAdapter(this);
-            Setup();
+            _currentMarker = null;
+            _selectedMarkerPoint = null;
         }
 
 
@@ -106,6 +109,7 @@ namespace PaddleBuddy.Droid.Fragments
                 {
                     case MapModes.Browse:
                         HideMapBar();
+                        SetupBrowse();
                         break;
                     case MapModes.Navigate:
                         UpdateMapBar("");
@@ -118,10 +122,12 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void LocationUpdatedReceived(LocationUpdatedMessage obj)
         {
+            IsLoading = false;
             switch (MapMode)
             {
                 case MapModes.Browse:
                     DrawCurrent();
+                    BrowseUpdate();
                     break;
                 case MapModes.Navigate:
                     DrawCurrent();
@@ -134,6 +140,7 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void NavigationUpdate()
         {
+            if (IsLoading) return;
             if (TripManager == null || TripManager.Points == null || TripManager.Points.Count < 1)
             {
                 LogService.Log("No navigation update. tripData not configured correctly");
@@ -207,30 +214,9 @@ namespace PaddleBuddy.Droid.Fragments
             
         }
 
-        private void Setup()
+        private void BrowseUpdate()
         {
-            IsLoading = true;
-            DrawCurrent();
-            _currentMarker = null;
-            _selectedMarkerPoint = null;
-            switch (MapMode)
-            {
-                case MapModes.Browse:
-                    SetupBrowse();
-                    break;
-                case MapModes.InitFromPlan:
-                    SetupInitFromPlan();
-                    break;
-                default: throw new ArgumentOutOfRangeException();
-            }
-            IsLoading = false;
-        }
-
-        private void SetupBrowse()
-        {
-            HideSpeed();
-            SimulatorService.GetInstance().StopSimulating();
-            ClearTripData();
+            if (IsLoading) return;
             try
             {
                 MoveCameraZoom(animate: true);
@@ -239,8 +225,8 @@ namespace PaddleBuddy.Droid.Fragments
                 {
                     DrawLine(path);
                     var launchSites = from p in DatabaseService.GetInstance().Points
-                        where p.RiverId == DatabaseService.GetInstance().ClosestRiverId && p.IsLaunchSite
-                        select p;
+                                      where p.RiverId == DatabaseService.GetInstance().ClosestRiverId && p.IsLaunchSite
+                                      select p;
                     foreach (var site in launchSites)
                     {
                         DrawMarker(site);
@@ -252,12 +238,13 @@ namespace PaddleBuddy.Droid.Fragments
                 LogService.Log("Error in browse setup");
                 LogService.Log(e.Message);
             }
-            MapMode = MapModes.Browse;
         }
 
-        private void SetupInitFromPlan()
+        private void SetupBrowse()
         {
-            
+            HideSpeed();
+            SimulatorService.GetInstance().StopSimulating();
+            ClearTripData();
         }
 
         private void SetupTripData(List<Point> points)
@@ -270,7 +257,16 @@ namespace PaddleBuddy.Droid.Fragments
             TripManager = null;
             _currentTripPolyline = null;
             _currentDestinationMarker = null;
-            
+        }
+
+        public bool IsLoading
+        {
+            get { return _isLoading; }
+            set
+            {
+                _isLoading = MapIsNull || value;
+                _progressBarLayout.Visibility = _isLoading ? ViewStates.Visible : ViewStates.Gone;
+            }
         }
 
         private void StartSimulating(int type)

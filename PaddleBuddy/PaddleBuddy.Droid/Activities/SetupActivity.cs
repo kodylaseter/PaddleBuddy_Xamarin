@@ -68,7 +68,7 @@ namespace PaddleBuddy.Droid.Activities
         {
             LogService.Log(
                 $"trying to start main activity... _mainactivitystarted = {_mainActivityStarted} _dbready = {_dbReady} _locationpermissionapproved = {_locationPermissionApproved} _locationready = {_locationReady}");
-            if (!_mainActivityStarted & _dbReady & _locationPermissionApproved & _locationReady)
+            if (!_mainActivityStarted & _dbReady & _locationPermissionApproved)
             {
                 _mainActivityStarted = true;
                 MessengerService.Messenger.Unregister<DbReadyMessage>(this);

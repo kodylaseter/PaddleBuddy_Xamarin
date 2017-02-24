@@ -11,5 +11,5 @@
     <color name="black">#0D131A</color>
 
     <color name="text_gray">#4b4e51</color>
-    <color name="list_results_background">#7F7A7A7A</color>
+    <color name="semi_transparent_grey_background">#8F7A7A7A</color>
 </resources>
