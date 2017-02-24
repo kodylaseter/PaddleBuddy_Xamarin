@@ -424,7 +424,7 @@ namespace PaddleBuddy.Droid.Fragments
         private void DrawMarker(Point p)
         {
             if (MapIsNull) return;
-            var marker = new MarkerOptions().SetPosition(AndroidUtils.PointToLatLng(p));
+            var marker = new MarkerOptions().SetPosition(p.ToLatLng());
             if (p.IsLaunchSite) marker.SetTitle(p.Label).SetSnippet(p.Id.ToString());
             MyMap.AddMarker(marker);
         }
@@ -443,7 +443,7 @@ namespace PaddleBuddy.Droid.Fragments
                 .InvokeColor(Resource.Color.black)
                 .InvokeWidth(9)
                 .InvokeZIndex(1);
-            polyOpts.Add(AndroidUtils.PointsToLatLngs(points));
+            polyOpts.Add(points.ToLatLngs());
             return MyMap.AddPolyline(polyOpts);
         }
 
@@ -465,7 +465,7 @@ namespace PaddleBuddy.Droid.Fragments
             try
             {
                 if (MapIsNull) return;
-                var position = AndroidUtils.PointToLatLng(CurrentLocation);
+                var position = CurrentLocation.ToLatLng();
                 if (_currentMarker != null)
                 {
                     _currentMarker.Position = position;
@@ -484,7 +484,7 @@ namespace PaddleBuddy.Droid.Fragments
         private void DrawCurrentDestination(Point p)
         {
             if (MapIsNull) return;
-            var position = AndroidUtils.PointToLatLng(p);
+            var position = p.ToLatLng();
             if (_currentDestinationMarker != null)
             {
                 _currentDestinationMarker.Position = position;
@@ -516,6 +516,7 @@ namespace PaddleBuddy.Droid.Fragments
             {
                bearing = PBMath.BearingBetweenPoints(CurrentLocation, TripManager.CurrentPoint);
             }
+            //var mapPoint = MyMap.Projection.ToScreenLocation(CurrentLocation.ToLatLng())
             var camPos = CameraUpdateBuilder(CurrentLocation, NAV_TILT, NAV_ZOOM, bearing);
             MyMap.AnimateCamera(camPos);
         }
@@ -543,7 +544,7 @@ namespace PaddleBuddy.Droid.Fragments
             var builder = new LatLngBounds.Builder();
             foreach (var p in points)
             {
-                builder.Include(AndroidUtils.PointToLatLng(p));
+                builder.Include(p.ToLatLng());
             }
             var bounds = builder.Build();
             var cameraUpdate = CameraUpdateFactory.NewLatLngBounds(bounds, 80);

@@ -6,16 +6,16 @@ using PaddleBuddy.Core.Models.Map;
 
 namespace PaddleBuddy.Droid.Utilities
 {
-    public static class AndroidUtils
+    public static class AndroidObjectExtensions
     {
-        public static LatLng PointToLatLng(Point p)
+        public static LatLng ToLatLng(this Point value)
         {
-            return new LatLng(p.Lat, p.Lng);
+            return new LatLng(value.Lat, value.Lng);
         }
 
-        public static LatLng[] PointsToLatLngs(List<Point> points)
+        public static LatLng[] ToLatLngs(this List<Point> points)
         {
-            return points.Select(PointToLatLng).ToArray();
+            return points.Select(a => a.ToLatLng()).ToArray();
         }
 
         /// <summary>
