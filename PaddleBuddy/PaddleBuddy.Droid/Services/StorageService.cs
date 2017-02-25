@@ -67,15 +67,15 @@ namespace PaddleBuddy.Droid.Services
                 }
                 else
                 {
-                    LogService.Log("Failed to update points");
+                    LogService.ExceptionLog("Failed to update points");
                     return false;
                 }
             }
             catch (Exception e)
             {
 
-                LogService.Log(e.Message);
-                LogService.Log("Failed to update points");
+                LogService.ExceptionLog(e.Message);
+                LogService.ExceptionLog("Failed to update points");
                 return false;
             }
             return true;
@@ -92,14 +92,14 @@ namespace PaddleBuddy.Droid.Services
                 }
                 else
                 {
-                    LogService.Log("Failed to update rivers");
+                    LogService.ExceptionLog("Failed to update rivers");
                     return false;
                 }
             }
             catch (Exception e)
             {
-                LogService.Log(e.Message);
-                LogService.Log("Failed to update rivers");
+                LogService.ExceptionLog(e.Message);
+                LogService.ExceptionLog("Failed to update rivers");
                 return false;
             }
             return true;
@@ -122,8 +122,8 @@ namespace PaddleBuddy.Droid.Services
             }
             catch (Exception e)
             {
-                LogService.Log(e.Message);
-                LogService.Log("Failed to update links");
+                LogService.ExceptionLog(e.Message);
+                LogService.ExceptionLog("Failed to update links");
                 return false;
             }
             return true;

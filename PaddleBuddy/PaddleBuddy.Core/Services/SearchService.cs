@@ -32,7 +32,7 @@ namespace PaddleBuddy.Core.Services
             }
             catch (Exception e)
             {
-                LogService.Log(e.Message);
+                LogService.ExceptionLog(e.Message);
             }
             return filteredList;
         } 

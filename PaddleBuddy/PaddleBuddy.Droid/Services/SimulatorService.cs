@@ -98,7 +98,7 @@ namespace PaddleBuddy.Droid.Services
             }
             catch (Exception e)
             {
-                Log(e.Message);
+                LogService.ExceptionLog(e.Message);
                 StopSimulating();
             }
         }

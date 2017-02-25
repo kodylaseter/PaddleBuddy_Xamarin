@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using Android.Gms.Maps.Model;
 using PaddleBuddy.Core.Models.Map;
 
@@ -25,6 +26,11 @@ namespace PaddleBuddy.Droid.Utilities
         public static LatLng[] ToLatLngs(this List<Point> points)
         {
             return points.Select(a => a.ToLatLng()).ToArray();
+        }
+
+        public static Point[] ToPoints(this List<LatLng> latLngs)
+        {
+            return latLngs.Select(a => a.ToPoint()).ToArray();
         }
 
         /// <summary>

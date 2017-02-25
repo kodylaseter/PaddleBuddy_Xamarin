@@ -23,8 +23,8 @@ namespace PaddleBuddy.Core.Services
                 }
                 catch (Exception e)
                 {
-                    LogService.Log("Problem reaching remote server");
-                    LogService.Log(e.Message);
+                    LogService.ExceptionLog("Problem reaching remote server");
+                    LogService.ExceptionLog(e.Message);
                     response = new Response
                     {
                         Success = false
@@ -54,8 +54,8 @@ namespace PaddleBuddy.Core.Services
                 }
                 catch (Exception e)
                 {
-                    LogService.Log("Problem reaching remote server");
-                    LogService.Log(e.Message);
+                    LogService.ExceptionLog("Problem reaching remote server");
+                    LogService.ExceptionLog(e.Message);
                     response = new Response
                     {
                         Success = false
@@ -83,8 +83,8 @@ namespace PaddleBuddy.Core.Services
                 }
                 catch (Exception e)
                 {
-                    LogService.Log("Problem reaching remote server");
-                    LogService.Log(e.Message);
+                    LogService.ExceptionLog("Problem reaching remote server");
+                    LogService.ExceptionLog(e.Message);
                     response = new Response
                     {
                         Success = false

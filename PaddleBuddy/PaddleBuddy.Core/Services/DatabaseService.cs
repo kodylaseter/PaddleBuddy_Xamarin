@@ -38,9 +38,6 @@ namespace PaddleBuddy.Core.Services
                     (_links != null && _links.Count > 0);
         }
 
-
-        public int ClosestRiverId { get; set; }
-
         public bool IsReady
         {
             get { return _isReady; }
@@ -130,13 +127,22 @@ namespace PaddleBuddy.Core.Services
             return (from river in Rivers where river.Id == id select river).Single();
         }
 
-        //todo: enable this
-        public Path GetClosestRiver()
+        public int GetClosestRiverId(Point point = null)
         {
-            var curr = LocationService.GetInstance().CurrentLocation;
-            var point = (from p in Points let dist = PBMath.DistanceInMiles(curr, p) orderby dist ascending select p).First();
-            ClosestRiverId = point.RiverId;
-            return GetPath(point.RiverId);
+            if (point == null)
+            {
+                point = LocationService.GetInstance().CurrentLocation;
+            }
+            if (point == null)
+            {
+                throw new NotImplementedException();
+            };
+            return (from p in Points let dist = PBMath.DistanceInMiles(point, p) orderby dist ascending select p).First().RiverId;
+        }
+
+        public Path GetClosestRiverPath(Point point = null)
+        {
+            return GetPath(GetClosestRiverId(point));
         }
 
         public Point GetPoint(int id)
