@@ -4,6 +4,8 @@ using PaddleBuddy.Core.Models.Map;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using PaddleBuddy.Core.Services;
 
 namespace PaddleBuddy.Core.Utilities
 {
@@ -97,23 +99,55 @@ namespace PaddleBuddy.Core.Utilities
             };
         }
 
-        public static TripEstimate LinksToEstimate(List<LinkPoint> list)
+        public static TripEstimate PointsToEstimate(List<Point> points)
         {
-            double totalTime = 0;
+            var totalTime = new TimeSpan();
             double totalDistance = 0;
-            foreach (var lp in list)
+            var index = 0;
+            while (points.ElementAtOrDefault(index + 1) != null)
             {
-                var dist = DistanceInMeters(lp.BeginLat, lp.BeginLng, lp.EndLat, lp.EndLng);
+                var start = points[index];
+                var end = points[index + 1];
+                var dist = DistanceInMeters(start, end);
                 totalDistance += dist;
-                totalTime += dist / lp.Speed * 3600000;
+                var link = DatabaseService.GetInstance().GetLinkForPointIds(start.Id, end.Id);
+                if (link == null)
+                {
+                    if (points.ElementAtOrDefault(index + 2) != null)
+                    {
+                        link = DatabaseService.GetInstance().GetLinkForPointIds(end.Id, points[index + 2].Id);
+                    } else if (points.ElementAtOrDefault(index - 1) != null)
+                    {
+                        link = DatabaseService.GetInstance().GetLinkForPointIds(points[index - 1].Id, start.Id);
+                    }
+                    else
+                    {
+                        link = new Link
+                        {
+                            Speed = SysPrefs.DefaultSpeed
+                        };
+                    }
+                }
+                totalTime += DistanceAndSpeedToTime(dist, link.Speed);
+                index++;
 
             }
             return new TripEstimate()
             {
-                Time = TimeSpan.FromMilliseconds(totalTime),
+                Time = totalTime,
                 Distance = totalDistance,
-                DistanceUnit = "miles"
+                DistanceUnit = "meters"
             };
+        }
+
+        /// <summary>
+        /// Takes a distance in meters and speed in meters per second and returns timespan
+        /// </summary>
+        /// <param name="distance">Meters</param>
+        /// <param name="speed">Meters/Second</param>
+        private static TimeSpan DistanceAndSpeedToTime(double distance, double speed)
+        {
+            return new TimeSpan(0,0,0,(int)Math.Round(distance / speed)); 
         }
 
         /// <summary>

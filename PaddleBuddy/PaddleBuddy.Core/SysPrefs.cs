@@ -9,12 +9,14 @@
         public static bool UseLocalDb => false;
         public static string ApiBase => UseLocalDb ? LocalDb : LiveDb;
         public static Devices Device { get; set; }
+
         public static bool TestOffline = false;
         public static bool DisableMap = false;
         public static bool Simulate = false;
         public static double TripPointsCloseThreshold = 70;
         //used in camera updates to make current location appear closer to bottom of screen
-        public static int MetersAheadToAim = 500; 
+        public static int MetersAheadToAim = 500;
+        public static float DefaultSpeed = 1.5f; //meters per second
 
         public enum Devices
         {

@@ -107,6 +107,24 @@ namespace PaddleBuddy.Core.Services
             return closestNextPoint.Item1;
         }
 
+        public Link GetLinkForPoinds(Point a, Point b)
+        {
+            return GetLinkForPointIds(a.Id, b.Id);
+        }
+
+        /// <summary>
+        /// Gets the link from a to b
+        /// Maybe check for the opposite? 
+        /// </summary>
+        /// <param name="id1"></param>
+        /// <param name="id2"></param>
+        /// <returns></returns>
+        public Link GetLinkForPointIds(int id1, int id2)
+        {
+            var link = Links.SingleOrDefault(l => l.Begin == id1 && l.End == id2);
+            return link;
+        }
+
         public River GetRiver(int id)
         {
             return (from river in Rivers where river.Id == id select river).Single();

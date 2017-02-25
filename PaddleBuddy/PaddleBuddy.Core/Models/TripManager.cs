@@ -74,6 +74,16 @@ namespace PaddleBuddy.Core.Models
             get { return Points != null && Points.Count > 0 && Points.ElementAt(Index) != null; }
         }
 
+        public List<Point> RemainingPoints
+        {
+            get
+            {
+                var points = Points.ToList();
+                points.RemoveRange(0, Index);
+                return points;
+            }
+        } 
+
         public void Increment()
         {
             Index++;

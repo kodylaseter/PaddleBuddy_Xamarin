@@ -158,7 +158,7 @@ namespace PaddleBuddy.Droid.Fragments
                 {
                     DrawCurrentDestination(TripManager.CurrentPoint);
                     NavigateCamera();
-                    UpdateMapBar(TripManager.CurrentPoint.Id.ToString());
+                    UpdateMapBar();
                     if (TripManager.CloseToNext(CurrentLocation))
                     {
                         if (TripManager.HasNext)
@@ -299,10 +299,20 @@ namespace PaddleBuddy.Droid.Fragments
         }
 
 
-        private void UpdateMapBar(string text1)
+        private void UpdateMapBar(string text1 = null)
         {
             ShowMapBar();
-            _mapBarTextView1.Text = text1;
+            if (string.IsNullOrWhiteSpace(text1))
+            {
+                var points = TripManager.RemainingPoints;
+                points.Insert(0, CurrentLocation);
+                var tripEstimate = PBMath.PointsToEstimate(points);
+                _mapBarTextView1.Text = tripEstimate.TimeRemaining;
+            }
+            else
+            {
+                _mapBarTextView1.Text = text1;
+            }
         }
 
         private void UpdateSpeed()

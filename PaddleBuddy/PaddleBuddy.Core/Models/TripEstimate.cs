@@ -6,7 +6,6 @@ namespace PaddleBuddy.Core.Models
     {
         public TimeSpan Time { get; set; }
         //public double Time { get; set; }
-        public string TimeUnit { get; set; }
         //todo: implement distanceunit of some sort?
         public double Distance { get; set; }
         public string DistanceUnit { get; set; }
@@ -15,13 +14,7 @@ namespace PaddleBuddy.Core.Models
         public int EndId { get; set; }
         public int RiverId { get; set; }
 
-        public string TimeString
-        {
-            get
-            {
-                return Time.ToString();
-            }
-        }
+        public string TimeRemaining => Time.ToString(@"hh\:mm\:ss");
 
         public override string ToString()
         {

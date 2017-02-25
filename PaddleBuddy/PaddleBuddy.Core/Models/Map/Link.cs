@@ -6,6 +6,9 @@
         public int Begin { get; set; }
         public int End { get; set; }
         public int RiverId { get; set; }
-        public float Speed { get; set; }
+        /// <summary>
+        /// in meters per second
+        /// </summary>
+        public float Speed { get; set; } 
     }
 }
