@@ -283,21 +283,6 @@ namespace PaddleBuddy.Core.Utilities
         {
             return (rad / Math.PI * 180.0);
         }
-
-        /// <summary>
-        /// Takes a distance in meters and returns string representation in meters or miles plus unit text
-        /// </summary>
-        /// <param name="distance"></param>
-        /// <returns></returns>
-        public static string FormatDistanceToMilesOrMeters(double distance)
-        {
-            var miles = distance/1609.34;
-            if (miles > 0.1)
-            {
-                return miles.ToString("0.00") + "mi";
-            }
-            return distance.ToString("0.0") + "m";
-        }
     }
 }
 

@@ -33,6 +33,8 @@ namespace PaddleBuddy.Droid.Fragments
         private LinearLayout _mapBarLayout;
         private RelativeLayout _progressBarLayout;
         private TextView _mapBarTextView1;
+        private TextView _mapBarTextView2;
+        private TextView _mapBarTextView3;
         private MarkerOptions _currentMarkerOptions;
         private Marker _currentMarker;
         private Marker _currentDestinationMarker;
@@ -80,6 +82,8 @@ namespace PaddleBuddy.Droid.Fragments
             _speedTextView = view.FindViewById<TextView>(Resource.Id.speed_textview);
             _mapBarLayout = view.FindViewById<LinearLayout>(Resource.Id.mapbar_layout);
             _mapBarTextView1 = view.FindViewById<TextView>(Resource.Id.mapbar_text1);
+            _mapBarTextView2 = view.FindViewById<TextView>(Resource.Id.mapbar_text2);
+            _mapBarTextView3 = view.FindViewById<TextView>(Resource.Id.mapbar_text3);
             _progressBarLayout = view.FindViewById<RelativeLayout>(Resource.Id.map_isloading_overlay);
             IsLoading = true;
             MapMode = MapModes.Browse;
@@ -191,7 +195,7 @@ namespace PaddleBuddy.Droid.Fragments
                     {
                         distance = PBMath.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint);
                     }
-                    UpdateMapBar($"Navigate to river - {PBMath.FormatDistanceToMilesOrMeters(distance)}");
+                    UpdateMapBar($"Navigate to river - {PBUtilities.FormatDistanceToMilesOrMeters(distance)}");
                 }
             }
             else
@@ -308,6 +312,8 @@ namespace PaddleBuddy.Droid.Fragments
                 points.Insert(0, CurrentLocation);
                 var tripEstimate = PBMath.PointsToEstimate(points);
                 _mapBarTextView1.Text = tripEstimate.TimeRemaining;
+                _mapBarTextView2.Text = PBUtilities.FormatDistanceToMilesOrMeters(tripEstimate.Distance);
+                _mapBarTextView3.Text = DateTime.Now.Add(tripEstimate.Time).ToString("hh:mm tt");
             }
             else
             {

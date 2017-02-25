@@ -7,6 +7,7 @@
     <color name="statusBarColor">#455A64</color>
     
     <color name="white">#FFFFFF</color>
+    <color name="almostWhite">#F9F9F9</color>
     <color name="gray">#7A7A7A</color>
     <color name="black">#0D131A</color>
 
