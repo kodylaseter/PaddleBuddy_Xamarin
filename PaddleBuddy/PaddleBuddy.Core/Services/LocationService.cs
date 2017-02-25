@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using PaddleBuddy.Core.Models.Map;
 using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Utilities;
-using Plugin.Connectivity;
 using Plugin.Geolocator;
 using Plugin.Geolocator.Abstractions;
 

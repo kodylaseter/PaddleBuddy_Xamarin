@@ -104,15 +104,16 @@ namespace PaddleBuddy.Droid.Fragments
             MyMap.SetOnMarkerClickListener(this);
             MyMap.SetOnMapClickListener(this);
             MyMap.SetInfoWindowAdapter(this);
-            Task.Run(DelayedSetupBrowse);
+            DelayedSetupBrowse();
         }
 
-        private async Task DelayedSetupBrowse()
+        private async void DelayedSetupBrowse()
         {
+            //todo: improve or debug this
             await Task.Delay(500);
             if (CurrentLocation != null && _browsePolyline == null)
             {
-                Activity.RunOnUiThread(() => LocationUpdatedReceived(null));
+                LocationUpdatedReceived(null);
             }
         }
 
@@ -465,9 +466,12 @@ namespace PaddleBuddy.Droid.Fragments
             {
                 _browsePolyline?.Remove();
                 _browsePolyline = null;
-                foreach (var siteMarker in _launchSiteMarkers)
+                if (_launchSiteMarkers != null)
                 {
-                    siteMarker.Remove();
+                    foreach (var siteMarker in _launchSiteMarkers)
+                    {
+                        siteMarker.Remove();
+                    }
                 }
                 _launchSiteMarkers = new List<Marker>();
             }
@@ -588,7 +592,7 @@ namespace PaddleBuddy.Droid.Fragments
                 builder.Include(p);
             }
             var bounds = builder.Build();
-            var cameraUpdate = CameraUpdateFactory.NewLatLngBounds(bounds, 80);
+            var cameraUpdate = CameraUpdateFactory.NewLatLngBounds(bounds, View.Width, View.Height, 80);
             MyMap.AnimateCamera(cameraUpdate);
         }
 
