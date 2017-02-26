@@ -1,5 +1,4 @@
 ﻿using PaddleBuddy.Core.Models;
-using PaddleBuddy.Core.Models.LinqModels;
 using PaddleBuddy.Core.Models.Map;
 using System;
 using System.Collections.Generic;
@@ -14,6 +13,11 @@ namespace PaddleBuddy.Core.Utilities
         private static double EARTH_RADIUS_IN_METERS = 6371000;
         private static double EARTH_RADIUS_IN_KM = 6371;
 
+        public static double NormalizeDegrees(double degrees)
+        {
+            return (degrees + 360)%360;
+        }
+
         /// <summary>
         /// returns degrees
         /// credit: http://www.movable-type.co.uk/scripts/latlong.html
@@ -21,13 +25,16 @@ namespace PaddleBuddy.Core.Utilities
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns> returns float in degrees </returns>
-        public static float BearingBetweenPoints(Point start, Point end)
+        public static double BearingBetweenPoints(Point start, Point end)
         {
-            var x = Math.Cos(end.Lat) * Math.Sin(start.Lng - end.Lng);
-            var y = Math.Cos(start.Lat)*Math.Sin(end.Lat) -
-                    Math.Sin(start.Lat)*Math.Cos(end.Lat)*Math.Cos(start.Lng - end.Lng);
-            var b = Math.Atan2(x, y);
-            return (float) Radians2Degrees(b);
+            var startLat = Degrese2Radians(start.Lat);
+            var startLng = Degrese2Radians(start.Lng);
+            var endLat = Degrese2Radians(end.Lat);
+            var endLng = Degrese2Radians(end.Lng);
+            var y = Math.Sin(endLng - startLng)*Math.Cos(endLat);
+            var x = Math.Cos(startLat)*Math.Sin(endLat) - Math.Sin(startLat)*Math.Cos(endLat)*Math.Cos(endLng - startLng);
+            var b = Math.Atan2(y,x);
+            return NormalizeDegrees(Radians2Degrees(b));
         }
 
         /// <summary>
@@ -203,10 +210,7 @@ namespace PaddleBuddy.Core.Utilities
         private static double AngleBetweenBearings(double b1, double b2)
         {
             var angle = Math.Abs(b1 - b2);
-            if (angle > 180)
-            {
-                angle = 360 - angle;
-            }
+            if (angle > 180) angle = 360 - angle;
             return angle;
         }
 

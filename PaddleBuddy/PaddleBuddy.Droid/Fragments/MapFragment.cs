@@ -271,34 +271,6 @@ namespace PaddleBuddy.Droid.Fragments
             }
         }
 
-        private void StartSimulating(int type)
-        {
-            var p = new List<Point>();
-            switch (type)
-            {
-                case 0: //random bad test
-                    p.Add(DatabaseService.GetInstance().GetPoint(86));
-                    p.Add(DatabaseService.GetInstance().GetPoint(87));
-                    p.Add(DatabaseService.GetInstance().GetPoint(88));
-                    p.Add(DatabaseService.GetInstance().GetPoint(89));
-                    SetupNavigate(p);
-                    SimulatorService.GetInstance().StartSimulating(TripManager.Points);
-                    break;
-                case 1: //chat test 7-42
-                    p = DatabaseService.GetInstance().GetPath(2).Points;
-                    SetupNavigate(p);
-                    SimulatorService.GetInstance().StartSimulating(TripManager.Points);
-                    break;
-                case 2:
-                    p = DatabaseService.GetInstance().GetPath(19).Points;
-                    SetupNavigate(p);
-                    SimulatorService.GetInstance().StartSimulating(TripManager.Points);
-                    break;
-                default:
-                    break;
-            }
-        }
-
 
         private void UpdateMapBar(string text1 = null)
         {
@@ -385,6 +357,34 @@ namespace PaddleBuddy.Droid.Fragments
         public static MapFragment NewInstance()
         {
             return new MapFragment();
+        }
+
+        private void StartSimulating(int type)
+        {
+            var p = new List<Point>();
+            switch (type)
+            {
+                case 0: //random bad test
+                    p.Add(DatabaseService.GetInstance().GetPoint(86));
+                    p.Add(DatabaseService.GetInstance().GetPoint(87));
+                    p.Add(DatabaseService.GetInstance().GetPoint(88));
+                    p.Add(DatabaseService.GetInstance().GetPoint(89));
+                    SetupNavigate(p);
+                    SimulatorService.GetInstance().StartSimulating(TripManager.Points);
+                    break;
+                case 1: //chat test 7-42
+                    p = DatabaseService.GetInstance().GetPath(2).Points;
+                    SetupNavigate(p);
+                    SimulatorService.GetInstance().StartSimulating(TripManager.Points);
+                    break;
+                case 2:
+                    p = DatabaseService.GetInstance().GetPath(19).Points;
+                    SetupNavigate(p);
+                    SimulatorService.GetInstance().StartSimulating(TripManager.Points);
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void OnPlanTripButtonClicked(object sender, EventArgs e)
@@ -596,12 +596,12 @@ namespace PaddleBuddy.Droid.Fragments
             MyMap.AnimateCamera(cameraUpdate);
         }
 
-        private CameraUpdate CameraUpdateBuilder(Point p, int tilt = int.MaxValue, int zoom = 0, float bearing = float.NaN)
+        private CameraUpdate CameraUpdateBuilder(Point p, int tilt = int.MaxValue, int zoom = 0, double bearing = double.NaN)
         {
             var camPos = new CameraPosition.Builder(MyMap.CameraPosition).Target(new LatLng(p.Lat, p.Lng));
             if (tilt != int.MaxValue) camPos.Tilt(tilt);
             if (zoom != 0) camPos.Zoom(zoom);
-            if (!bearing.Equals(float.NaN)) camPos.Bearing(bearing);
+            if (!bearing.Equals(double.NaN)) camPos.Bearing((float)bearing);
             return CameraUpdateFactory.NewCameraPosition(camPos.Build());
         }
 

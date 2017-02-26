@@ -164,6 +164,7 @@
     <Compile Include="Activities\SetupActivity.cs" />
     <Compile Include="Adapters\MainActivitySearchAdapter.cs" />
     <Compile Include="Fragments\BaseFragment.cs" />
+    <Compile Include="Fragments\TripSummaryFragment.cs" />
     <Compile Include="Fragments\PlanFragment.cs" />
     <Compile Include="Fragments\MapFragment.cs" />
     <Compile Include="MainApplication.cs" />
@@ -193,6 +194,9 @@
     </AndroidResource>
     <AndroidResource Include="Resources\layout\infowindow_custom_marker.axml" />
     <AndroidResource Include="Resources\menu\main_menu.axml" />
+    <AndroidResource Include="Resources\layout\fragment_tripsummary.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\activity_setup.axml" />
