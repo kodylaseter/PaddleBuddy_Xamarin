@@ -158,7 +158,6 @@ namespace PaddleBuddy.Droid.Fragments
             {
                 if (TripManager.IsOnTrack(TripManager.PreviousPoint, TripManager.CurrentPoint, CurrentLocation))
                 {
-                    DrawCurrentDestination(TripManager.CurrentPoint);
                     NavigateCamera();
                     UpdateMapBar();
                     if (TripManager.CloseToNext(CurrentLocation))
@@ -169,8 +168,8 @@ namespace PaddleBuddy.Droid.Fragments
                         }
                         else
                         {
-                            LogService.Log("Finished trip!");
-                            SetupBrowse();
+                            FinishTrip();
+                            return;
                         }
                     }
                     UpdateSpeed();
@@ -206,14 +205,13 @@ namespace PaddleBuddy.Droid.Fragments
                     }
                     else
                     {
-                        LogService.Log("Finished trip!");
-                        SetupBrowse();
+                        FinishTrip();
+                        return;
                     }
                 }
                 else
                 {
                     HideSpeed();
-                    DrawCurrentDestination(TripManager.CurrentPoint);
                     AnimateCameraBounds(new List<Point> { CurrentLocation, TripManager.CurrentPoint });
                     UpdateMapBar("Navigate to river");
                 }
@@ -359,6 +357,14 @@ namespace PaddleBuddy.Droid.Fragments
             return new MapFragment();
         }
 
+        private void FinishTrip()
+        {
+            LogService.Log("finished trip");
+            LocationService.GetInstance().StopListening();
+            MessengerService.Messenger.Unregister<LocationUpdatedMessage>(this);
+            NavigateTo(TripSummaryFragment.NewInstance());
+        }
+
         private void StartSimulating(int type)
         {
             var p = new List<Point>();
@@ -382,6 +388,11 @@ namespace PaddleBuddy.Droid.Fragments
                     SetupNavigate(p);
                     SimulatorService.GetInstance().StartSimulating(TripManager.Points);
                     break;
+                case 3:
+                    p = DatabaseService.GetInstance().GetPath(15).Points;
+                    SetupNavigate(p);
+                    SimulatorService.GetInstance().StartSimulating(TripManager.Points);
+                    break;
                 default:
                     break;
             }
@@ -389,7 +400,7 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void OnPlanTripButtonClicked(object sender, EventArgs e)
         {
-            ((MainActivity)Activity).HandleNavigation(null, PlanFragment.NewInstance(_selectedMarkerPoint.Id));
+            ((MainActivity)Activity).HandleNavigation(PlanFragment.NewInstance(_selectedMarkerPoint.Id));
         }
 
         private void OnCancelTripClicked(object sender, EventArgs e)
@@ -400,7 +411,7 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void OnSimulateButtonClicked(object sender, EventArgs e)
         {
-            StartSimulating(2);
+            StartSimulating(3);
         }
 
         public bool OnMarkerClick(Marker marker)
@@ -553,7 +564,8 @@ namespace PaddleBuddy.Droid.Fragments
         {
             if (MapIsNull) return;
             //trying to avoid setting bearing when points are too close to accurately calulate it
-            if (PBMath.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint) < SysPrefs.TripPointsCloseThreshold)
+            var dist = PBMath.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint);
+            if (dist < SysPrefs.BearingTooCloseThreshold)
                 return;
             var bearing = PBMath.BearingBetweenPoints(CurrentLocation, TripManager.CurrentPoint);
             var camTarget = PBMath.PointAtDistanceAlongBearing(CurrentLocation, SysPrefs.MetersAheadToAim, bearing);

@@ -113,32 +113,40 @@ namespace PaddleBuddy.Droid.Activities
             return true;
         }
 
-        public void HandleNavigation(IMenuItem menuItem = null, BaseFragment fragment = null)
+        public void HandleNavigation(IMenuItem menuItem)
         {
             var id = menuItem?.ItemId ?? Resource.Id.nav_map;
             //converts id to a drawerindex
+            BaseFragment fragment;
             switch (id)
             {
                 case Resource.Id.nav_map:
                     id = (int)NavDraweritems.Map;
-                    fragment = fragment ?? MapFragment.NewInstance();
+                    fragment = MapFragment.NewInstance();
                     break;
                 case Resource.Id.nav_plan:
                     id = (int)NavDraweritems.Plan;
-                    fragment = fragment ?? PlanFragment.NewInstance();
+                    fragment = PlanFragment.NewInstance();
                     break;
                 default:
                     id = (int)NavDraweritems.Map;
-                    fragment = fragment ?? MapFragment.NewInstance();
+                    fragment = MapFragment.NewInstance();
                     break;
             }
+            if (fragment != null)
+            {
+                _navigationView.Menu.GetItem(id).SetChecked(true);
+                HandleNavigation(fragment);
+            }
+        }
+
+        public void HandleNavigation(BaseFragment fragment)
+        {
+            if (fragment == null) return;
+            LogService.TagAndLog("NAV", $"Navigating to {fragment.GetType()}");
             try
             {
-                if (fragment != null)
-                {
-                    SupportFragmentManager.BeginTransaction().Replace(Resource.Id.content_f, fragment).Commit();
-                }
-                _navigationView.Menu.GetItem(id).SetChecked(true);
+                SupportFragmentManager.BeginTransaction().Replace(Resource.Id.content_f, fragment).Commit();
             }
             catch (Exception e)
             {

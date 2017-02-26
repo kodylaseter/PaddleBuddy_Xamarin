@@ -13,7 +13,8 @@
         public static bool TestOffline = false;
         public static bool DisableMap = false;
         public static bool Simulate = false;
-        public static double TripPointsCloseThreshold = 70;
+        public static double TripPointsCloseThreshold = 30;
+        public static double BearingTooCloseThreshold = 10;
         //used in camera updates to make current location appear closer to bottom of screen
         public static int MetersAheadToAim = 500;
         public static float DefaultSpeed = 1.5f; //meters per second

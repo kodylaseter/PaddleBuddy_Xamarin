@@ -51,6 +51,7 @@
     <Compile Include="Models\TimeEstimate.cs" />
     <Compile Include="Models\TripManager.cs" />
     <Compile Include="Models\TripEstimate.cs" />
+    <Compile Include="Models\TripSummary.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ApiService.cs" />

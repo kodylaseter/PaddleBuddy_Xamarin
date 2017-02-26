@@ -55,13 +55,13 @@ namespace PaddleBuddy.Droid.Services
         {
             try
             {
-                if (_stop)
+                if (_stop || points.Count < 2)
                 {
                     StopSimulating();
                     return;
                 }
                 LS.StopListening();
-                SetCurrent(points.First());
+                SetCurrent(points.FirstOrDefault());
                 int rand;
                 await Task.Delay(TIME_DELAY);
                 foreach (var point in points.ToList())

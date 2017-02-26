@@ -111,10 +111,10 @@
             android:layout_centerInParent="true"
             style="?android:attr/progressBarStyleLarge"/>
         <TextView 
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/map_progress_bar"
-            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
             android:text="waiting on gps"/>
 
     </RelativeLayout>
