@@ -12,11 +12,26 @@ namespace PaddleBuddy.Core.Models
 
         private int _index;
         private List<Point> _points;
+        private List<Point> _pointsHistory; 
         private const double IS_CLOSE_THRESHOLD = 100; //meters
+        private TimeSpan _timeStart;
+        private TimeSpan _timeEnd;
 
         public TripManager()
         {
             Index = 0;
+            _timeStart = DateTime.Now.TimeOfDay;
+            _pointsHistory = new List<Point>();
+        }
+
+        public TripSummary ExportTripSummary()
+        {
+            return new TripSummary
+            {
+                StartTime = _timeStart,
+                EndTime = DateTime.Now.TimeOfDay,
+                PointsHistory = _pointsHistory
+            };
         }
 
 
@@ -33,7 +48,6 @@ namespace PaddleBuddy.Core.Models
             }
         }
 
-
         public List<Point> Points
         {
             get { return _points; }
@@ -42,6 +56,11 @@ namespace PaddleBuddy.Core.Models
                 _points = value; 
                 
             }
+        }
+
+        public void AddToPointHistory(Point p)
+        {
+            _pointsHistory.Add(p);
         }
 
         public Point StartPoint

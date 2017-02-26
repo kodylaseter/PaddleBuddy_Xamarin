@@ -117,7 +117,6 @@ namespace PaddleBuddy.Droid.Fragments
             }
         }
 
-
         private MapModes MapMode
         {
             get { return _mapMode; }
@@ -268,7 +267,6 @@ namespace PaddleBuddy.Droid.Fragments
                 _progressBarLayout.Visibility = _isLoading ? ViewStates.Visible : ViewStates.Gone;
             }
         }
-
 
         private void UpdateMapBar(string text1 = null)
         {
@@ -429,7 +427,6 @@ namespace PaddleBuddy.Droid.Fragments
                 LogService.ExceptionLog(e.Message);
                 throw e;
             }
-            return false;
         }
 
         public void OnMapClick(LatLng point)
