@@ -45,7 +45,6 @@
     <Compile Include="Models\Messages\DbReadyMessage.cs" />
     <Compile Include="Models\Messages\LocationUpdatedMessage.cs" />
     <Compile Include="Models\Messages\PermissionMessage.cs" />
-    <Compile Include="Models\PermissionCodes.cs" />
     <Compile Include="Models\Response.cs" />
     <Compile Include="Models\SearchItem.cs" />
     <Compile Include="Models\TimeEstimate.cs" />

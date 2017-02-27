@@ -5,7 +5,6 @@ using Android.OS;
 using Android.Support.V7.App;
 using Android.Views;
 using PaddleBuddy.Core;
-using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Services;
@@ -102,7 +101,7 @@ namespace PaddleBuddy.Droid.Activities
         private void PermissionMessageReceived(PermissionMessage obj)
         {
             LogService.Log("permission message received");
-            if (obj.PermissionCode == PermissionCodes.LOCATION && !_locationPermissionApproved)
+            if (obj.PermissionCode == SysPrefs.PERMISSION_LOCATION && !_locationPermissionApproved)
             {
                 LocationPermissionApproved = true;
             }
@@ -144,7 +143,7 @@ namespace PaddleBuddy.Droid.Activities
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             switch (requestCode)
             {
-                case PermissionCodes.LOCATION:
+                case SysPrefs.PERMISSION_LOCATION:
                     {
                         if (grantResults == null || grantResults.Length < 1 || grantResults[0] != Permission.Granted)
                         {

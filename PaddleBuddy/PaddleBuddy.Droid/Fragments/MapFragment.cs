@@ -360,40 +360,15 @@ namespace PaddleBuddy.Droid.Fragments
             LogService.Log("finished trip");
             LocationService.GetInstance().StopListening();
             MessengerService.Messenger.Unregister<LocationUpdatedMessage>(this);
-            NavigateTo(TripSummaryFragment.NewInstance());
+            NavigateTo(TripSummaryFragment.NewInstance(), SysPrefs.SERIALIZABLE_TRIPSUMMARY, new TripSummary {EndTime = DateTime.Now.TimeOfDay});
         }
 
-        private void StartSimulating(int type)
+        private void StartSimulating()
         {
-            var p = new List<Point>();
-            switch (type)
-            {
-                case 0: //random bad test
-                    p.Add(DatabaseService.GetInstance().GetPoint(86));
-                    p.Add(DatabaseService.GetInstance().GetPoint(87));
-                    p.Add(DatabaseService.GetInstance().GetPoint(88));
-                    p.Add(DatabaseService.GetInstance().GetPoint(89));
-                    SetupNavigate(p);
-                    SimulatorService.GetInstance().StartSimulating(TripManager.Points);
-                    break;
-                case 1: //chat test 7-42
-                    p = DatabaseService.GetInstance().GetPath(2).Points;
-                    SetupNavigate(p);
-                    SimulatorService.GetInstance().StartSimulating(TripManager.Points);
-                    break;
-                case 2:
-                    p = DatabaseService.GetInstance().GetPath(19).Points;
-                    SetupNavigate(p);
-                    SimulatorService.GetInstance().StartSimulating(TripManager.Points);
-                    break;
-                case 3:
-                    p = DatabaseService.GetInstance().GetPath(15).Points;
-                    SetupNavigate(p);
-                    SimulatorService.GetInstance().StartSimulating(TripManager.Points);
-                    break;
-                default:
-                    break;
-            }
+            var p = DatabaseService.GetInstance().GetPath(SysPrefs.SimulateRiver).Points;
+            if (p.Count <= 1) return;
+            SetupNavigate(p);
+            SimulatorService.GetInstance().StartSimulating(p);
         }
 
         private void OnPlanTripButtonClicked(object sender, EventArgs e)
@@ -409,7 +384,7 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void OnSimulateButtonClicked(object sender, EventArgs e)
         {
-            StartSimulating(3);
+            StartSimulating();
         }
 
         public bool OnMarkerClick(Marker marker)

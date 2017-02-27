@@ -8,6 +8,8 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
+using Newtonsoft.Json;
+using PaddleBuddy.Core;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Adapters;
 using PaddleBuddy.Droid.Fragments;
@@ -138,6 +140,15 @@ namespace PaddleBuddy.Droid.Activities
                 _navigationView.Menu.GetItem(id).SetChecked(true);
                 HandleNavigation(fragment);
             }
+        }
+
+        public void HandleNavigationWithData(BaseFragment fragment, string key, string json)
+        {
+            if (fragment == null || string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(json)) return;
+            var bundle = new Bundle();
+            bundle.PutString(SysPrefs.SERIALIZABLE_TRIPSUMMARY, json);
+            fragment.Arguments = bundle;
+            HandleNavigation(fragment);
         }
 
         public void HandleNavigation(BaseFragment fragment)

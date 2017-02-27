@@ -2112,8 +2112,8 @@ namespace PaddleBuddy.Droid
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f090093
-			public const int action0 = 2131296403;
+			// aapt resource value: 0x7f090094
+			public const int action0 = 2131296404;
 			
 			// aapt resource value: 0x7f090065
 			public const int action_bar = 2131296357;
@@ -2139,8 +2139,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f090066
 			public const int action_context_bar = 2131296358;
 			
-			// aapt resource value: 0x7f090097
-			public const int action_divider = 2131296407;
+			// aapt resource value: 0x7f090098
+			public const int action_divider = 2131296408;
 			
 			// aapt resource value: 0x7f090003
 			public const int action_menu_divider = 2131296259;
@@ -2157,11 +2157,11 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f090047
 			public const int action_mode_close_button = 2131296327;
 			
-			// aapt resource value: 0x7f0900a7
-			public const int action_search = 2131296423;
+			// aapt resource value: 0x7f0900a8
+			public const int action_search = 2131296424;
 			
-			// aapt resource value: 0x7f0900a6
-			public const int action_settings = 2131296422;
+			// aapt resource value: 0x7f0900a7
+			public const int action_settings = 2131296423;
 			
 			// aapt resource value: 0x7f090048
 			public const int activity_chooser_view_content = 2131296328;
@@ -2190,8 +2190,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f09004f
 			public const int buttonPanel = 2131296335;
 			
-			// aapt resource value: 0x7f090094
-			public const int cancel_action = 2131296404;
+			// aapt resource value: 0x7f090095
+			public const int cancel_action = 2131296405;
 			
 			// aapt resource value: 0x7f090083
 			public const int cancel_trip_button = 2131296387;
@@ -2208,8 +2208,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f09005d
 			public const int checkbox = 2131296349;
 			
-			// aapt resource value: 0x7f09009a
-			public const int chronometer = 2131296410;
+			// aapt resource value: 0x7f09009b
+			public const int chronometer = 2131296411;
 			
 			// aapt resource value: 0x7f09003e
 			public const int clip_horizontal = 2131296318;
@@ -2268,8 +2268,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f09008f
 			public const int end_edittext = 2131296399;
 			
-			// aapt resource value: 0x7f09009f
-			public const int end_padder = 2131296415;
+			// aapt resource value: 0x7f0900a0
+			public const int end_padder = 2131296416;
 			
 			// aapt resource value: 0x7f09002e
 			public const int enterAlways = 2131296302;
@@ -2319,8 +2319,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f09004a
 			public const int image = 2131296330;
 			
-			// aapt resource value: 0x7f09009e
-			public const int info = 2131296414;
+			// aapt resource value: 0x7f09009f
+			public const int info = 2131296415;
 			
 			// aapt resource value: 0x7f090000
 			public const int item_touch_helper_previous_elevation = 2131296256;
@@ -2331,11 +2331,11 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f090017
 			public const int light = 2131296279;
 			
-			// aapt resource value: 0x7f090098
-			public const int line1 = 2131296408;
+			// aapt resource value: 0x7f090099
+			public const int line1 = 2131296409;
 			
-			// aapt resource value: 0x7f09009c
-			public const int line3 = 2131296412;
+			// aapt resource value: 0x7f09009d
+			public const int line3 = 2131296413;
 			
 			// aapt resource value: 0x7f090018
 			public const int listMode = 2131296280;
@@ -2364,11 +2364,11 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f090086
 			public const int mapbar_text3 = 2131296390;
 			
-			// aapt resource value: 0x7f090090
-			public const int markerTitle = 2131296400;
+			// aapt resource value: 0x7f090091
+			public const int markerTitle = 2131296401;
 			
-			// aapt resource value: 0x7f090096
-			public const int media_actions = 2131296406;
+			// aapt resource value: 0x7f090097
+			public const int media_actions = 2131296407;
 			
 			// aapt resource value: 0x7f090027
 			public const int middle = 2131296295;
@@ -2379,23 +2379,23 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f090020
 			public const int multiply = 2131296288;
 			
-			// aapt resource value: 0x7f0900a3
-			public const int nav_manage = 2131296419;
-			
-			// aapt resource value: 0x7f0900a0
-			public const int nav_map = 2131296416;
+			// aapt resource value: 0x7f0900a4
+			public const int nav_manage = 2131296420;
 			
 			// aapt resource value: 0x7f0900a1
-			public const int nav_plan = 2131296417;
-			
-			// aapt resource value: 0x7f0900a5
-			public const int nav_send = 2131296421;
-			
-			// aapt resource value: 0x7f0900a4
-			public const int nav_share = 2131296420;
+			public const int nav_map = 2131296417;
 			
 			// aapt resource value: 0x7f0900a2
-			public const int nav_slideshow = 2131296418;
+			public const int nav_plan = 2131296418;
+			
+			// aapt resource value: 0x7f0900a6
+			public const int nav_send = 2131296422;
+			
+			// aapt resource value: 0x7f0900a5
+			public const int nav_share = 2131296421;
+			
+			// aapt resource value: 0x7f0900a3
+			public const int nav_slideshow = 2131296419;
 			
 			// aapt resource value: 0x7f090079
 			public const int nav_view = 2131296377;
@@ -2547,8 +2547,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f09008e
 			public const int start_edittext = 2131296398;
 			
-			// aapt resource value: 0x7f090095
-			public const int status_bar_latest_event_content = 2131296405;
+			// aapt resource value: 0x7f090096
+			public const int status_bar_latest_event_content = 2131296406;
 			
 			// aapt resource value: 0x7f090070
 			public const int submit_area = 2131296368;
@@ -2565,23 +2565,26 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f09008b
 			public const int test_simulate_button = 2131296395;
 			
-			// aapt resource value: 0x7f09009d
-			public const int text = 2131296413;
+			// aapt resource value: 0x7f090090
+			public const int test_tripsum = 2131296400;
 			
-			// aapt resource value: 0x7f090091
-			public const int text1 = 2131296401;
+			// aapt resource value: 0x7f09009e
+			public const int text = 2131296414;
 			
-			// aapt resource value: 0x7f09009b
-			public const int text2 = 2131296411;
+			// aapt resource value: 0x7f090092
+			public const int text1 = 2131296402;
+			
+			// aapt resource value: 0x7f09009c
+			public const int text2 = 2131296412;
 			
 			// aapt resource value: 0x7f090058
 			public const int textSpacerNoButtons = 2131296344;
 			
-			// aapt resource value: 0x7f090092
-			public const int textView = 2131296402;
+			// aapt resource value: 0x7f090093
+			public const int textView = 2131296403;
 			
-			// aapt resource value: 0x7f090099
-			public const int time = 2131296409;
+			// aapt resource value: 0x7f09009a
+			public const int time = 2131296410;
 			
 			// aapt resource value: 0x7f09004e
 			public const int title = 2131296334;
