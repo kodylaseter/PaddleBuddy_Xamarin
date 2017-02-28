@@ -116,6 +116,11 @@ namespace PaddleBuddy.Core.Services
             return link;
         }
 
+        public string GetRiverName(int id)
+        {
+            return GetRiver(id).Name;
+        }
+
         public River GetRiver(int id)
         {
             return (from river in Rivers where river.Id == id select river).Single();

@@ -17,9 +17,11 @@ namespace PaddleBuddy.Core.Models
         public TripManager()
         {
             Index = 0;
-            TripSummary = new TripSummary();
-            TripSummary.StartTime = DateTime.Now.TimeOfDay;
-            TripSummary.PointsHistory = new List<Point>();
+            TripSummary = new TripSummary
+            {
+                StartDateTime = DateTime.Now,
+                PointsHistory = new List<Point>()
+            };
         }
 
         public TripSummary ExportTripSummary()
@@ -46,8 +48,8 @@ namespace PaddleBuddy.Core.Models
             get { return _points; }
             set
             {
-                _points = value; 
-                
+                _points = value;
+                TripSummary.RiverId = Points.First().RiverId;
             }
         }
 
