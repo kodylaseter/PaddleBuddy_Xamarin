@@ -145,6 +145,10 @@ namespace PaddleBuddy.Droid.Activities
         public void HandleNavigationWithData(BaseFragment fragment, string key, string json)
         {
             if (fragment == null || string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(json)) return;
+            for (int i = 0; i < _navigationView.Menu.Size(); i++)
+            {
+                _navigationView.Menu.GetItem(i).SetChecked(false);
+            }
             var bundle = new Bundle();
             bundle.PutString(SysPrefs.SERIALIZABLE_TRIPSUMMARY, json);
             fragment.Arguments = bundle;
@@ -180,7 +184,6 @@ namespace PaddleBuddy.Droid.Activities
                 _searchItem.CollapseActionView();
             }
         }
-
 
         //todo: figure out why this doesnt call when the search view is open
         public override void OnBackPressed()

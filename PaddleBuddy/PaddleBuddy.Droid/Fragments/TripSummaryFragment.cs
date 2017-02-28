@@ -35,10 +35,10 @@ namespace PaddleBuddy.Droid.Fragments
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var view = inflater.Inflate(Resource.Layout.fragment_tripsummary, container, false);
-            if (_tripSummary != null)
-            {
-                view.FindViewById<TextView>(Resource.Id.test_tripsum).Text = _tripSummary.EndTime.ToString();
-            }
+            //if (_tripSummary != null)
+            //{
+            //    view.FindViewById<TextView>(Resource.Id.test_tripsum).Text = _tripSummary.EndTime.ToString();
+            //}
             return view;
         }
 

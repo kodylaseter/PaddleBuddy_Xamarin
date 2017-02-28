@@ -25,6 +25,8 @@
 
         public static double TripPointsCloseThreshold = 30;
         public static double BearingTooCloseThreshold = 10;
+        public static double IsOnTrackCloseThreshold = 80;
+        public static double PickNextDestinationThreshold = 1000;
         //used in camera updates to make current location appear closer to bottom of screen
         public static int MetersAheadToAim = 500;
         public static float DefaultSpeed = 1.5f; //meters per second

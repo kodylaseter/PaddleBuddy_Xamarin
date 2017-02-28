@@ -16,10 +16,6 @@ namespace PaddleBuddy.Core.Services
         private List<Point> _points;
         private List<Link> _links;
         private bool _isReady;
-        /// <summary>
-        /// Used for IsOnTrack calculation for filtering out points
-        /// </summary>
-        private const double POINT_TOO_FAR_AWAY = 5500;
 
         public static DatabaseService GetInstance()
         {
@@ -57,13 +53,11 @@ namespace PaddleBuddy.Core.Services
             set { _points = value; }
         }
 
-
         public List<River> Rivers
         {
             get { return _rivers; }
             set { _rivers = value; }
         }
-
 
         public List<Link> Links
         {
@@ -80,7 +74,7 @@ namespace PaddleBuddy.Core.Services
             for (var i = tripPoints.Count - 1; i >= 0; i--)
             {
                 var dist = PBMath.DistanceInMeters(current, tripPoints[i]);
-                if (dist > POINT_TOO_FAR_AWAY)
+                if (dist > SysPrefs.PickNextDestinationThreshold)
                 {
                     tripPoints.RemoveAt(i);
                 }

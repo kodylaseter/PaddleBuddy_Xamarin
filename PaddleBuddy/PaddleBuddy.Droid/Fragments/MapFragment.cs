@@ -153,6 +153,7 @@ namespace PaddleBuddy.Droid.Fragments
                 return;
             }
             DrawCurrentTrip();
+            TripManager.AddToPointHistory(CurrentLocation);
             if (TripManager.HasStarted)
             {
                 if (TripManager.IsOnTrack(TripManager.PreviousPoint, TripManager.CurrentPoint, CurrentLocation))
@@ -360,7 +361,7 @@ namespace PaddleBuddy.Droid.Fragments
             LogService.Log("finished trip");
             LocationService.GetInstance().StopListening();
             MessengerService.Messenger.Unregister<LocationUpdatedMessage>(this);
-            NavigateTo(TripSummaryFragment.NewInstance(), SysPrefs.SERIALIZABLE_TRIPSUMMARY, new TripSummary {EndTime = DateTime.Now.TimeOfDay});
+            NavigateTo(TripSummaryFragment.NewInstance(), SysPrefs.SERIALIZABLE_TRIPSUMMARY, TripManager.ExportTripSummary());
         }
 
         private void StartSimulating()

@@ -12,28 +12,21 @@ namespace PaddleBuddy.Core.Models
 
         private int _index;
         private List<Point> _points;
-        private List<Point> _pointsHistory; 
-        private const double IS_CLOSE_THRESHOLD = 100; //meters
-        private TimeSpan _timeStart;
-        private TimeSpan _timeEnd;
+        private TripSummary TripSummary { get; }
 
         public TripManager()
         {
             Index = 0;
-            _timeStart = DateTime.Now.TimeOfDay;
-            _pointsHistory = new List<Point>();
+            TripSummary = new TripSummary();
+            TripSummary.StartTime = DateTime.Now.TimeOfDay;
+            TripSummary.PointsHistory = new List<Point>();
         }
 
         public TripSummary ExportTripSummary()
         {
-            return new TripSummary
-            {
-                StartTime = _timeStart,
-                EndTime = DateTime.Now.TimeOfDay,
-                PointsHistory = _pointsHistory
-            };
+            TripSummary.EndTime = DateTime.Now.TimeOfDay;
+            return TripSummary;
         }
-
 
         public int Index
         {
@@ -60,7 +53,7 @@ namespace PaddleBuddy.Core.Models
 
         public void AddToPointHistory(Point p)
         {
-            _pointsHistory.Add(p);
+            TripSummary.PointsHistory.Add(p);
         }
 
         public Point StartPoint
@@ -123,7 +116,7 @@ namespace PaddleBuddy.Core.Models
         public bool IsOnTrack(Point lineStart, Point lineEnd, Point current)
         {
             var dist = PBMath.DistanceInMetersFromPointToLineSegment(lineStart, lineEnd, current);
-            return Math.Abs(dist) < IS_CLOSE_THRESHOLD;
+            return Math.Abs(dist) < SysPrefs.IsOnTrackCloseThreshold;
         }
 
         public bool CloseToStart(Point current)
