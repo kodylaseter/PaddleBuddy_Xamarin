@@ -279,7 +279,7 @@ namespace PaddleBuddy.Droid.Fragments
                 var tripEstimate = PBMath.PointsToEstimate(points);
                 _mapBarTextView1.Text = tripEstimate.TimeRemaining;
                 _mapBarTextView2.Text = PBUtilities.FormatDistanceToMilesOrMeters(tripEstimate.Distance);
-                _mapBarTextView3.Text = DateTime.Now.Add(tripEstimate.Time).ToString("hh:mm tt");
+                _mapBarTextView3.Text = DateTime.Now.Add(tripEstimate.Time).ToStringHrsMinsAmPm();
             }
             else
             {
@@ -366,7 +366,7 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void StartSimulating()
         {
-            var p = DatabaseService.GetInstance().GetPath(SysPrefs.SimulateRiver).Points;
+            var p = DatabaseService.GetInstance().GetPath(SysPrefs.RiverIdToSimulate).Points;
             if (p.Count <= 1) return;
             SetupNavigate(p);
             SimulatorService.GetInstance().StartSimulating(p);

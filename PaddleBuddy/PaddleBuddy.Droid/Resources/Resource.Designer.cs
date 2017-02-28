@@ -2845,9 +2845,6 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b00ae
 			public const int right_side = 2131427502;
 			
-			// aapt resource value: 0x7f0b009f
-			public const int river_name = 2131427487;
-			
 			// aapt resource value: 0x7f0b0012
 			public const int satellite = 2131427346;
 			
@@ -3019,9 +3016,6 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b0063
 			public const int titleDividerNoCustom = 2131427427;
 			
-			// aapt resource value: 0x7f0b009e
-			public const int title_bar = 2131427486;
-			
 			// aapt resource value: 0x7f0b0061
 			public const int title_template = 2131427425;
 			
@@ -3043,8 +3037,14 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b000e
 			public const int transition_scene_layoutid_cache = 2131427342;
 			
+			// aapt resource value: 0x7f0b009f
+			public const int tripsummary_map = 2131427487;
+			
 			// aapt resource value: 0x7f0b00a0
-			public const int trip_date = 2131427488;
+			public const int tripsummary_times = 2131427488;
+			
+			// aapt resource value: 0x7f0b009e
+			public const int tripsummary_title = 2131427486;
 			
 			// aapt resource value: 0x7f0b000b
 			public const int up = 2131427339;
@@ -4722,8 +4722,14 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f06001e
 			public const int Widget_Design_TextInputLayout = 2131099678;
 			
+			// aapt resource value: 0x7f060184
+			public const int textLargeGray = 2131100036;
+			
 			// aapt resource value: 0x7f060183
 			public const int textLargeWhite = 2131100035;
+			
+			// aapt resource value: 0x7f060185
+			public const int textMediumGray = 2131100037;
 			
 			// aapt resource value: 0x7f060182
 			public const int textSmallWhite = 2131100034;

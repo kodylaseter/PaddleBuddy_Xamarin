@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using PaddleBuddy.Core;
 using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Services;
+using PaddleBuddy.Core.Utilities;
 
 namespace PaddleBuddy.Droid.Fragments
 {
@@ -13,7 +14,7 @@ namespace PaddleBuddy.Droid.Fragments
     {
         private EditText _startEditText;
         private EditText _endEditText;
-        private TripSummary _tripSummary;
+        private TripSummary TripSummary { get; set; }
 
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -21,7 +22,7 @@ namespace PaddleBuddy.Droid.Fragments
             if (Arguments == null || !Arguments.ContainsKey(SysPrefs.SERIALIZABLE_TRIPSUMMARY)) return;
             try
             {
-                _tripSummary =
+                TripSummary =
                     JsonConvert.DeserializeObject<TripSummary>(
                         Arguments.GetString(SysPrefs.SERIALIZABLE_TRIPSUMMARY));
             }
@@ -35,13 +36,18 @@ namespace PaddleBuddy.Droid.Fragments
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var view = inflater.Inflate(Resource.Layout.fragment_tripsummary, container, false);
-            if (_tripSummary != null)
-            {
-                view.FindViewById<TextView>(Resource.Id.river_name).Text =
-                    DatabaseService.GetInstance().GetRiverName(_tripSummary.RiverId);
-                view.FindViewById<TextView>(Resource.Id.trip_date).Text = _tripSummary.StartDateTime.ToString("YY-MM-DD/dd/yyyy");
+            if (TripSummary == null) return view;
 
-            }
+            var titleString = DatabaseService.GetInstance().GetRiverName(TripSummary.RiverId);
+            titleString += " - ";
+            titleString += TripSummary.StartDateTime.ToShortDateString();
+            var timesString = TripSummary.StartDateTime.ToStringHrsMinsAmPm();
+            timesString += " - " + TripSummary.EndTime.ToStringHrsMinsAmPm();
+            timesString += " | " + TripSummary.EndTime.Subtract(TripSummary.StartDateTime).ToStringHrsOrMins();
+            view.FindViewById<TextView>(Resource.Id.tripsummary_title).Text =
+                titleString;
+            view.FindViewById<TextView>(Resource.Id.tripsummary_times).Text =
+                timesString;
             return view;
         }
 

@@ -2,41 +2,41 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:layout_margin="5dp">
+    android:layout_height="fill_parent">
     
     <!--look at elevation or something?-->
     <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal">
+        android:layout_gravity="center_horizontal"
+        card_view:cardUseCompatPadding="true"
+        card_view:contentPadding="5dp"
+        card_view:cardElevation="4dp"
+        card_view:cardCornerRadius="3dp">
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
-            <LinearLayout
-                android:id="@+id/title_bar"
-                android:layout_width="fill_parent"
+            <TextView 
+                android:id="@+id/tripsummary_title"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:marginBottom="5dp"
-                android:orientation="horizontal">
-                <TextView
-                    android:id="@+id/river_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-                <TextView
-                    android:id="@+id/trip_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@color/colorPrimary"/>
-
-            </LinearLayout>
+                android:layout_marginBottom="5dp"
+                android:textAppearance="@style/textLargeGray"/>
             <!--placeholder for eventual map image-->
             <FrameLayout 
+                android:id="@+id/tripsummary_map"
                 android:layout_width="fill_parent"
                 android:layout_height="200dp"
-                android:layout_below="@id/title_bar"
+                android:layout_below="@id/tripsummary_title"
+                android:layout_marginBottom="5dp"
                 android:background="@color/gray"/>
+            <TextView 
+                android:id="@+id/tripsummary_times"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tripsummary_map"
+                android:textAppearance="@style/textMediumGray"/>
             
         </RelativeLayout>
     </android.support.v7.widget.CardView>

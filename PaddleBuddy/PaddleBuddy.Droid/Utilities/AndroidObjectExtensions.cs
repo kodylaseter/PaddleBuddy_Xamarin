@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using Android.Gms.Maps.Model;
 using PaddleBuddy.Core.Models.Map;
 

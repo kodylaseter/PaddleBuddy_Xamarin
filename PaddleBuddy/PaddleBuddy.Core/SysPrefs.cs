@@ -20,7 +20,7 @@
         public static bool DisableMap = false;
 
         public static bool Simulate = false;
-        public static int SimulateRiver = 8;
+        public static int RiverIdToSimulate = 8;
 
 
         public static double TripPointsCloseThreshold = 30;

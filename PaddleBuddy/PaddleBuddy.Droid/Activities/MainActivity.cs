@@ -10,6 +10,7 @@ using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json;
 using PaddleBuddy.Core;
+using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Adapters;
 using PaddleBuddy.Droid.Fragments;
@@ -48,6 +49,7 @@ namespace PaddleBuddy.Droid.Activities
             _navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
             _navigationView.SetNavigationItemSelectedListener(this);
             OnNavigationItemSelected();
+            //TestTripSummary();
 
             _searchListView = FindViewById<ListView>(Resource.Id.search_list_view);
             _searchLayout = FindViewById<LinearLayout>(Resource.Id.search_results_layout);
@@ -167,6 +169,21 @@ namespace PaddleBuddy.Droid.Activities
             {
                 LogService.ExceptionLog(e.Message);
             }
+        }
+
+        private void TestTripSummary()
+        {
+            var fragment = TripSummaryFragment.NewInstance();
+            var tripSummary = new TripSummary
+            {
+                StartDateTime = DateTime.Now,
+                RiverId = SysPrefs.RiverIdToSimulate
+            };
+            var endTIme = DateTime.Now;
+            endTIme = endTIme.Add(new TimeSpan(0, 2, 20, 0));
+            tripSummary.EndTime = endTIme;
+            tripSummary.PointsHistory = DatabaseService.GetInstance().GetPath(tripSummary.RiverId).Points;
+            HandleNavigationWithData(fragment, SysPrefs.SERIALIZABLE_TRIPSUMMARY, JsonConvert.SerializeObject(tripSummary));
         }
 
         private void OpenSearch()

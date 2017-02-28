@@ -26,7 +26,7 @@ namespace PaddleBuddy.Core.Models
 
         public TripSummary ExportTripSummary()
         {
-            TripSummary.EndTime = DateTime.Now.TimeOfDay;
+            TripSummary.EndTime = DateTime.Now;
             return TripSummary;
         }
 

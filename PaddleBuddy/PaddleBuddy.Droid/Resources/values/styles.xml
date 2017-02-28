@@ -40,4 +40,10 @@
     <style name="textLargeWhite" parent="@android:style/TextAppearance.Large">
         <item name="android:textColor">@color/almostWhite</item>
     </style>
+    <style name="textLargeGray" parent="@android:style/TextAppearance.Large">
+        <item name="android:textColor">@color/black</item>
+    </style>
+    <style name="textMediumGray" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@color/black</item>
+    </style>
 </resources>

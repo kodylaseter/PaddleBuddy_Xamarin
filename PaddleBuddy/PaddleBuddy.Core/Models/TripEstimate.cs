@@ -1,4 +1,5 @@
 ﻿using System;
+using PaddleBuddy.Core.Utilities;
 
 namespace PaddleBuddy.Core.Models
 {
@@ -15,10 +16,7 @@ namespace PaddleBuddy.Core.Models
 
         public string TimeRemaining
         {
-            get
-            {
-                return Time.TotalMinutes < 60 ? Time.Minutes + "mins" : Time.ToString(@"hh\:mm");
-            }
+            get { return Time.ToStringHrsOrMins(); }
         } 
 
         public override string ToString()
