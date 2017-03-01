@@ -13,8 +13,8 @@ namespace PaddleBuddy.Droid.Adapters
 {
     public class MainActivitySearchAdapter : BaseAdapter<SearchItem>
     {
-        public SearchService SearchService { get; private set; }
-        private Activity _activity;
+        public SearchService SearchService { get; }
+        private readonly Activity _activity;
         public Filter Filter { get; private set; }
 
         public MainActivitySearchAdapter(Activity activity)

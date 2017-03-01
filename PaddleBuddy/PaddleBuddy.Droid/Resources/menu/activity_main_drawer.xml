@@ -7,9 +7,9 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="Map" />
         <item
-            android:id="@+id/nav_plan"
+            android:id="@+id/nav_history"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Plan" />
+            android:title="History" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_slideshow"

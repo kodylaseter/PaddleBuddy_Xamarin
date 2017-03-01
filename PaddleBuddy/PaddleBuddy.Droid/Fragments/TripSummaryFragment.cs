@@ -6,14 +6,12 @@ using Newtonsoft.Json;
 using PaddleBuddy.Core;
 using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Services;
-using PaddleBuddy.Core.Utilities;
+using PaddleBuddy.Droid.Controls;
 
 namespace PaddleBuddy.Droid.Fragments
 {
     public class TripSummaryFragment : BaseFragment
     {
-        private EditText _startEditText;
-        private EditText _endEditText;
         private TripSummary TripSummary { get; set; }
 
         public override void OnCreate(Bundle savedInstanceState)
@@ -35,19 +33,10 @@ namespace PaddleBuddy.Droid.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            var view = inflater.Inflate(Resource.Layout.fragment_tripsummary, container, false);
+            var view = new LinearLayout(Context);
             if (TripSummary == null) return view;
-
-            var titleString = DatabaseService.GetInstance().GetRiverName(TripSummary.RiverId);
-            titleString += " - ";
-            titleString += TripSummary.StartDateTime.ToShortDateString();
-            var timesString = TripSummary.StartDateTime.ToStringHrsMinsAmPm();
-            timesString += " - " + TripSummary.EndTime.ToStringHrsMinsAmPm();
-            timesString += " | " + TripSummary.EndTime.Subtract(TripSummary.StartDateTime).ToStringHrsOrMins();
-            view.FindViewById<TextView>(Resource.Id.tripsummary_title).Text =
-                titleString;
-            view.FindViewById<TextView>(Resource.Id.tripsummary_times).Text =
-                timesString;
+            view.SetPadding(5,5,5,5);
+            view.AddView(new TripSummaryCardView(Context, TripSummary, false));
             return view;
         }
 

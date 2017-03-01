@@ -30,10 +30,12 @@ namespace PaddleBuddy.Droid.Activities
         private LinearLayout _searchLayout;
         private SearchView _searchView;
         private IMenuItem _searchItem;
+        private int DEFAULT_FRAGMENT_ID;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            DEFAULT_FRAGMENT_ID = Resource.Id.nav_map;
             LogService.Log("main activity started");
             SetContentView(Resource.Layout.activity_main);
 
@@ -43,14 +45,15 @@ namespace PaddleBuddy.Droid.Activities
             _drawer = (DrawerLayout) FindViewById(Resource.Id.drawer_layout);
             _toggle = new ActionBarDrawerToggle(this, _drawer, _toolbar, Resource.String.navigation_drawer_open,
                 Resource.String.navigation_drawer_close);
-            _drawer.SetDrawerListener(_toggle);
+            _drawer.AddDrawerListener(_toggle);
             _toggle.SyncState();
 
             _navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
             _navigationView.SetNavigationItemSelectedListener(this);
-            OnNavigationItemSelected();
             //TestTripSummary();
+            TestTripHistory();
 
+            OnNavigationItemSelected();
             _searchListView = FindViewById<ListView>(Resource.Id.search_list_view);
             _searchLayout = FindViewById<LinearLayout>(Resource.Id.search_results_layout);
 
@@ -119,7 +122,7 @@ namespace PaddleBuddy.Droid.Activities
 
         public void HandleNavigation(IMenuItem menuItem)
         {
-            var id = menuItem?.ItemId ?? Resource.Id.nav_map;
+            var id = menuItem?.ItemId ?? DEFAULT_FRAGMENT_ID;
             //converts id to a drawerindex
             BaseFragment fragment;
             switch (id)
@@ -128,9 +131,9 @@ namespace PaddleBuddy.Droid.Activities
                     id = (int)NavDraweritems.Map;
                     fragment = MapFragment.NewInstance();
                     break;
-                case Resource.Id.nav_plan:
-                    id = (int)NavDraweritems.Plan;
-                    fragment = PlanFragment.NewInstance();
+                case Resource.Id.nav_history:
+                    id = (int)NavDraweritems.History;
+                    fragment = TripHistoryFragment.NewInstance();
                     break;
                 default:
                     id = (int)NavDraweritems.Map;
@@ -174,16 +177,14 @@ namespace PaddleBuddy.Droid.Activities
         private void TestTripSummary()
         {
             var fragment = TripSummaryFragment.NewInstance();
-            var tripSummary = new TripSummary
-            {
-                StartDateTime = DateTime.Now,
-                RiverId = SysPrefs.RiverIdToSimulate
-            };
-            var endTIme = DateTime.Now;
-            endTIme = endTIme.Add(new TimeSpan(0, 2, 20, 0));
-            tripSummary.EndTime = endTIme;
-            tripSummary.PointsHistory = DatabaseService.GetInstance().GetPath(tripSummary.RiverId).Points;
-            HandleNavigationWithData(fragment, SysPrefs.SERIALIZABLE_TRIPSUMMARY, JsonConvert.SerializeObject(tripSummary));
+            DatabaseService.GetInstance().SeedTripSummary();
+            HandleNavigationWithData(fragment, SysPrefs.SERIALIZABLE_TRIPSUMMARY, JsonConvert.SerializeObject(DatabaseService.GetInstance().TripSummaries.FirstOrDefault()));
+        }
+
+        private void TestTripHistory()
+        {
+            DatabaseService.GetInstance().SeedTripSummary();
+            DEFAULT_FRAGMENT_ID = Resource.Id.nav_history;
         }
 
         private void OpenSearch()
@@ -237,7 +238,7 @@ namespace PaddleBuddy.Droid.Activities
         private enum NavDraweritems
         {
             Map = 0,
-            Plan = 1
+            History = 1
         }
     }
 }

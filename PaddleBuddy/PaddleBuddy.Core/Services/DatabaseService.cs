@@ -12,9 +12,11 @@ namespace PaddleBuddy.Core.Services
     public class DatabaseService : ApiService
     {
         private static DatabaseService _databaseService;
-        private List<River> _rivers;
-        private List<Point> _points;
-        private List<Link> _links;
+        public List<TripSummary> TripSummaries { get; set; }
+        public List<Point> Points { get; set; }
+        public List<River> Rivers { get; set; }
+        public List<Link> Links { get; set; }
+
         private bool _isReady;
 
         public static DatabaseService GetInstance()
@@ -24,14 +26,38 @@ namespace PaddleBuddy.Core.Services
 
         public DatabaseService()
         {
-            _isReady = false;
+            IsReady = false;
+            TripSummaries = new List<TripSummary>();
         }
 
         public void UpdateIsReady()
         {
-            IsReady = (_rivers != null && _rivers.Count > 0) &&
-                    (_points != null && _points.Count > 0) &&
-                    (_links != null && _links.Count > 0);
+            IsReady = (Rivers != null && Rivers.Count > 0) &&
+                    (Points != null && Points.Count > 0) &&
+                    (Links != null && Links.Count > 0);
+        }
+
+        public void AddTripSummary(TripSummary tripSummary)
+        {
+            TripSummaries.Add(tripSummary);
+        }
+
+        public void SeedTripSummary(int count = 3)
+        {
+            for (var i = 0; i < count; i++)
+            {
+                var tripSummary = new TripSummary
+                {
+                    StartDateTime = DateTime.Now,
+                    RiverId = SysPrefs.RiverIdToSimulate
+                };
+                var endTIme = DateTime.Now;
+                endTIme = endTIme.Add(new TimeSpan(0, 2, 20, 0));
+                tripSummary.EndTime = endTIme;
+                tripSummary.PointsHistory = GetPath(tripSummary.RiverId).Points;
+                AddTripSummary(tripSummary);
+            }
+            
         }
 
         public bool IsReady
@@ -45,24 +71,6 @@ namespace PaddleBuddy.Core.Services
                     MessengerService.Messenger.Send(new DbReadyMessage());
                 }
             }
-        }
-
-        public List<Point> Points
-        {
-            get { return _points; }
-            set { _points = value; }
-        }
-
-        public List<River> Rivers
-        {
-            get { return _rivers; }
-            set { _rivers = value; }
-        }
-
-        public List<Link> Links
-        {
-            get { return _links; }
-            set { _links = value; }
         }
 
         public Point PickNextDestination(Point current, TripManager tripManager)
@@ -98,7 +106,7 @@ namespace PaddleBuddy.Core.Services
             return closestNextPoint.Item1;
         }
 
-        public Link GetLinkForPoinds(Point a, Point b)
+        public Link GetLinkForPoints(Point a, Point b)
         {
             return GetLinkForPointIds(a.Id, b.Id);
         }

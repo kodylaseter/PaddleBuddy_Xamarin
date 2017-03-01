@@ -100,11 +100,34 @@ namespace PaddleBuddy.Droid.Fragments
         public void OnMapReady(GoogleMap googleMap)
         {
             MyMap = googleMap;
-            MessengerService.Messenger.Register<LocationUpdatedMessage>(this, LocationUpdatedReceived);
             MyMap.SetOnMarkerClickListener(this);
             MyMap.SetOnMapClickListener(this);
             MyMap.SetInfoWindowAdapter(this);
             DelayedSetupBrowse();
+        }
+
+        public override void OnStop()
+        {
+            base.OnStop();
+            PrepareForClose();
+        }
+
+        public override void OnStart()
+        {
+            base.OnStart();
+            PrepareForStart();
+        }
+
+        private void PrepareForStart()
+        {
+            LocationService.GetInstance().StartListening();
+            MessengerService.Messenger.Register<LocationUpdatedMessage>(this, LocationUpdatedReceived);
+        }
+
+        private void PrepareForClose()
+        {
+            LocationService.GetInstance().StopListening();
+            MessengerService.Messenger.Unregister<LocationUpdatedMessage>(this);
         }
 
         private async void DelayedSetupBrowse()
@@ -359,8 +382,7 @@ namespace PaddleBuddy.Droid.Fragments
         private void FinishTrip()
         {
             LogService.Log("finished trip");
-            LocationService.GetInstance().StopListening();
-            MessengerService.Messenger.Unregister<LocationUpdatedMessage>(this);
+            PrepareForClose();
             NavigateTo(TripSummaryFragment.NewInstance(), SysPrefs.SERIALIZABLE_TRIPSUMMARY, TripManager.ExportTripSummary());
         }
 

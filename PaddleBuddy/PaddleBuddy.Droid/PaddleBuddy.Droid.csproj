@@ -204,7 +204,10 @@
     <Compile Include="Activities\MainActivity.cs" />
     <Compile Include="Activities\SetupActivity.cs" />
     <Compile Include="Adapters\MainActivitySearchAdapter.cs" />
+    <Compile Include="Adapters\TripSummaryAdapter.cs" />
+    <Compile Include="Controls\TripSummaryCardView.cs" />
     <Compile Include="Fragments\BaseFragment.cs" />
+    <Compile Include="Fragments\TripHistoryFragment.cs" />
     <Compile Include="Fragments\TripSummaryFragment.cs" />
     <Compile Include="Fragments\PlanFragment.cs" />
     <Compile Include="Fragments\MapFragment.cs" />
@@ -235,7 +238,10 @@
     </AndroidResource>
     <AndroidResource Include="Resources\layout\infowindow_custom_marker.axml" />
     <AndroidResource Include="Resources\menu\main_menu.axml" />
-    <AndroidResource Include="Resources\layout\fragment_tripsummary.axml">
+    <AndroidResource Include="Resources\layout\cardview_tripsummary.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\fragment_triphistory.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
