@@ -33,10 +33,9 @@ namespace PaddleBuddy.Droid.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            var view = new LinearLayout(Context);
+            var view = inflater.Inflate(Resource.Layout.fragment_tripsummary, container, false);
             if (TripSummary == null) return view;
-            view.SetPadding(5,5,5,5);
-            view.AddView(new TripSummaryCardView(Context, TripSummary, false));
+            view.FindViewById<LinearLayout>(Resource.Id.summary_container).AddView(new TripSummaryCardView(Context, TripSummary, false));
             return view;
         }
 

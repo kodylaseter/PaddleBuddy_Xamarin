@@ -16,7 +16,7 @@ namespace PaddleBuddy.Core.Models
 
         public string TimeRemaining
         {
-            get { return Time.ToStringHrsOrMins(); }
+            get { return Time.ToStringHrsMinsText(); }
         } 
 
         public override string ToString()

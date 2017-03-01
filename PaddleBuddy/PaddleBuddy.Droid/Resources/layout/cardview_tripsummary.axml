@@ -5,7 +5,7 @@
               android:orientation="vertical">
     <TextView
         android:id="@+id/tripsummary_title"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:textAppearance="@style/textLargeGray"/>
@@ -24,7 +24,7 @@
             android:background="@color/gray"/>
         <TextView
             android:id="@+id/tripsummary_times"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tripsummary_map"
             android:textAppearance="@style/textMediumGray"/>

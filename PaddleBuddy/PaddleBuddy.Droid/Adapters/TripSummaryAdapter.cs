@@ -21,7 +21,7 @@ namespace PaddleBuddy.Droid.Adapters
 
         private void UpdateTripSummaries()
         {
-            TripSummaries = DatabaseService.GetInstance().TripSummaries;
+            TripSummaries = DatabaseService.GetInstance().GetSortedSummaries();
         }
 
         public override long GetItemId(int position)

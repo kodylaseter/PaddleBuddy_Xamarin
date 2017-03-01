@@ -51,7 +51,7 @@ namespace PaddleBuddy.Droid.Activities
             _navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
             _navigationView.SetNavigationItemSelectedListener(this);
             //TestTripSummary();
-            TestTripHistory();
+            //TestTripHistory();
 
             OnNavigationItemSelected();
             _searchListView = FindViewById<ListView>(Resource.Id.search_list_view);

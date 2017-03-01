@@ -28,7 +28,7 @@ namespace PaddleBuddy.Droid.Controls
             titleString += TripSummary.StartDateTime.ToShortDateString();
             var timesString = TripSummary.StartDateTime.ToStringHrsMinsAmPm();
             timesString += " - " + TripSummary.EndTime.ToStringHrsMinsAmPm();
-            timesString += " | " + TripSummary.EndTime.Subtract(TripSummary.StartDateTime).ToStringHrsOrMins();
+            timesString += " | " + TripSummary.EndTime.Subtract(TripSummary.StartDateTime).ToStringHrsMinsText();
             _titleTextView = FindViewById<TextView>(Resource.Id.tripsummary_title);
             _titleTextView.Text = titleString;
             FindViewById<TextView>(Resource.Id.tripsummary_times).Text =
