@@ -42,6 +42,11 @@ namespace PaddleBuddy.Core.Services
             TripSummaries.Add(tripSummary);
         }
 
+        public List<TripSummary> GetSortedSummaries()
+        {
+            return TripSummaries.ToList().Sort();
+        } 
+
         public void SeedTripSummary(int count = 3)
         {
             for (var i = 0; i < count; i++)

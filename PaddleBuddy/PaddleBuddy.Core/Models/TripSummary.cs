@@ -5,7 +5,7 @@ using PaddleBuddy.Core.Utilities;
 
 namespace PaddleBuddy.Core.Models
 {
-    public class TripSummary
+    public class TripSummary : IComparable<TripSummary>
     {
         public DateTime StartDateTime { get; set; }
         public DateTime EndTime { get; set; }
@@ -16,6 +16,11 @@ namespace PaddleBuddy.Core.Models
         public TripSummary()
         {
             Id = PBUtilities.GetNextId();
+        }
+
+        public int CompareTo(TripSummary other)
+        {
+            return StartDateTime.CompareTo(other.StartDateTime);
         }
     }
 }
