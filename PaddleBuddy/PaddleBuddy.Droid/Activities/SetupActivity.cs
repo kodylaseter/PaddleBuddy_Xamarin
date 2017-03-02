@@ -29,7 +29,7 @@ namespace PaddleBuddy.Droid.Activities
             _dbReady = false;
             _locationPermissionApproved = false;
             _locationReady = false;
-            SetupSysPrefs();
+            SetupSysPrefs(testOffline: true);
             SetContentView(Resource.Layout.activity_setup);
         }
 
@@ -39,12 +39,12 @@ namespace PaddleBuddy.Droid.Activities
             Setup();
         }
 
-        private void SetupSysPrefs()
+        private void SetupSysPrefs(bool testOffline = false)
         {
             SysPrefs.Device = SysPrefs.Devices.Android;
-            SysPrefs.TestOffline = false;
-            SysPrefs.DisableMap = false;
-            SysPrefs.Simulate = true;
+            SysPrefs.TestOffline = testOffline;
+            SysPrefs.DisableMap = testOffline;
+            SysPrefs.Simulate = testOffline;
         }
 
         private void Setup()
