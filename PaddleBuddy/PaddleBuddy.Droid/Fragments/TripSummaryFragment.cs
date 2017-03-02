@@ -35,7 +35,10 @@ namespace PaddleBuddy.Droid.Fragments
         {
             var view = inflater.Inflate(Resource.Layout.fragment_tripsummary, container, false);
             if (TripSummary == null) return view;
-            view.FindViewById<LinearLayout>(Resource.Id.summary_container).AddView(new TripSummaryCardView(Context, TripSummary, false));
+            var tripSummaryCardView = new TripSummaryCardView(Context, false);
+            tripSummaryCardView.UpdateData(TripSummary);
+            view.FindViewById<LinearLayout>(Resource.Id.summary_container).AddView(tripSummaryCardView);
+
             return view;
         }
 

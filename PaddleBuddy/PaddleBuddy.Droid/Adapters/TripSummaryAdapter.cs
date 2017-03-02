@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using Android.App;
+using Android.Support.V7.Widget;
 using Android.Views;
-using Android.Widget;
 using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Controls;
 
 namespace PaddleBuddy.Droid.Adapters
 {
-    public class TripSummaryAdapter : BaseAdapter<TripSummary>
+    public class TripSummaryAdapter : RecyclerView.Adapter
     {
         private readonly Activity _activity;
         public List<TripSummary> TripSummaries { get; set; }
@@ -24,22 +24,27 @@ namespace PaddleBuddy.Droid.Adapters
             TripSummaries = DatabaseService.GetInstance().GetSortedSummaries();
         }
 
-        public override long GetItemId(int position)
+        public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
-            return TripSummaries[position].Id;
+            var tripSummaryViewHolder = holder as TripSummaryViewHolder;
+            tripSummaryViewHolder?.CardView.UpdateData(TripSummaries[position]);
         }
 
-        public override View GetView(int position, View convertView, ViewGroup parent)
+        public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
-            var currentSummary = TripSummaries[position];
-            return convertView ?? new TripSummaryCardView(_activity, currentSummary, true);
+            TripSummaryCardView itemView = new TripSummaryCardView(_activity, true);
+            return new TripSummaryViewHolder(itemView);
         }
 
-        public override int Count => TripSummaries.Count;
+        public override int ItemCount => TripSummaries.Count;
 
-        public override TripSummary this[int position]
+        private class TripSummaryViewHolder : RecyclerView.ViewHolder
         {
-            get { throw new System.NotImplementedException(); }
+            public TripSummaryCardView CardView { get; }
+            public TripSummaryViewHolder(TripSummaryCardView cardView) : base(cardView)
+            {
+                CardView = cardView;
+            }
         }
     }
 }

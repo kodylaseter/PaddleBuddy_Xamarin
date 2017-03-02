@@ -10,7 +10,6 @@ using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json;
 using PaddleBuddy.Core;
-using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Adapters;
 using PaddleBuddy.Droid.Fragments;

@@ -1,8 +1,5 @@
-using System;
 using Android.Content;
-using Android.Runtime;
 using Android.Support.V7.Widget;
-using Android.Util;
 using Android.Views;
 using Android.Widget;
 using PaddleBuddy.Core.Models;
@@ -15,73 +12,55 @@ namespace PaddleBuddy.Droid.Controls
     {
         public bool IsExpandable { get; set; }
         public TripSummary TripSummary { get; set; }
-        private TextView _titleTextView;
-        private View _detailsGroup;
+        private TextView TimesTextView { get; set; }
+        private TextView TitleTextView { get; set; }
+        private View DetailsGroup { get; set; }
+        private LinearLayout TitleGroup { get; set; }
+
         private void Initialize()
         {
             UseCompatPadding = true;
             SetContentPadding(5, 5, 5, 5);
+            LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             AddView(Inflate(Context, Resource.Layout.cardview_tripsummary, null));
 
+            TitleTextView = FindViewById<TextView>(Resource.Id.tripsummary_title);
+            TimesTextView = FindViewById<TextView>(Resource.Id.tripsummary_times);
+            DetailsGroup = FindViewById(Resource.Id.tripsummary_details);
+            TitleGroup = FindViewById<LinearLayout>(Resource.Id.tripsummary_title_group);
+            if (IsExpandable)
+            {
+                DetailsGroup.Visibility = ViewStates.Gone;
+                TitleGroup.Clickable = true;
+                TitleGroup.Click += (s, e) =>
+                {
+                    ToggleExpansion();
+                };
+            }
+        }
+
+        public void UpdateData(TripSummary tripSummary)
+        {
+            TripSummary = tripSummary;
             var titleString = DatabaseService.GetInstance().GetRiverName(TripSummary.RiverId);
             titleString += " - ";
             titleString += TripSummary.StartDateTime.ToShortDateString();
             var timesString = TripSummary.StartDateTime.ToStringHrsMinsAmPm();
             timesString += " - " + TripSummary.EndTime.ToStringHrsMinsAmPm();
             timesString += " | " + TripSummary.EndTime.Subtract(TripSummary.StartDateTime).ToStringHrsMinsText();
-            _titleTextView = FindViewById<TextView>(Resource.Id.tripsummary_title);
-            _titleTextView.Text = titleString;
-            FindViewById<TextView>(Resource.Id.tripsummary_times).Text =
-                timesString;
-            _detailsGroup = FindViewById(Resource.Id.tripsummary_details);
-
-            if (IsExpandable)
-            {
-                _detailsGroup.Visibility = ViewStates.Gone;
-            }
+            TimesTextView.Text = timesString;
+            TitleTextView.Text = titleString;
         }
 
         public void ToggleExpansion()
         {
-            _detailsGroup.Visibility = _detailsGroup.Visibility == ViewStates.Gone ? ViewStates.Visible : ViewStates.Gone;
+            DetailsGroup.Visibility = DetailsGroup.Visibility == ViewStates.Gone ? ViewStates.Visible : ViewStates.Gone;
         }
 
-        //private void OnCardClicked(object sender, EventArgs e)
-        //{
-        //    _detailsGroup.Visibility = _detailsGroup.Visibility == ViewStates.Gone
-        //        ? ViewStates.Visible
-        //        : ViewStates.Gone;
-        //}
-
-
-        public TripSummaryCardView(Context context, TripSummary tripSummary, bool isExpandable) : base(context)
+        public TripSummaryCardView(Context context, bool isExpandable) : base(context)
         {
             IsExpandable = isExpandable;
-            TripSummary = tripSummary;
             Initialize();
         }
-
-        #region old constructors
-
-        public TripSummaryCardView(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public TripSummaryCardView(Context context) : base(context)
-        {
-            throw new NotImplementedException();
-        }
-
-        public TripSummaryCardView(Context context, IAttributeSet attrs) : base(context, attrs)
-        {
-            throw new NotImplementedException();
-        }
-
-        public TripSummaryCardView(Context context, IAttributeSet attrs, int defStyleAttr) : base(context, attrs, defStyleAttr)
-        {
-            throw new NotImplementedException();
-        }
-#endregion
     }
 }
