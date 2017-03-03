@@ -1,11 +1,13 @@
 using System;
 using System.Linq;
 using Android.App;
+using Android.Content;
 using Android.OS;
 using Android.Support.Design.Widget;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
+using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json;
@@ -14,6 +16,7 @@ using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Adapters;
 using PaddleBuddy.Droid.Fragments;
 using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
+using SearchView = Android.Widget.SearchView;
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace PaddleBuddy.Droid.Activities
@@ -24,7 +27,7 @@ namespace PaddleBuddy.Droid.Activities
         private Toolbar _toolbar;
         private DrawerLayout _drawer;
         private NavigationView _navigationView;
-        private ListView _searchListView;
+        private RecyclerView SearchRecyclerView { get; set; }
         private ActionBarDrawerToggle _toggle;
         private LinearLayout _searchLayout;
         private SearchView _searchView;
@@ -53,7 +56,7 @@ namespace PaddleBuddy.Droid.Activities
             //TestTripHistory();
 
             OnNavigationItemSelected();
-            _searchListView = FindViewById<ListView>(Resource.Id.search_list_view);
+            SearchRecyclerView = FindViewById<RecyclerView>(Resource.Id.search_recyclerview);
             _searchLayout = FindViewById<LinearLayout>(Resource.Id.search_results_layout);
 
             Window.SetSoftInputMode(SoftInput.AdjustNothing);
@@ -78,7 +81,8 @@ namespace PaddleBuddy.Droid.Activities
         {
 
             var mainActivitySearchAdapter = new MainActivitySearchAdapter(this);
-            _searchListView.Adapter = mainActivitySearchAdapter;
+            SearchRecyclerView.SetAdapter(mainActivitySearchAdapter);
+            SearchRecyclerView.SetLayoutManager(new LinearLayoutManager(Application.Context));
             _searchLayout.Clickable = true;
             _searchLayout.Click += (s, e) => { CloseSearch(true); };
 
@@ -86,18 +90,17 @@ namespace PaddleBuddy.Droid.Activities
             _searchItem = menu.FindItem(Resource.Id.action_search);
             _searchView = (SearchView) _searchItem.ActionView;
             MenuItemCompat.SetOnActionExpandListener(_searchItem, this);
-            _searchView.QueryTextChange += (sender, args) =>
-            {
-                LogService.Log("typing: " + args.NewText);
-                mainActivitySearchAdapter.Filter.InvokeFilter(args.NewText);
-                args.Handled = true;
-            };
-            _searchView.QueryTextSubmit += (sender, args) =>
-            {
-                LogService.Log("query text submitted: " + args.Query);
-                args.Handled = true;
-            };
-            _searchView.Focusable = true;
+            //_searchView.QueryTextChange += (sender, args) =>
+            //{
+            //    mainActivitySearchAdapter.Filter.InvokeFilter(args.NewText);
+            //    args.Handled = true;
+            //};
+            //_searchView.QueryTextSubmit += (sender, args) =>
+            //{
+            //    LogService.Log("query text submitted: " + args.Query);
+            //    args.Handled = true;
+            //};
+            //_searchView.Focusable = true;
             return base.OnCreateOptionsMenu(menu);
         }
 

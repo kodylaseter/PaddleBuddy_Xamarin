@@ -16,7 +16,6 @@ namespace PaddleBuddy.Core.Services
         public List<Point> Points { get; set; }
         public List<River> Rivers { get; set; }
         public List<Link> Links { get; set; }
-
         private bool _isReady;
 
         public static DatabaseService GetInstance()
@@ -28,6 +27,9 @@ namespace PaddleBuddy.Core.Services
         {
             IsReady = false;
             TripSummaries = new List<TripSummary>();
+            Points = new List<Point>();
+            Rivers = new List<River>();
+            Links = new List<Link>();
         }
 
         public void UpdateIsReady()
@@ -37,17 +39,20 @@ namespace PaddleBuddy.Core.Services
                     (Links != null && Links.Count > 0);
         }
 
-        public void AddTripSummary(TripSummary tripSummary)
-        {
-            TripSummaries.Add(tripSummary);
-        }
-
         public List<TripSummary> GetSortedSummaries()
         {
             var sums = TripSummaries.ToList();
             sums.Sort();
             return sums;
-        } 
+        }
+
+        #region seeding
+
+        public void SeedData()
+        {
+            SeedTripSummary();
+            SeedPoints();
+        }
 
         public void SeedTripSummary(int count = 3)
         {
@@ -61,11 +66,42 @@ namespace PaddleBuddy.Core.Services
                 var endTIme = DateTime.Now;
                 endTIme = endTIme.Add(new TimeSpan(0, 2, 20, 0));
                 tripSummary.EndTime = endTIme;
-                tripSummary.PointsHistory = GetPath(tripSummary.RiverId).Points;
+                var points = GetPath(tripSummary.RiverId)?.Points;
+                if (points != null && points.Count > 0)
+                {
+                    tripSummary.PointsHistory = points;
+                }
                 AddTripSummary(tripSummary);
             }
-            
         }
+
+        public void AddTripSummary(TripSummary tripSummary)
+        {
+            TripSummaries.Add(tripSummary);
+        }
+
+        public void SeedPoints(int count = 10)
+        {
+            var random = new Random();
+            var strings = new[]
+            {"asdf", "blue", "green", "red", "orange", "black", "purple", "georgia", "florida", "hawaii", "new york"};
+            for (var i = 0; i < count; i++)
+            {
+                var randInt = random.Next(0, strings.Length);
+                var point = new Point
+                {
+                    Id = PBUtilities.GetNextId(),
+                    Label = strings[randInt]
+                };
+                AddPoint(point);
+            }
+        }
+
+        private void AddPoint(Point p)
+        {
+            Points.Add(p);
+        }
+        #endregion
 
         public bool IsReady
         {
@@ -172,7 +208,7 @@ namespace PaddleBuddy.Core.Services
 
         public Path GetPath(int riverId)
         {
-            var points = (from p in Points where p.RiverId == riverId select p).ToList();
+            var points = (from p in Points where p.RiverId == riverId select p)?.ToList();
             return new Path
             {
                 RiverId = riverId,

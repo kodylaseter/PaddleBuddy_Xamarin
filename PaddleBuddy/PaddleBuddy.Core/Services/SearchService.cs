@@ -11,7 +11,6 @@ namespace PaddleBuddy.Core.Services
         public List<SearchItem> OriginalData { get; }
         public List<SearchItem> Items { get; set; } 
 
-
         public SearchService()
         {
             OriginalData = new List<SearchItem>();

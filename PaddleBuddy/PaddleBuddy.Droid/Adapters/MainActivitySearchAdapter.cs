@@ -2,49 +2,88 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.App;
+using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Java.Lang;
 using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Services;
+using PaddleBuddy.Droid.Controls;
 using PaddleBuddy.Droid.Utilities;
 
 namespace PaddleBuddy.Droid.Adapters
 {
-    public class MainActivitySearchAdapter : BaseAdapter<SearchItem>
+    public class MainActivitySearchAdapter : RecyclerView.Adapter
     {
         public SearchService SearchService { get; }
         private readonly Activity _activity;
-        public Filter Filter { get; private set; }
 
         public MainActivitySearchAdapter(Activity activity)
         {
             _activity = activity;
             SearchService = new SearchService();
-            Filter = new SearchItemFilter(this);
+            InitData();
+        }
+
+        private void InitData()
+        {
             SearchService.AddData(DatabaseService.GetInstance().Points.ToArray<object>());
-            SearchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
+            //SearchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
         }
 
-        public override int Count => SearchService.Items.Count;
-
-        public override long GetItemId(int position)
+        public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
-            return SearchService.Items[position].Id;
+            var searchItemViewHolder = holder as SearchItemViewHolder;
+            searchItemViewHolder?.CardView.UpdateData(SearchService.Items[position]);
         }
 
-        public override View GetView(int position, View convertView, ViewGroup parent)
+        public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
-            var view = convertView ??
-                       _activity.LayoutInflater.Inflate(Resource.Layout.list_item_searchitem, parent, false);
-            view.FindViewById<TextView>(Resource.Id.text1).Text = SearchService.Items[position].SearchString;
-            return view;
+            var itemView = new SearchItemCardView(_activity);
+            return new SearchItemViewHolder(itemView);
         }
 
-        public override SearchItem this[int position]
+        public override int ItemCount => SearchService.OriginalData.Count;
+
+        private class SearchItemViewHolder : RecyclerView.ViewHolder
         {
-            get { throw new System.NotImplementedException(); }
+            public SearchItemCardView CardView { get; }
+            public SearchItemViewHolder(SearchItemCardView cardView) : base(cardView)
+            {
+                CardView = cardView;
+            }
         }
+
+        //public Filter Filter { get; private set; }
+
+        //public MainActivitySearchAdapter(Activity activity)
+        //{
+        //    _activity = activity;
+        //    SearchService = new SearchService();
+        //    Filter = new SearchItemFilter(this);
+        //    SearchService.AddData(DatabaseService.GetInstance().Points.ToArray<object>());
+        //    SearchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
+        //}
+
+        //public override int Count => SearchService.Items.Count;
+
+        //public override long GetItemId(int position)
+        //{
+        //    return SearchService.Items[position].Id;
+        //}
+
+        //public override View GetView(int position, View convertView, ViewGroup parent)
+        //{
+        //    var view = convertView ??
+        //               _activity.LayoutInflater.Inflate(Resource.Layout.list_item_searchitem, parent, false);
+        //    view.FindViewById<TextView>(Resource.Id.text1).Text = SearchService.Items[position].SearchString;
+        //    return view;
+        //}
+
+        //public override SearchItem this[int position]
+        //{
+        //    get { throw new System.NotImplementedException(); }
+        //}
 
 
         /// <summary>
@@ -96,6 +135,4 @@ namespace PaddleBuddy.Droid.Adapters
             }
         }
     }
-
-
 }

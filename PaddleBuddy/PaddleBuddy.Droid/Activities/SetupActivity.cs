@@ -45,6 +45,10 @@ namespace PaddleBuddy.Droid.Activities
             SysPrefs.TestOffline = testOffline;
             SysPrefs.DisableMap = testOffline;
             SysPrefs.Simulate = testOffline;
+            if (testOffline)
+            {
+                DatabaseService.GetInstance().SeedData();
+            }
         }
 
         private void Setup()

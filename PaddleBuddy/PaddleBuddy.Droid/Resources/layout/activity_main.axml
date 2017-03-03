@@ -48,13 +48,17 @@
                 android:orientation="vertical"
                 android:background="@color/semi_transparent_grey_background"
                 android:visibility="gone">
-                <ListView
+                <!--<ListView
                     android:id="@+id/search_list_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/gray">
                     
-                </ListView>
+                </ListView>-->
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/search_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
             </LinearLayout>
         </android.support.design.widget.CoordinatorLayout>
 
