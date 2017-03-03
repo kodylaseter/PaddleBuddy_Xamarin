@@ -16,13 +16,16 @@ namespace PaddleBuddy.Droid.Adapters
     public class MainActivitySearchAdapter : RecyclerView.Adapter
     {
         public SearchService SearchService { get; }
+        public Filter Filter { get; set; }
         private readonly Activity _activity;
+
 
         public MainActivitySearchAdapter(Activity activity)
         {
             _activity = activity;
             SearchService = new SearchService();
             InitData();
+            Filter = new SearchItemFilter(this);
         }
 
         private void InitData()
@@ -43,7 +46,7 @@ namespace PaddleBuddy.Droid.Adapters
             return new SearchItemViewHolder(itemView);
         }
 
-        public override int ItemCount => SearchService.OriginalData.Count;
+        public override int ItemCount => SearchService.Items.Count;
 
         private class SearchItemViewHolder : RecyclerView.ViewHolder
         {
@@ -53,38 +56,6 @@ namespace PaddleBuddy.Droid.Adapters
                 CardView = cardView;
             }
         }
-
-        //public Filter Filter { get; private set; }
-
-        //public MainActivitySearchAdapter(Activity activity)
-        //{
-        //    _activity = activity;
-        //    SearchService = new SearchService();
-        //    Filter = new SearchItemFilter(this);
-        //    SearchService.AddData(DatabaseService.GetInstance().Points.ToArray<object>());
-        //    SearchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
-        //}
-
-        //public override int Count => SearchService.Items.Count;
-
-        //public override long GetItemId(int position)
-        //{
-        //    return SearchService.Items[position].Id;
-        //}
-
-        //public override View GetView(int position, View convertView, ViewGroup parent)
-        //{
-        //    var view = convertView ??
-        //               _activity.LayoutInflater.Inflate(Resource.Layout.list_item_searchitem, parent, false);
-        //    view.FindViewById<TextView>(Resource.Id.text1).Text = SearchService.Items[position].SearchString;
-        //    return view;
-        //}
-
-        //public override SearchItem this[int position]
-        //{
-        //    get { throw new System.NotImplementedException(); }
-        //}
-
 
         /// <summary>
         /// Custom filter inspired by cheesebaron

@@ -90,17 +90,17 @@ namespace PaddleBuddy.Droid.Activities
             _searchItem = menu.FindItem(Resource.Id.action_search);
             _searchView = (SearchView) _searchItem.ActionView;
             MenuItemCompat.SetOnActionExpandListener(_searchItem, this);
-            //_searchView.QueryTextChange += (sender, args) =>
-            //{
-            //    mainActivitySearchAdapter.Filter.InvokeFilter(args.NewText);
-            //    args.Handled = true;
-            //};
-            //_searchView.QueryTextSubmit += (sender, args) =>
-            //{
-            //    LogService.Log("query text submitted: " + args.Query);
-            //    args.Handled = true;
-            //};
-            //_searchView.Focusable = true;
+            _searchView.QueryTextChange += (sender, args) =>
+            {
+                mainActivitySearchAdapter.Filter.InvokeFilter(args.NewText);
+                args.Handled = true;
+            };
+            _searchView.QueryTextSubmit += (sender, args) =>
+            {
+                LogService.Log("query text submitted: " + args.Query);
+                args.Handled = true;
+            };
+            _searchView.Focusable = true;
             return base.OnCreateOptionsMenu(menu);
         }
 
