@@ -57,6 +57,8 @@ namespace PaddleBuddy.Droid.Activities
 
             OnNavigationItemSelected();
             SearchRecyclerView = FindViewById<RecyclerView>(Resource.Id.search_recyclerview);
+            var divider = new DividerItemDecoration(SearchRecyclerView.Context, DividerItemDecoration.Vertical);
+            SearchRecyclerView.AddItemDecoration(divider);
             _searchLayout = FindViewById<LinearLayout>(Resource.Id.search_results_layout);
 
             Window.SetSoftInputMode(SoftInput.AdjustNothing);

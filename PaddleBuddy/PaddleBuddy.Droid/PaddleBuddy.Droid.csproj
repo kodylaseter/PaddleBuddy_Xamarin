@@ -205,7 +205,7 @@
     <Compile Include="Activities\SetupActivity.cs" />
     <Compile Include="Adapters\MainActivitySearchAdapter.cs" />
     <Compile Include="Adapters\TripSummaryAdapter.cs" />
-    <Compile Include="Controls\SearchItemCardView.cs" />
+    <Compile Include="Controls\SearchItemView.cs" />
     <Compile Include="Controls\TripSummaryCardView.cs" />
     <Compile Include="Fragments\BaseFragment.cs" />
     <Compile Include="Fragments\TripHistoryFragment.cs" />
@@ -246,9 +246,6 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\fragment_tripsummary.axml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
-    <AndroidResource Include="Resources\layout\cardview_searchitem.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

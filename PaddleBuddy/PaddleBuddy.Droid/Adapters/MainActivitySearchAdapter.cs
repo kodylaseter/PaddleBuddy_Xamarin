@@ -37,12 +37,12 @@ namespace PaddleBuddy.Droid.Adapters
         public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
         {
             var searchItemViewHolder = holder as SearchItemViewHolder;
-            searchItemViewHolder?.CardView.UpdateData(SearchService.Items[position]);
+            searchItemViewHolder?.SearchItemView.UpdateData(SearchService.Items[position]);
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
         {
-            var itemView = new SearchItemCardView(_activity);
+            var itemView = new SearchItemView(_activity);
             return new SearchItemViewHolder(itemView);
         }
 
@@ -50,10 +50,10 @@ namespace PaddleBuddy.Droid.Adapters
 
         private class SearchItemViewHolder : RecyclerView.ViewHolder
         {
-            public SearchItemCardView CardView { get; }
-            public SearchItemViewHolder(SearchItemCardView cardView) : base(cardView)
+            public SearchItemView SearchItemView { get; }
+            public SearchItemViewHolder(SearchItemView searchItemView) : base(searchItemView)
             {
-                CardView = cardView;
+                SearchItemView = searchItemView;
             }
         }
 

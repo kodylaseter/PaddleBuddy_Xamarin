@@ -37,6 +37,9 @@
     <style name="textSmallWhite" parent="@android:style/TextAppearance.Small">
         <item name="android:textColor">@color/almostWhite</item>
     </style>
+    <style name="textMediumWhite" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@color/almostWhite</item>
+    </style>
     <style name="textLargeWhite" parent="@android:style/TextAppearance.Large">
         <item name="android:textColor">@color/almostWhite</item>
     </style>
