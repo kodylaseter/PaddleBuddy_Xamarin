@@ -8,6 +8,7 @@ namespace PaddleBuddy.Droid.Controls
     public class SearchItemView : LinearLayout
     {
         private TextView ItemTextView { get; set; }
+        public SearchItem SearchItem { get; set; }
 
         private void Initialize()
         {
@@ -19,11 +20,13 @@ namespace PaddleBuddy.Droid.Controls
                     new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
             };
             ItemTextView.SetTextAppearance(Resource.Style.textMediumWhite);
+            ItemTextView.Gravity = GravityFlags.CenterVertical;
             AddView(ItemTextView);
         }
 
         public void UpdateData(SearchItem searchItem)
         {
+            SearchItem = searchItem;
             ItemTextView.Text = searchItem.SearchString;
         }
 

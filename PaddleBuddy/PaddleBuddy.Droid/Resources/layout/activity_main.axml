@@ -48,17 +48,13 @@
                 android:orientation="vertical"
                 android:background="@color/semi_transparent_grey_background"
                 android:visibility="gone">
-                <!--<ListView
-                    android:id="@+id/search_list_view"
+                <ListView
+                    android:id="@+id/search_listview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/gray">
                     
-                </ListView>-->
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/search_recyclerview"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                </ListView>
             </LinearLayout>
         </android.support.design.widget.CoordinatorLayout>
 
@@ -74,30 +70,5 @@
             app:itemIconTint="@color/gray"/>
 
     </android.support.v4.widget.DrawerLayout>    
-    <!--<RelativeLayout
-        android:id="@+id/searchbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="@color/colorAccent"
-        android:visibility="gone">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@*android:dimen/status_bar_height">
-            <ImageButton
-                android:id="@+id/close_searchbar_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/ic_clear_white_36dp"
-                android:background="?attr/selectableItemBackgroundBorderless"/>
-            <EditText
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:layout_toLeftOf="@id/close_searchbar_button"/>
-        </RelativeLayout>
-    </RelativeLayout>-->
 </RelativeLayout>
 

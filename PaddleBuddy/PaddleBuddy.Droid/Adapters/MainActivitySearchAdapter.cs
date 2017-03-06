@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.App;
-using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using Java.Lang;
@@ -13,49 +12,41 @@ using PaddleBuddy.Droid.Utilities;
 
 namespace PaddleBuddy.Droid.Adapters
 {
-    public class MainActivitySearchAdapter : RecyclerView.Adapter
+    public class MainActivitySearchAdapter : BaseAdapter<SearchItem>
     {
         public SearchService SearchService { get; }
-        public Filter Filter { get; set; }
         private readonly Activity _activity;
-
+        public Filter Filter { get; private set; }
 
         public MainActivitySearchAdapter(Activity activity)
         {
             _activity = activity;
             SearchService = new SearchService();
-            InitData();
             Filter = new SearchItemFilter(this);
-        }
-
-        private void InitData()
-        {
             SearchService.AddData(DatabaseService.GetInstance().Points.ToArray<object>());
-            //SearchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
+            SearchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
         }
 
-        public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
+        public override int Count => SearchService.Items.Count;
+
+        public override long GetItemId(int position)
         {
-            var searchItemViewHolder = holder as SearchItemViewHolder;
-            searchItemViewHolder?.SearchItemView.UpdateData(SearchService.Items[position]);
+            return SearchService.Items[position].Id;
         }
 
-        public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
+        public override View GetView(int position, View convertView, ViewGroup parent)
         {
-            var itemView = new SearchItemView(_activity);
-            return new SearchItemViewHolder(itemView);
+            var view = convertView != null && convertView.GetType() == typeof(SearchItemView) ? 
+                       convertView : new SearchItemView(_activity);
+            ((SearchItemView)view).UpdateData(SearchService.Items[position]);
+            return view;
         }
 
-        public override int ItemCount => SearchService.Items.Count;
-
-        private class SearchItemViewHolder : RecyclerView.ViewHolder
+        public override SearchItem this[int position]
         {
-            public SearchItemView SearchItemView { get; }
-            public SearchItemViewHolder(SearchItemView searchItemView) : base(searchItemView)
-            {
-                SearchItemView = searchItemView;
-            }
+            get { throw new System.NotImplementedException(); }
         }
+
 
         /// <summary>
         /// Custom filter inspired by cheesebaron
@@ -106,4 +97,6 @@ namespace PaddleBuddy.Droid.Adapters
             }
         }
     }
+
+
 }

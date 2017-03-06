@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using PaddleBuddy.Core;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Adapters;
+using PaddleBuddy.Droid.Controls;
 using PaddleBuddy.Droid.Fragments;
 using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
 using SearchView = Android.Widget.SearchView;
@@ -27,7 +28,7 @@ namespace PaddleBuddy.Droid.Activities
         private Toolbar _toolbar;
         private DrawerLayout _drawer;
         private NavigationView _navigationView;
-        private RecyclerView SearchRecyclerView { get; set; }
+        private ListView SearchListView { get; set; }
         private ActionBarDrawerToggle _toggle;
         private LinearLayout _searchLayout;
         private SearchView _searchView;
@@ -56,9 +57,7 @@ namespace PaddleBuddy.Droid.Activities
             //TestTripHistory();
 
             OnNavigationItemSelected();
-            SearchRecyclerView = FindViewById<RecyclerView>(Resource.Id.search_recyclerview);
-            var divider = new DividerItemDecoration(SearchRecyclerView.Context, DividerItemDecoration.Vertical);
-            SearchRecyclerView.AddItemDecoration(divider);
+            SearchListView = FindViewById<ListView>(Resource.Id.search_listview);
             _searchLayout = FindViewById<LinearLayout>(Resource.Id.search_results_layout);
 
             Window.SetSoftInputMode(SoftInput.AdjustNothing);
@@ -81,12 +80,11 @@ namespace PaddleBuddy.Droid.Activities
 
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
-
             var mainActivitySearchAdapter = new MainActivitySearchAdapter(this);
-            SearchRecyclerView.SetAdapter(mainActivitySearchAdapter);
-            SearchRecyclerView.SetLayoutManager(new LinearLayoutManager(Application.Context));
+            SearchListView.Adapter = mainActivitySearchAdapter;
             _searchLayout.Clickable = true;
             _searchLayout.Click += (s, e) => { CloseSearch(true); };
+            SearchListView.ItemClick += OnSearchItemSelected;
 
             MenuInflater.Inflate(Resource.Menu.main_menu, menu);
             _searchItem = menu.FindItem(Resource.Id.action_search);
@@ -106,6 +104,11 @@ namespace PaddleBuddy.Droid.Activities
             return base.OnCreateOptionsMenu(menu);
         }
 
+        private void OnSearchItemSelected(object sender, AdapterView.ItemClickEventArgs e)
+        {
+            //var item = SearchListView.Adapter.GetItem(e.Position) as Search
+        }
+
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             int id = item.ItemId;
@@ -122,6 +125,11 @@ namespace PaddleBuddy.Droid.Activities
             
             _drawer.CloseDrawer(GravityCompat.Start);
             return true;
+        }
+
+        public void OnSearchItemSelected(string str)
+        {
+            LogService.Log(str);
         }
 
         public void HandleNavigation(IMenuItem menuItem)

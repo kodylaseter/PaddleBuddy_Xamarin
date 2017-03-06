@@ -2884,14 +2884,14 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b007a
 			public const int search_go_btn = 2131427450;
 			
+			// aapt resource value: 0x7f0b0081
+			public const int search_listview = 2131427457;
+			
 			// aapt resource value: 0x7f0b0075
 			public const int search_mag_icon = 2131427445;
 			
 			// aapt resource value: 0x7f0b0076
 			public const int search_plate = 2131427446;
-			
-			// aapt resource value: 0x7f0b0081
-			public const int search_recyclerview = 2131427457;
 			
 			// aapt resource value: 0x7f0b0080
 			public const int search_results_layout = 2131427456;
