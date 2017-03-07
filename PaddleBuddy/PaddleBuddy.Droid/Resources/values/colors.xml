@@ -12,5 +12,5 @@
     <color name="black">#0D131A</color>
 
     <color name="text_gray">#4b4e51</color>
-    <color name="semi_transparent_grey_background">#AF7A7A7A</color>
+    <color name="semi_transparent_grey">#AF7A7A7A</color>
 </resources>

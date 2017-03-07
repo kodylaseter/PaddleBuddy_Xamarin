@@ -8,6 +8,7 @@ using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using Android.Text;
 using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json;
@@ -23,18 +24,19 @@ using Toolbar = Android.Support.V7.Widget.Toolbar;
 namespace PaddleBuddy.Droid.Activities
 {
     [Activity(Label = "PaddleBuddy", Theme = "@style/AppTheme")]
-    public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener, MenuItemCompat.IOnActionExpandListener
+    public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener
     {
         private Toolbar _toolbar;
         private DrawerLayout _drawer;
         private NavigationView _navigationView;
-        private ListView SearchListView { get; set; }
         private ActionBarDrawerToggle _toggle;
-        private LinearLayout _searchLayout;
-        private SearchView _searchView;
-        private IMenuItem _searchItem;
+        private ListView SearchListView { get; set; }
+        private LinearLayout SearchLayout { get; set; }
+        private EditText SearchEditText { get; set; }
+        private MainActivitySearchAdapter SearchAdapter { get; set; }
         private int DEFAULT_FRAGMENT_ID;
 
+        #region init
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -44,12 +46,14 @@ namespace PaddleBuddy.Droid.Activities
 
             _toolbar = (Toolbar) FindViewById(Resource.Id.toolbar);
             SetSupportActionBar(_toolbar);
+            SupportActionBar.Title = null;
 
             _drawer = (DrawerLayout) FindViewById(Resource.Id.drawer_layout);
             _toggle = new ActionBarDrawerToggle(this, _drawer, _toolbar, Resource.String.navigation_drawer_open,
                 Resource.String.navigation_drawer_close);
             _drawer.AddDrawerListener(_toggle);
             _toggle.SyncState();
+            
 
             _navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
             _navigationView.SetNavigationItemSelectedListener(this);
@@ -58,55 +62,82 @@ namespace PaddleBuddy.Droid.Activities
 
             OnNavigationItemSelected();
             SearchListView = FindViewById<ListView>(Resource.Id.search_listview);
-            _searchLayout = FindViewById<LinearLayout>(Resource.Id.search_results_layout);
+            SearchLayout = FindViewById<LinearLayout>(Resource.Id.search_layout);
+            SearchEditText = FindViewById<EditText>(Resource.Id.search_edittext_1);
+            SearchEditText.TextChanged += SearchEditTextOnTextChanged;
+            SearchAdapter = new MainActivitySearchAdapter(this);
+            SearchListView.Adapter = SearchAdapter;
+            SearchLayout.Clickable = true;
+            SearchLayout.Click += (s, e) => { CloseSearch(); };
+            SearchListView.ItemClick += OnSearchItemSelected;
 
             Window.SetSoftInputMode(SoftInput.AdjustNothing);
         }
 
-        //private void SetSearchBarHeight()
-        //{
-        //    var resourceId = Resources.GetIdentifier("status_bar_height", "dimen", "android");
-        //    var typedValue = new TypedValue();
-        //    if (resourceId > 0 && Theme.ResolveAttribute(Android.Resource.Attribute.ActionBarSize, typedValue, true))
-        //    {
-        //        var height = Resources.GetDimensionPixelSize(resourceId) + TypedValue.ComplexToDimensionPixelSize(typedValue.Data, Resources.DisplayMetrics);
-        //        FindViewById(Resource.Id.searchbar).SetMinimumHeight(height);
-        //    }
-        //    else
-        //    {
-        //        throw new Exception("unable to set searchbar height");
-        //    }
-        //}
-
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
-            var mainActivitySearchAdapter = new MainActivitySearchAdapter(this);
-            SearchListView.Adapter = mainActivitySearchAdapter;
-            _searchLayout.Clickable = true;
-            _searchLayout.Click += (s, e) => { CloseSearch(true); };
-            SearchListView.ItemClick += OnSearchItemSelected;
-
             MenuInflater.Inflate(Resource.Menu.main_menu, menu);
-            _searchItem = menu.FindItem(Resource.Id.action_search);
-            _searchView = (SearchView) _searchItem.ActionView;
-            MenuItemCompat.SetOnActionExpandListener(_searchItem, this);
-            _searchView.QueryTextChange += (sender, args) =>
-            {
-                mainActivitySearchAdapter.Filter.InvokeFilter(args.NewText);
-                args.Handled = true;
-            };
-            _searchView.QueryTextSubmit += (sender, args) =>
-            {
-                LogService.Log("query text submitted: " + args.Query);
-                args.Handled = true;
-            };
-            _searchView.Focusable = true;
+
+            //_searchItem = menu.FindItem(Resource.Id.action_search);
+            //SearchView = (SearchView) _searchItem.ActionView;
+            //MenuItemCompat.SetOnActionExpandListener(_searchItem, this);
+            //SearchView.QueryTextChange += (sender, args) =>
+            //{
+            //    mainActivitySearchAdapter.Filter.InvokeFilter(args.NewText);
+            //    args.Handled = true;
+            //};
+            //SearchView.QueryTextSubmit += (sender, args) =>
+            //{
+            //    LogService.Log("query text submitted: " + args.Query);
+            //    args.Handled = true;
+            //};
+            //SearchView.Focusable = true;
             return base.OnCreateOptionsMenu(menu);
+        }
+        #endregion
+
+        #region search
+        private void SearchEditTextOnTextChanged(object sender, TextChangedEventArgs args)
+        {
+            SearchAdapter.Filter.InvokeFilter(args.Text.ToString());
+        }
+
+        private void ToggleSearch()
+        {
+            if (SearchLayout.Visibility == ViewStates.Gone)
+            {
+                OpenSearch();
+            }
+            else
+            {
+                CloseSearch();
+            }
+        }
+
+        private void OpenSearch()
+        {
+            SearchLayout.Visibility = ViewStates.Visible;
+        }
+
+        private void CloseSearch()
+        {
+            SearchLayout.Visibility = ViewStates.Gone;
         }
 
         private void OnSearchItemSelected(object sender, AdapterView.ItemClickEventArgs e)
         {
+            var a = 5;
             //var item = SearchListView.Adapter.GetItem(e.Position) as Search
+        }
+        #endregion
+
+        #region navigation
+        public bool OnNavigationItemSelected(IMenuItem menuItem = null)
+        {
+            HandleNavigation(menuItem);
+
+            _drawer.CloseDrawer(GravityCompat.Start);
+            return true;
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -114,22 +145,26 @@ namespace PaddleBuddy.Droid.Activities
             int id = item.ItemId;
             if (id == Resource.Id.action_search)
             {
-                OpenSearch();
+                ToggleSearch();
             }
             return base.OnOptionsItemSelected(item);
         }
 
-        public bool OnNavigationItemSelected(IMenuItem menuItem = null)
+        //todo: figure out why this doesnt call when the search view is open
+        public override void OnBackPressed()
         {
-            HandleNavigation(menuItem);
-            
-            _drawer.CloseDrawer(GravityCompat.Start);
-            return true;
-        }
-
-        public void OnSearchItemSelected(string str)
-        {
-            LogService.Log(str);
+            if (_drawer.IsDrawerOpen(GravityCompat.Start))
+            {
+                _drawer.CloseDrawer(GravityCompat.Start);
+            }
+            //else if (_searchItem.IsActionViewExpanded)
+            //{
+            //    CloseSearch(true);
+            //}
+            else
+            {
+                base.OnBackPressed();
+            }
         }
 
         public void HandleNavigation(IMenuItem menuItem)
@@ -185,7 +220,9 @@ namespace PaddleBuddy.Droid.Activities
                 LogService.ExceptionLog(e.Message);
             }
         }
+        #endregion
 
+        #region tests
         private void TestTripSummary()
         {
             var fragment = TripSummaryFragment.NewInstance();
@@ -198,54 +235,7 @@ namespace PaddleBuddy.Droid.Activities
             DatabaseService.GetInstance().SeedTripSummary();
             DEFAULT_FRAGMENT_ID = Resource.Id.nav_history;
         }
-
-        private void OpenSearch()
-        {
-            _searchLayout.Visibility = ViewStates.Visible;
-            _searchView.Iconified = false;
-        }
-
-        private void CloseSearch(bool shouldCollapse)
-        {
-            _searchLayout.Visibility = ViewStates.Gone;
-            _searchView.Iconified = true;
-            if (shouldCollapse)
-            {
-                _searchItem.CollapseActionView();
-            }
-        }
-
-        //todo: figure out why this doesnt call when the search view is open
-        public override void OnBackPressed()
-        {
-            if (_drawer.IsDrawerOpen(GravityCompat.Start))
-            {
-                _drawer.CloseDrawer(GravityCompat.Start);
-            }
-            else if (_searchItem.IsActionViewExpanded)
-            {
-                CloseSearch(true);
-            }
-            else
-            {
-                base.OnBackPressed();
-            }
-        }
-
-        public bool OnMenuItemActionCollapse(IMenuItem item)
-        {
-            var id = item.ItemId;
-            if (id == Resource.Id.action_search)
-            {
-                CloseSearch(false);
-            }
-            return true;
-        }
-
-        public bool OnMenuItemActionExpand(IMenuItem item)
-        {
-            return true;
-        }
+        #endregion
 
         private enum NavDraweritems
         {
