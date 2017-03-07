@@ -16,6 +16,7 @@ using PaddleBuddy.Core;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Adapters;
 using PaddleBuddy.Droid.Fragments;
+using PaddleBuddy.Droid.Utilities;
 using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 
@@ -32,6 +33,7 @@ namespace PaddleBuddy.Droid.Activities
         private LinearLayout SearchLayout { get; set; }
         private EditText SearchEditText { get; set; }
         private MainActivitySearchAdapter SearchAdapter { get; set; }
+        private ImageButton SearchCloseImageButton { get; set; }
         private int DEFAULT_FRAGMENT_ID;
         private InputMethodManager InputMethodManager => (InputMethodManager) GetSystemService(InputMethodService);
 
@@ -63,6 +65,8 @@ namespace PaddleBuddy.Droid.Activities
             SearchListView = FindViewById<ListView>(Resource.Id.search_listview);
             SearchLayout = FindViewById<LinearLayout>(Resource.Id.search_layout);
             SearchEditText = FindViewById<EditText>(Resource.Id.search_edittext_1);
+            SearchCloseImageButton = FindViewById<ImageButton>(Resource.Id.search_close);
+            SearchCloseImageButton.Click += SearchCloseImageButtonClicked;
             SearchEditText.TextChanged += SearchEditTextOnTextChanged;
             SearchAdapter = new MainActivitySearchAdapter(this);
             SearchListView.Adapter = SearchAdapter;
@@ -83,7 +87,23 @@ namespace PaddleBuddy.Droid.Activities
         #region search
         private void SearchEditTextOnTextChanged(object sender, TextChangedEventArgs args)
         {
+            var query = args.Text.ToString();
             SearchAdapter.Filter.InvokeFilter(args.Text.ToString());
+            var isNotNull = !string.IsNullOrWhiteSpace(query);
+            UpdateSearchCloseOrClear(isNotNull);
+        }
+
+        private void SearchCloseImageButtonClicked(object sender, EventArgs e)
+        {
+            if (!SearchLayout.IsVisible()) return;
+            if (string.IsNullOrWhiteSpace(SearchEditText.Text))
+            {
+                CloseSearch();
+            }
+            else
+            {
+                SearchEditText.Text = "";
+            }
         }
 
         private void ToggleSearch()
@@ -104,6 +124,7 @@ namespace PaddleBuddy.Droid.Activities
             SearchEditText.RequestFocus();
             InputMethodManager.ShowSoftInput(SearchEditText, ShowFlags.Implicit);
             Toolbar.Visibility = ViewStates.Gone;
+            UpdateSearchCloseOrClear(false);
         }
 
         private void CloseSearch()
@@ -116,6 +137,13 @@ namespace PaddleBuddy.Droid.Activities
                 InputMethodManager.HideSoftInputFromWindow(view.WindowToken,
                     HideSoftInputFlags.None);
             }
+        }
+
+        private void UpdateSearchCloseOrClear(bool setToClear)
+        {
+            SearchCloseImageButton.SetImageResource(setToClear
+                ? Resource.Drawable.ic_clear_white_24dp
+                : Resource.Drawable.ic_arrow_back_white_24dp);
         }
 
         private void OnSearchItemSelected(object sender, AdapterView.ItemClickEventArgs e)
