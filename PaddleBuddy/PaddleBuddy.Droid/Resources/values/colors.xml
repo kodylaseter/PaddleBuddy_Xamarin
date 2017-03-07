@@ -13,4 +13,6 @@
 
     <color name="text_gray">#4b4e51</color>
     <color name="semi_transparent_grey">#AF7A7A7A</color>
+
+    <color name="search_divider">#7A7A7A</color>
 </resources>

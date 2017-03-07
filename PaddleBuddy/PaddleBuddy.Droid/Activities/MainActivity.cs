@@ -7,18 +7,16 @@ using Android.Support.Design.Widget;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using Android.Text;
 using Android.Views;
+using Android.Views.InputMethods;
 using Android.Widget;
 using Newtonsoft.Json;
 using PaddleBuddy.Core;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Adapters;
-using PaddleBuddy.Droid.Controls;
 using PaddleBuddy.Droid.Fragments;
 using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
-using SearchView = Android.Widget.SearchView;
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace PaddleBuddy.Droid.Activities
@@ -26,7 +24,7 @@ namespace PaddleBuddy.Droid.Activities
     [Activity(Label = "PaddleBuddy", Theme = "@style/AppTheme")]
     public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener
     {
-        private Toolbar _toolbar;
+        private Toolbar Toolbar { get; set; }
         private DrawerLayout _drawer;
         private NavigationView _navigationView;
         private ActionBarDrawerToggle _toggle;
@@ -35,6 +33,7 @@ namespace PaddleBuddy.Droid.Activities
         private EditText SearchEditText { get; set; }
         private MainActivitySearchAdapter SearchAdapter { get; set; }
         private int DEFAULT_FRAGMENT_ID;
+        private InputMethodManager InputMethodManager => (InputMethodManager) GetSystemService(InputMethodService);
 
         #region init
         protected override void OnCreate(Bundle savedInstanceState)
@@ -44,12 +43,12 @@ namespace PaddleBuddy.Droid.Activities
             LogService.Log("main activity started");
             SetContentView(Resource.Layout.activity_main);
 
-            _toolbar = (Toolbar) FindViewById(Resource.Id.toolbar);
-            SetSupportActionBar(_toolbar);
+            Toolbar = (Toolbar) FindViewById(Resource.Id.toolbar);
+            SetSupportActionBar(Toolbar);
             SupportActionBar.Title = null;
 
             _drawer = (DrawerLayout) FindViewById(Resource.Id.drawer_layout);
-            _toggle = new ActionBarDrawerToggle(this, _drawer, _toolbar, Resource.String.navigation_drawer_open,
+            _toggle = new ActionBarDrawerToggle(this, _drawer, Toolbar, Resource.String.navigation_drawer_open,
                 Resource.String.navigation_drawer_close);
             _drawer.AddDrawerListener(_toggle);
             _toggle.SyncState();
@@ -70,28 +69,13 @@ namespace PaddleBuddy.Droid.Activities
             SearchLayout.Clickable = true;
             SearchLayout.Click += (s, e) => { CloseSearch(); };
             SearchListView.ItemClick += OnSearchItemSelected;
+            Window.SetSoftInputMode(SoftInput.AdjustResize);
 
-            Window.SetSoftInputMode(SoftInput.AdjustNothing);
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
             MenuInflater.Inflate(Resource.Menu.main_menu, menu);
-
-            //_searchItem = menu.FindItem(Resource.Id.action_search);
-            //SearchView = (SearchView) _searchItem.ActionView;
-            //MenuItemCompat.SetOnActionExpandListener(_searchItem, this);
-            //SearchView.QueryTextChange += (sender, args) =>
-            //{
-            //    mainActivitySearchAdapter.Filter.InvokeFilter(args.NewText);
-            //    args.Handled = true;
-            //};
-            //SearchView.QueryTextSubmit += (sender, args) =>
-            //{
-            //    LogService.Log("query text submitted: " + args.Query);
-            //    args.Handled = true;
-            //};
-            //SearchView.Focusable = true;
             return base.OnCreateOptionsMenu(menu);
         }
         #endregion
@@ -117,11 +101,21 @@ namespace PaddleBuddy.Droid.Activities
         private void OpenSearch()
         {
             SearchLayout.Visibility = ViewStates.Visible;
+            SearchEditText.RequestFocus();
+            InputMethodManager.ShowSoftInput(SearchEditText, ShowFlags.Implicit);
+            Toolbar.Visibility = ViewStates.Gone;
         }
 
         private void CloseSearch()
         {
             SearchLayout.Visibility = ViewStates.Gone;
+            Toolbar.Visibility = ViewStates.Visible;
+            var view = CurrentFocus;
+            if (view != null)
+            {
+                InputMethodManager.HideSoftInputFromWindow(view.WindowToken,
+                    HideSoftInputFlags.None);
+            }
         }
 
         private void OnSearchItemSelected(object sender, AdapterView.ItemClickEventArgs e)
