@@ -251,6 +251,9 @@
     <AndroidResource Include="Resources\layout\view_mainsearch.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
+    <AndroidResource Include="Resources\layout\view_searchitem.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\activity_setup.axml" />

@@ -5,6 +5,17 @@
               android:orientation="horizontal"
               android:padding="@dimen/search_inner_padding">
     <ImageView 
+        android:id="@+id/searchitem_imageview"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_marginRight="@dimen/search_inner_padding"/>
+    <!--<View 
+        style="@style/VerticalLayoutDivider"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"/>-->
+    <TextView 
+        android:id="@+id/searchitem_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/textMediumGray"/>
 </LinearLayout>
