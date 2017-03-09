@@ -65,8 +65,8 @@ namespace PaddleBuddy.Droid.Activities
             }
             else
             {
-                //StartActivity(typeof(MainActivity));
-                StartActivity(typeof (TestActivity));
+                StartActivity(typeof(MainActivity));
+                //StartActivity(typeof(TestActivity));
             }
         }
 

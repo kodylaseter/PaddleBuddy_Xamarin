@@ -2551,8 +2551,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b004d
 			public const int action_mode_close_button = 2131427405;
 			
-			// aapt resource value: 0x7f0b00cd
-			public const int action_search = 2131427533;
+			// aapt resource value: 0x7f0b00cf
+			public const int action_search = 2131427535;
 			
 			// aapt resource value: 0x7f0b00a9
 			public const int action_text = 2131427497;
@@ -2782,8 +2782,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b00a5
 			public const int markerTitle = 2131427493;
 			
-			// aapt resource value: 0x7f0b00c6
-			public const int masked = 2131427526;
+			// aapt resource value: 0x7f0b00c8
+			public const int masked = 2131427528;
 			
 			// aapt resource value: 0x7f0b00ad
 			public const int media_actions = 2131427501;
@@ -2797,23 +2797,23 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b0035
 			public const int multiply = 2131427381;
 			
-			// aapt resource value: 0x7f0b00c8
-			public const int nav_history = 2131427528;
-			
 			// aapt resource value: 0x7f0b00ca
-			public const int nav_manage = 2131427530;
-			
-			// aapt resource value: 0x7f0b00c7
-			public const int nav_map = 2131427527;
+			public const int nav_history = 2131427530;
 			
 			// aapt resource value: 0x7f0b00cc
-			public const int nav_send = 2131427532;
-			
-			// aapt resource value: 0x7f0b00cb
-			public const int nav_share = 2131427531;
+			public const int nav_manage = 2131427532;
 			
 			// aapt resource value: 0x7f0b00c9
-			public const int nav_slideshow = 2131427529;
+			public const int nav_map = 2131427529;
+			
+			// aapt resource value: 0x7f0b00ce
+			public const int nav_send = 2131427534;
+			
+			// aapt resource value: 0x7f0b00cd
+			public const int nav_share = 2131427533;
+			
+			// aapt resource value: 0x7f0b00cb
+			public const int nav_slideshow = 2131427531;
 			
 			// aapt resource value: 0x7f0b0081
 			public const int nav_view = 2131427457;
@@ -2890,6 +2890,12 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b0034
 			public const int scrollable = 2131427380;
 			
+			// aapt resource value: 0x7f0b00c2
+			public const int search1_clearedittext = 2131427522;
+			
+			// aapt resource value: 0x7f0b00c1
+			public const int search_backarrow = 2131427521;
+			
 			// aapt resource value: 0x7f0b0072
 			public const int search_badge = 2131427442;
 			
@@ -2917,8 +2923,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b00be
 			public const int search_layout = 2131427518;
 			
-			// aapt resource value: 0x7f0b00c2
-			public const int search_listview = 2131427522;
+			// aapt resource value: 0x7f0b00c4
+			public const int search_listview = 2131427524;
 			
 			// aapt resource value: 0x7f0b0075
 			public const int search_mag_icon = 2131427445;
@@ -2926,8 +2932,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b0076
 			public const int search_plate = 2131427446;
 			
-			// aapt resource value: 0x7f0b00c1
-			public const int search_results_cardview = 2131427521;
+			// aapt resource value: 0x7f0b00c3
+			public const int search_results_cardview = 2131427523;
 			
 			// aapt resource value: 0x7f0b0077
 			public const int search_src_text = 2131427447;
@@ -2935,11 +2941,11 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b007b
 			public const int search_voice_btn = 2131427451;
 			
-			// aapt resource value: 0x7f0b00c3
-			public const int searchitem_imageview = 2131427523;
+			// aapt resource value: 0x7f0b00c5
+			public const int searchitem_imageview = 2131427525;
 			
-			// aapt resource value: 0x7f0b00c4
-			public const int searchitem_textview = 2131427524;
+			// aapt resource value: 0x7f0b00c6
+			public const int searchitem_textview = 2131427526;
 			
 			// aapt resource value: 0x7f0b007c
 			public const int select_dialog_listview = 2131427452;
@@ -3106,8 +3112,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b0002
 			public const int view_offset_helper = 2131427330;
 			
-			// aapt resource value: 0x7f0b00c5
-			public const int visible = 2131427525;
+			// aapt resource value: 0x7f0b00c7
+			public const int visible = 2131427527;
 			
 			// aapt resource value: 0x7f0b0018
 			public const int wide = 2131427352;

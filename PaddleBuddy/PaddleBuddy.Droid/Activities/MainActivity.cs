@@ -2,8 +2,10 @@ using System;
 using System.Linq;
 using Android.App;
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
 using Android.Support.Design.Widget;
+using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
@@ -15,6 +17,7 @@ using Newtonsoft.Json;
 using PaddleBuddy.Core;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Adapters;
+using PaddleBuddy.Droid.Controls;
 using PaddleBuddy.Droid.Fragments;
 using PaddleBuddy.Droid.Utilities;
 using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
@@ -31,9 +34,10 @@ namespace PaddleBuddy.Droid.Activities
         private ActionBarDrawerToggle _toggle;
         private ListView SearchListView { get; set; }
         private LinearLayout SearchLayout { get; set; }
-        private EditText SearchEditText { get; set; }
         private MainActivitySearchAdapter SearchAdapter { get; set; }
-        private ImageButton SearchCloseImageButton { get; set; }
+        private ClearEditText ClearEditText1 { get; set; }
+        private ImageButton CloseSearchImageButton { get; set; }
+
         private int DEFAULT_FRAGMENT_ID;
         private InputMethodManager InputMethodManager => (InputMethodManager) GetSystemService(InputMethodService);
 
@@ -64,8 +68,13 @@ namespace PaddleBuddy.Droid.Activities
             OnNavigationItemSelected();
             SearchListView = FindViewById<ListView>(Resource.Id.search_listview);
             SearchLayout = FindViewById<LinearLayout>(Resource.Id.search_layout);
-            //SearchEditText = FindViewById<EditText>(Resource.Id.search_edittext_1);
-            //SearchEditText.TextChanged += SearchEditTextOnTextChanged;
+            ClearEditText1 = FindViewById<ClearEditText>(Resource.Id.search1_clearedittext);
+            CloseSearchImageButton = FindViewById<ImageButton>(Resource.Id.search_backarrow);
+            CloseSearchImageButton.SetColorFilter(new Color(ContextCompat.GetColor(ApplicationContext, Resource.Color.gray)));
+            CloseSearchImageButton.Click += (s, e) => CloseSearch();
+            ClearEditText1.SetHint("Search here...");
+            ClearEditText1.EditText.TextChanged += EditTextOnTextChanged;
+
             SearchAdapter = new MainActivitySearchAdapter(this);
             SearchListView.Adapter = SearchAdapter;
             SearchLayout.Clickable = true;
@@ -83,26 +92,12 @@ namespace PaddleBuddy.Droid.Activities
         #endregion
 
         #region search
-        private void SearchEditTextOnTextChanged(object sender, TextChangedEventArgs args)
+        private void EditTextOnTextChanged(object sender, TextChangedEventArgs textChangedEventArgs)
         {
-            var query = args.Text.ToString();
-            SearchAdapter.Filter.InvokeFilter(args.Text.ToString());
-            var isNotNull = !string.IsNullOrWhiteSpace(query);
-            UpdateSearchCloseOrClear(isNotNull);
+            SearchAdapter.Filter.InvokeFilter(textChangedEventArgs.Text.ToString());
         }
 
-        private void SearchCloseImageButtonClicked(object sender, EventArgs e)
-        {
-            if (!SearchLayout.IsVisible()) return;
-            if (string.IsNullOrWhiteSpace(SearchEditText.Text))
-            {
-                CloseSearch();
-            }
-            else
-            {
-                SearchEditText.Text = "";
-            }
-        }
+
 
         private void ToggleSearch()
         {
@@ -118,15 +113,15 @@ namespace PaddleBuddy.Droid.Activities
 
         private void OpenSearch()
         {
+            ClearEditText1.EditText.Text = "";
             SearchLayout.Visibility = ViewStates.Visible;
-            //SearchEditText.RequestFocus();
-            InputMethodManager.ShowSoftInput(SearchEditText, ShowFlags.Implicit);
+            InputMethodManager.ShowSoftInput(ClearEditText1.EditText, ShowFlags.Implicit);
             Toolbar.Visibility = ViewStates.Gone;
-            UpdateSearchCloseOrClear(false);
         }
 
         private void CloseSearch()
         {
+            ClearEditText1.EditText.Text = "";
             SearchLayout.Visibility = ViewStates.Gone;
             Toolbar.Visibility = ViewStates.Visible;
             var view = CurrentFocus;
@@ -135,13 +130,6 @@ namespace PaddleBuddy.Droid.Activities
                 InputMethodManager.HideSoftInputFromWindow(view.WindowToken,
                     HideSoftInputFlags.None);
             }
-        }
-
-        private void UpdateSearchCloseOrClear(bool setToClear)
-        {
-            SearchCloseImageButton.SetImageResource(setToClear
-                ? Resource.Drawable.ic_clear_white_24dp
-                : Resource.Drawable.ic_arrow_back_white_24dp);
         }
 
         private void OnSearchItemSelected(object sender, AdapterView.ItemClickEventArgs e)

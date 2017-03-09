@@ -20,12 +20,20 @@
             android:id="@+id/search_cardview_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp">
-            <!--<paddlebuddy.droid.controls.ClearEditText
-                android:width="match_parent"
-                android:height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"/>-->
+            android:padding="6dp"
+            android:layout_gravity="center_vertical">
+            <ImageButton 
+                android:id="@+id/search_backarrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:src="@drawable/ic_arrow_back_white_24dp"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+            <paddlebuddy.droid.controls.ClearEditText
+                android:id="@+id/search1_clearedittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/search_backarrow"/>
             
         </RelativeLayout>
                         
