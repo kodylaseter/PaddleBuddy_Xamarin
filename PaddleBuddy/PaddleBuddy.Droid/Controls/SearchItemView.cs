@@ -24,7 +24,7 @@ namespace PaddleBuddy.Droid.Controls
         public void UpdateData(SearchItem searchItem)
         {
             SearchItem = searchItem;
-            ItemTextView.Text = searchItem.SearchString;
+            ItemTextView.Text = searchItem.Title;
             IconImageView.SetImageResource(Resource.Drawable.ic_place_black_24dp);
         }
 

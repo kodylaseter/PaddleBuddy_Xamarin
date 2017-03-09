@@ -8,7 +8,7 @@ namespace PaddleBuddy.Core.Services
 {
     public class SearchService
     {
-        public List<SearchItem> OriginalData { get; }
+        public List<SearchItem> OriginalData { get; set; }
         public List<SearchItem> Items { get; set; } 
 
         public SearchService()
@@ -48,6 +48,7 @@ namespace PaddleBuddy.Core.Services
                         OriginalData.Add(new SearchItem
                         {
                             SearchString = river.Name,
+                            Title = river.Name,
                             Item = river
                         });
                     }
@@ -60,6 +61,7 @@ namespace PaddleBuddy.Core.Services
                         OriginalData.Add(new SearchItem
                         {
                             SearchString = point.Label ?? point.Id.ToString(),
+                            Title = point.Label,
                             Item = point
                         });
                     }
@@ -71,6 +73,17 @@ namespace PaddleBuddy.Core.Services
             }
             OriginalData.Sort();
             Items = OriginalData.ToList();
+        }
+
+        public void Clear()
+        {
+            Items.Clear();
+            OriginalData.Clear();
+        }
+
+        public SearchItem GetItem(int index)
+        {
+            return Items.Count > index ? Items[index] : null;
         }
     }
 }

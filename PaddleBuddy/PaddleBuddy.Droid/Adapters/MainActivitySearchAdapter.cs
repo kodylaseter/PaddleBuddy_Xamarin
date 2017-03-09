@@ -23,8 +23,20 @@ namespace PaddleBuddy.Droid.Adapters
             _activity = activity;
             SearchService = new SearchService();
             Filter = new SearchItemFilter(this);
-            SearchService.AddData(DatabaseService.GetInstance().Points.ToArray<object>());
-            SearchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
+        }
+
+        public void UpdateData(object o = null)
+        {
+            SearchService.Clear();
+            if (o == null)
+            {
+                SearchService.AddData(DatabaseService.GetInstance().Points.ToArray<object>());
+                SearchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
+            } else 
+            {
+                DatabaseService.GetInstance().SeedPoints();
+                SearchService.AddData(DatabaseService.GetInstance().Points.ToArray<object>());
+            }
         }
 
         public override int Count => SearchService.Items.Count;
@@ -42,11 +54,12 @@ namespace PaddleBuddy.Droid.Adapters
             return view;
         }
 
-        public override SearchItem this[int position]
-        {
-            get { throw new System.NotImplementedException(); }
-        }
+        public override SearchItem this[int position] => SearchService.Items[position];
 
+        public SearchItem GetSearchItem(int index)
+        {
+            return SearchService.GetItem(index);
+        }
 
         /// <summary>
         /// Custom filter inspired by cheesebaron

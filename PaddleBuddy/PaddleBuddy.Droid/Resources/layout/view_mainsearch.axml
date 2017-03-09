@@ -21,12 +21,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="6dp"
-            android:layout_gravity="center_vertical">
+            android:animateLayoutChanges="true">
             <ImageButton 
                 android:id="@+id/search_backarrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
                 android:src="@drawable/ic_arrow_back_white_24dp"
                 android:background="?attr/selectableItemBackgroundBorderless"/>
             <paddlebuddy.droid.controls.ClearEditText
@@ -34,7 +35,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/search_backarrow"/>
-            
+            <LinearLayout
+                android:id="@+id/search2_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/search1_clearedittext"
+                android:layout_toRightOf="@id/search_backarrow"
+                android:orientation="vertical">
+                <View
+                    android:id="@+id/search_divider"
+                    style="@style/horizontalLayoutDivider"/>
+                <paddlebuddy.droid.controls.ClearEditText
+                    android:id="@+id/search2_clearedittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
         </RelativeLayout>
                         
     </android.support.v7.widget.CardView>
