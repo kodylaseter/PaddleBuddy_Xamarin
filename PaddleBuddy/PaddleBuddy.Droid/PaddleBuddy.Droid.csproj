@@ -202,9 +202,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activities\MainActivity.cs" />
+    <Compile Include="Activities\TestActivity.cs" />
     <Compile Include="Activities\SetupActivity.cs" />
     <Compile Include="Adapters\MainActivitySearchAdapter.cs" />
     <Compile Include="Adapters\TripSummaryAdapter.cs" />
+    <Compile Include="Controls\ClearEditText.cs" />
     <Compile Include="Controls\SearchItemView.cs" />
     <Compile Include="Controls\TripSummaryCardView.cs" />
     <Compile Include="Fragments\BaseFragment.cs" />
@@ -254,6 +256,7 @@
     <AndroidResource Include="Resources\layout\view_searchitem.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
+    <AndroidResource Include="Resources\layout\activity_test.axml" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\activity_setup.axml" />

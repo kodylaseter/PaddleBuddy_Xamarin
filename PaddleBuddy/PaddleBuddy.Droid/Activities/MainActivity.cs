@@ -64,10 +64,8 @@ namespace PaddleBuddy.Droid.Activities
             OnNavigationItemSelected();
             SearchListView = FindViewById<ListView>(Resource.Id.search_listview);
             SearchLayout = FindViewById<LinearLayout>(Resource.Id.search_layout);
-            SearchEditText = FindViewById<EditText>(Resource.Id.search_edittext_1);
-            SearchCloseImageButton = FindViewById<ImageButton>(Resource.Id.search_close);
-            SearchCloseImageButton.Click += SearchCloseImageButtonClicked;
-            SearchEditText.TextChanged += SearchEditTextOnTextChanged;
+            //SearchEditText = FindViewById<EditText>(Resource.Id.search_edittext_1);
+            //SearchEditText.TextChanged += SearchEditTextOnTextChanged;
             SearchAdapter = new MainActivitySearchAdapter(this);
             SearchListView.Adapter = SearchAdapter;
             SearchLayout.Clickable = true;
@@ -121,7 +119,7 @@ namespace PaddleBuddy.Droid.Activities
         private void OpenSearch()
         {
             SearchLayout.Visibility = ViewStates.Visible;
-            SearchEditText.RequestFocus();
+            //SearchEditText.RequestFocus();
             InputMethodManager.ShowSoftInput(SearchEditText, ShowFlags.Implicit);
             Toolbar.Visibility = ViewStates.Gone;
             UpdateSearchCloseOrClear(false);

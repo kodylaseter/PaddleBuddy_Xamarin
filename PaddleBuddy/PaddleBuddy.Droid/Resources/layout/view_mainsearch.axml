@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/search_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_alignParentTop="true"
     android:layout_above="@id/app_bar_layout"
     android:padding="@dimen/search_outer_padding"
@@ -21,23 +20,12 @@
             android:id="@+id/search_cardview_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:gravity="center_vertical">
-            <ImageButton 
-                android:id="@+id/search_close"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="center_vertical"
-                android:tint="@color/gray"
-                android:background="?attr/selectableItemBackgroundBorderless"/>
-            <EditText
-                android:id="@+id/search_edittext_1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@id/search_close"
-                android:background="@android:color/transparent"
-                android:hint="Search here..."/>
+            android:padding="8dp">
+            <!--<paddlebuddy.droid.controls.ClearEditText
+                android:width="match_parent"
+                android:height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"/>-->
             
         </RelativeLayout>
                         
