@@ -18,102 +18,12 @@ namespace PaddleBuddy.Core.Services
         public List<Link> Links { get; set; }
         private bool _isReady;
 
-        public static DatabaseService GetInstance()
-        {
-            return _databaseService ?? (_databaseService = new DatabaseService());
-        }
-
-        public DatabaseService()
-        {
-            IsReady = false;
-            TripSummaries = new List<TripSummary>();
-            Points = new List<Point>();
-            Rivers = new List<River>();
-            Links = new List<Link>();
-        }
-
-        public void UpdateIsReady()
-        {
-            IsReady = (Rivers != null && Rivers.Count > 0) &&
-                    (Points != null && Points.Count > 0) &&
-                    (Links != null && Links.Count > 0);
-        }
-
+        #region data stuff
         public List<TripSummary> GetSortedSummaries()
         {
             var sums = TripSummaries.ToList();
             sums.Sort();
             return sums;
-        }
-
-        #region seeding
-
-        public void SeedData()
-        {
-            SeedTripSummary();
-            SeedPoints();
-        }
-
-        public void SeedTripSummary(int count = 3)
-        {
-            for (var i = 0; i < count; i++)
-            {
-                var tripSummary = new TripSummary
-                {
-                    StartDateTime = DateTime.Now,
-                    RiverId = SysPrefs.RiverIdToSimulate
-                };
-                var endTIme = DateTime.Now;
-                endTIme = endTIme.Add(new TimeSpan(0, 2, 20, 0));
-                tripSummary.EndTime = endTIme;
-                var points = GetPath(tripSummary.RiverId)?.Points;
-                if (points != null && points.Count > 0)
-                {
-                    tripSummary.PointsHistory = points;
-                }
-                AddTripSummary(tripSummary);
-            }
-        }
-
-        public void AddTripSummary(TripSummary tripSummary)
-        {
-            TripSummaries.Add(tripSummary);
-        }
-
-        public void SeedPoints(int count = 10)
-        {
-            var random = new Random();
-            var strings = new[]
-            {"asdf", "blue", "green", "red", "orange", "black", "purple", "georgia", "florida", "hawaii", "new york"};
-            for (var i = 0; i < count; i++)
-            {
-                var randInt = random.Next(0, strings.Length);
-                var point = new Point
-                {
-                    Id = PBUtilities.GetNextId(),
-                    Label = strings[randInt]
-                };
-                AddPoint(point);
-            }
-        }
-
-        private void AddPoint(Point p)
-        {
-            Points.Add(p);
-        }
-        #endregion
-
-        public bool IsReady
-        {
-            get { return _isReady; }
-            set
-            {
-                _isReady = value;
-                if (_isReady)
-                {
-                    MessengerService.Messenger.Send(new DbReadyMessage());
-                }
-            }
         }
 
         public Point PickNextDestination(Point current, TripManager tripManager)
@@ -237,7 +147,7 @@ namespace PaddleBuddy.Core.Services
                 else
                 {
                     path.Points.Add(temp.Point);
-                } 
+                }
                 while (temp != null && temp.Point.Id != end.Id)
                 {
                     temp = (from p in tempList where p.Point.Id == temp.Next select p).First();
@@ -248,9 +158,104 @@ namespace PaddleBuddy.Core.Services
                         break;
                     }
                 }
-                
+
             }
             return path;
         }
+        #endregion
+
+        #region Update stuff
+        public static DatabaseService GetInstance()
+        {
+            return _databaseService ?? (_databaseService = new DatabaseService());
+        }
+
+        public bool IsReady
+        {
+            get { return _isReady; }
+            set
+            {
+                _isReady = value;
+                if (_isReady)
+                {
+                    MessengerService.Messenger.Send(new DbReadyMessage());
+                }
+            }
+        }
+
+        public DatabaseService()
+        {
+            IsReady = false;
+            TripSummaries = new List<TripSummary>();
+            Points = new List<Point>();
+            Rivers = new List<River>();
+            Links = new List<Link>();
+        }
+
+        public void UpdateIsReady()
+        {
+            IsReady = (Rivers != null && Rivers.Count > 0) &&
+                    (Points != null && Points.Count > 0) &&
+                    (Links != null && Links.Count > 0);
+        }
+        #endregion
+
+        #region seeding
+
+        public void SeedData()
+        {
+            SeedTripSummary();
+            SeedPoints();
+        }
+
+        public void SeedTripSummary(int count = 3)
+        {
+            for (var i = 0; i < count; i++)
+            {
+                var tripSummary = new TripSummary
+                {
+                    StartDateTime = DateTime.Now,
+                    RiverId = SysPrefs.RiverIdToSimulate
+                };
+                var endTIme = DateTime.Now;
+                endTIme = endTIme.Add(new TimeSpan(0, 2, 20, 0));
+                tripSummary.EndTime = endTIme;
+                var points = GetPath(tripSummary.RiverId)?.Points;
+                if (points != null && points.Count > 0)
+                {
+                    tripSummary.PointsHistory = points;
+                }
+                AddTripSummary(tripSummary);
+            }
+        }
+
+        public void AddTripSummary(TripSummary tripSummary)
+        {
+            TripSummaries.Add(tripSummary);
+        }
+
+        public void SeedPoints(int count = 10)
+        {
+            var random = new Random();
+            var strings = new[]
+            {"asdf", "blue", "green", "red", "orange", "black", "purple", "georgia", "florida", "hawaii", "new york"};
+            for (var i = 0; i < count; i++)
+            {
+                var randInt = random.Next(0, strings.Length);
+                var point = new Point
+                {
+                    Id = PBUtilities.GetNextId(),
+                    Label = strings[randInt]
+                };
+                AddPoint(point);
+            }
+        }
+
+        private void AddPoint(Point p)
+        {
+            Points.Add(p);
+        }
+        #endregion
+
     }
 }

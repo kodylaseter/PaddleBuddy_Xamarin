@@ -19,9 +19,11 @@ namespace PaddleBuddy.Droid.Activities
         private bool _locationPermissionApproved;
         private bool _locationReady;
 
+        #region init
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
+            SetContentView(Resource.Layout.activity_setup);
             //hide keyboard
             Window.SetSoftInputMode(SoftInput.StateAlwaysHidden);
             LogService.Log("setup activity started");
@@ -30,13 +32,19 @@ namespace PaddleBuddy.Droid.Activities
             _locationPermissionApproved = false;
             _locationReady = false;
             SetupSysPrefs(testOffline: true);
-            SetContentView(Resource.Layout.activity_setup);
+            if (!IsLoggedIn)
+            {
+                StartActivity(typeof(LoginRegisterActivity));
+            }
+            else
+            {
+                Setup();
+            }
         }
 
-        protected override void OnResume()
+        public bool IsLoggedIn
         {
-            base.OnResume();
-            Setup();
+            get { return false; }
         }
 
         private void SetupSysPrefs(bool testOffline = false)
@@ -50,7 +58,9 @@ namespace PaddleBuddy.Droid.Activities
                 DatabaseService.GetInstance().SeedData();
             }
         }
+        #endregion
 
+        #region setup for mainactivity
         private void Setup()
         {
             //todo: consider making these async again
@@ -174,12 +184,7 @@ namespace PaddleBuddy.Droid.Activities
                     }
             }
         }
-
-        public void OnGlobalLayout()
-        {
-            //Setup();
-            
-        }
+        #endregion
     }
 }
 

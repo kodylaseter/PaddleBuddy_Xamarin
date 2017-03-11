@@ -1,7 +1,5 @@
 using System;
-using Android.App;
 using Android.Content;
-using Android.Content.Res;
 using Android.Graphics;
 using Android.Runtime;
 using Android.Support.V4.Content;
@@ -68,6 +66,16 @@ namespace PaddleBuddy.Droid.Controls
         }
 
 #region constructors
+
+        private void HandleAttributes(IAttributeSet attrs)
+        {
+            var typedArray = Context.Theme.ObtainStyledAttributes(attrs, Resource.Styleable.ClearEditText, 0, 0);
+            var hint = typedArray.GetString(Resource.Styleable.ClearEditText_hint);
+            EditText.Hint = hint;
+            var hintcenter = typedArray.GetBoolean(Resource.Styleable.ClearEditText_centerHint, false);
+            EditText.Gravity = hintcenter ? GravityFlags.CenterHorizontal : GravityFlags.NoGravity;
+        }
+
         public ClearEditText(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
         {
             Initialize();
@@ -81,16 +89,19 @@ namespace PaddleBuddy.Droid.Controls
         public ClearEditText(Context context, IAttributeSet attrs) : base(context, attrs)
         {
             Initialize();
+            HandleAttributes(attrs);
         }
 
         public ClearEditText(Context context, IAttributeSet attrs, int defStyleAttr) : base(context, attrs, defStyleAttr)
         {
             Initialize();
+            HandleAttributes(attrs);
         }
 
         public ClearEditText(Context context, IAttributeSet attrs, int defStyleAttr, int defStyleRes) : base(context, attrs, defStyleAttr, defStyleRes)
         {
             Initialize();
+            HandleAttributes(attrs);
         }
 #endregion
     }

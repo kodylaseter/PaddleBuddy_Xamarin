@@ -202,6 +202,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activities\MainActivity.cs" />
+    <Compile Include="Activities\LoginRegisterActivity.cs" />
     <Compile Include="Activities\TestActivity.cs" />
     <Compile Include="Activities\SetupActivity.cs" />
     <Compile Include="Adapters\MainActivitySearchAdapter.cs" />
@@ -210,7 +211,9 @@
     <Compile Include="Controls\SearchItemView.cs" />
     <Compile Include="Controls\TripSummaryCardView.cs" />
     <Compile Include="Fragments\BaseFragment.cs" />
+    <Compile Include="Fragments\RegisterFragment.cs" />
     <Compile Include="Fragments\TripHistoryFragment.cs" />
+    <Compile Include="Fragments\LoginFragment.cs" />
     <Compile Include="Fragments\TripSummaryFragment.cs" />
     <Compile Include="Fragments\PlanFragment.cs" />
     <Compile Include="Fragments\MapFragment.cs" />
@@ -257,6 +260,13 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\activity_test.axml" />
+    <AndroidResource Include="Resources\layout\fragment_login.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\activity_loginregister.axml" />
+    <AndroidResource Include="Resources\layout\fragment_register.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\activity_setup.axml" />
@@ -433,6 +443,9 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable-xxxhdpi\ic_arrow_back_white_24dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\values\attrs.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
