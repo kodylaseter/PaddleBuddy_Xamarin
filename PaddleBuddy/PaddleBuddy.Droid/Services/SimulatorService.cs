@@ -73,7 +73,7 @@ namespace PaddleBuddy.Droid.Services
                         return;
                     }
                     var inc = PBMath.DistanceInMeters(LS.CurrentLocation, point)/SIM_INC;
-                    while (PBMath.DistanceInMeters(LS.CurrentLocation, point) > SysPrefs.TripPointsCloseThreshold)
+                    while (PBMath.DistanceInMeters(LS.CurrentLocation, point) > PBPrefs.TripPointsCloseThreshold)
                     {
                         if (_stop)
                         {

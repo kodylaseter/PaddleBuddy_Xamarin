@@ -17,6 +17,7 @@ using PaddleBuddy.Core;
 using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Models.Map;
 using PaddleBuddy.Core.Services;
+using PaddleBuddy.Core.Utilities;
 using PaddleBuddy.Droid.Adapters;
 using PaddleBuddy.Droid.Controls;
 using PaddleBuddy.Droid.Fragments;
@@ -271,7 +272,7 @@ namespace PaddleBuddy.Droid.Activities
                 _navigationView.Menu.GetItem(i).SetChecked(false);
             }
             var bundle = new Bundle();
-            bundle.PutString(SysPrefs.SERIALIZABLE_TRIPSUMMARY, json);
+            bundle.PutString(PBPrefs.SERIALIZABLE_TRIPSUMMARY, json);
             fragment.Arguments = bundle;
             HandleNavigation(fragment);
         }
@@ -296,7 +297,7 @@ namespace PaddleBuddy.Droid.Activities
         {
             var fragment = TripSummaryFragment.NewInstance();
             DatabaseService.GetInstance().SeedTripSummary();
-            HandleNavigationWithData(fragment, SysPrefs.SERIALIZABLE_TRIPSUMMARY, JsonConvert.SerializeObject(DatabaseService.GetInstance().TripSummaries.FirstOrDefault()));
+            HandleNavigationWithData(fragment, PBPrefs.SERIALIZABLE_TRIPSUMMARY, JsonConvert.SerializeObject(DatabaseService.GetInstance().TripSummaries.FirstOrDefault()));
         }
 
         private void TestTripHistory()

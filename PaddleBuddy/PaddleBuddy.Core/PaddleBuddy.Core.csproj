@@ -61,7 +61,7 @@
     <Compile Include="Services\MessengerService.cs" />
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Services\SearchService.cs" />
-    <Compile Include="SysPrefs.cs" />
+    <Compile Include="Utilities\PBPrefs.cs" />
     <Compile Include="Utilities\ObjectExtensions.cs" />
     <Compile Include="Utilities\PBMath.cs" />
     <Compile Include="Utilities\PBUtilities.cs" />

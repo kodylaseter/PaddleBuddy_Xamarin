@@ -131,7 +131,7 @@ namespace PaddleBuddy.Core.Utilities
                     {
                         link = new Link
                         {
-                            Speed = SysPrefs.DefaultSpeed
+                            Speed = PBPrefs.DefaultSpeed
                         };
                     }
                 }

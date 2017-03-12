@@ -1,66 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:custom="http://schemas.android.com/apk/res/com.paddlebuddy"
-              android:id="@+id/login_layout"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="horizontal"
-              android:weightSum="7">
-    <View 
-        android:layout_height="match_parent"
-        android:layout_width="0dp"
-        android:layout_weight="1"/>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:custom="http://schemas.android.com/apk/res/com.paddlebuddy"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="5"
-        android:orientation="vertical"
-        android:gravity="center">
-        <paddlebuddy.droid.controls.ClearEditText
-            android:id="@+id/first_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            custom:hint="email"/>
+        android:orientation="horizontal"
+        android:weightSum="7">
         <View
-            style="@style/loginRegisterHorizontalLayoutDivider"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp"
-            />
-        <paddlebuddy.droid.controls.ClearEditText
-            android:id="@+id/last_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            custom:hint="email"/>
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:orientation="vertical"
+            android:gravity="center">
+            <paddlebuddy.droid.controls.ClearEditText
+                android:id="@+id/first_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                custom:hint="first name"
+                custom:centerHint="true"/>
+            <View
+                style="@style/loginRegisterHorizontalLayoutDivider"/>
+            <paddlebuddy.droid.controls.ClearEditText
+                android:id="@+id/last_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                custom:hint="last name"
+                custom:centerHint="true"/>
+            <View
+                style="@style/loginRegisterHorizontalLayoutDivider"/>
+            <paddlebuddy.droid.controls.ClearEditText
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                custom:hint="email"
+                custom:centerHint="true"/>
+            <View
+                style="@style/loginRegisterHorizontalLayoutDivider"/>
+            <paddlebuddy.droid.controls.ClearEditText
+                android:id="@+id/password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                custom:hint="password"
+                custom:centerHint="true"/>
+            <Button
+                android:id="@+id/register_submit_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="register"
+                style="@style/PrimaryButton"/>
+        </LinearLayout>
         <View
-            style="@style/loginRegisterHorizontalLayoutDivider"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp"
-            />
-        <paddlebuddy.droid.controls.ClearEditText 
-            android:id="@+id/email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            custom:hint="email"/>
-        <View 
-            style="@style/loginRegisterHorizontalLayoutDivider"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp"
-            />
-        <paddlebuddy.droid.controls.ClearEditText
-            android:id="@+id/password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            custom:hint="password"/>
-        <Button
-            android:id="@+id/login_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="login"
-            style="@style/PrimaryButton"/>
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"/>
     </LinearLayout>
-    <View
+    <paddlebuddy.droid.controls.ProgressBarOverlay
+        android:id="@+id/register_progressbaroverlay"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_width="0dp"
-        android:layout_weight="1"/>
-</LinearLayout>
+        android:background="@color/semi_transparent_grey"
+        android:gravity="center|bottom"
+        android:visibility="gone"
+        custom:text="submitting"/>
+</RelativeLayout>

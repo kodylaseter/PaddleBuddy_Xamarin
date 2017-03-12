@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Flurl.Http;
 using PaddleBuddy.Core.Models;
+using PaddleBuddy.Core.Utilities;
 
 namespace PaddleBuddy.Core.Services
 {
@@ -15,7 +16,7 @@ namespace PaddleBuddy.Core.Services
 
             if (NetworkService.IsServerAvailable)
             {
-                var fullUrl = SysPrefs.ApiBase + url;
+                var fullUrl = PBPrefs.ApiBase + url;
                 try
                 {
                     response = await fullUrl.WithHeader("ContentType", ContentTypeJson)
@@ -46,7 +47,7 @@ namespace PaddleBuddy.Core.Services
             var response = new Response();
             if (NetworkService.IsServerAvailable)
             {
-                var fullUrl = SysPrefs.ApiBase + url;
+                var fullUrl = PBPrefs.ApiBase + url;
                 try
                 {
                     
@@ -76,7 +77,7 @@ namespace PaddleBuddy.Core.Services
             var response = new Response();
             if (NetworkService.IsServerAvailable)
             {
-                var fullUrl = SysPrefs.ApiBase + url;
+                var fullUrl = PBPrefs.ApiBase + url;
                 try
                 {
                     response = await fullUrl.WithHeaders(multiple).GetJsonAsync<Response>();

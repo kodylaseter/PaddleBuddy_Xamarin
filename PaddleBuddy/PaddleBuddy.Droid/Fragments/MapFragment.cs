@@ -10,7 +10,6 @@ using Android.OS;
 using Android.Support.V4.Content.Res;
 using Android.Views;
 using Android.Widget;
-using PaddleBuddy.Core;
 using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Services;
@@ -61,9 +60,8 @@ namespace PaddleBuddy.Droid.Fragments
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var view = inflater.Inflate(Resource.Layout.fragment_map, container, false);
-
             var rootView = view.RootView;
-            if (!SysPrefs.DisableMap)
+            if (!PBPrefs.TestOffline)
             {
                 _mapView = (MapView)rootView.FindViewById(Resource.Id.map_view);
                 _mapView.OnCreate(savedInstanceState);
@@ -383,12 +381,12 @@ namespace PaddleBuddy.Droid.Fragments
         {
             LogService.Log("finished trip");
             PrepareForClose();
-            NavigateTo(TripSummaryFragment.NewInstance(), SysPrefs.SERIALIZABLE_TRIPSUMMARY, TripManager.ExportTripSummary());
+            NavigateTo(TripSummaryFragment.NewInstance(), PBPrefs.SERIALIZABLE_TRIPSUMMARY, TripManager.ExportTripSummary());
         }
 
         private void StartSimulating()
         {
-            var p = DatabaseService.GetInstance().GetPath(SysPrefs.RiverIdToSimulate).Points;
+            var p = DatabaseService.GetInstance().GetPath(PBPrefs.RiverIdToSimulate).Points;
             if (p.Count <= 1) return;
             SetupNavigate(p);
             SimulatorService.GetInstance().StartSimulating(p);
@@ -560,10 +558,10 @@ namespace PaddleBuddy.Droid.Fragments
             if (MapIsNull) return;
             //trying to avoid setting bearing when points are too close to accurately calulate it
             var dist = PBMath.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint);
-            if (dist < SysPrefs.BearingTooCloseThreshold)
+            if (dist < PBPrefs.BearingTooCloseThreshold)
                 return;
             var bearing = PBMath.BearingBetweenPoints(CurrentLocation, TripManager.CurrentPoint);
-            var camTarget = PBMath.PointAtDistanceAlongBearing(CurrentLocation, SysPrefs.MetersAheadToAim, bearing);
+            var camTarget = PBMath.PointAtDistanceAlongBearing(CurrentLocation, PBPrefs.MetersAheadToAim, bearing);
             var camPos = CameraUpdateBuilder(camTarget, NAV_TILT, NAV_ZOOM, bearing);
             MyMap.AnimateCamera(camPos);
         }

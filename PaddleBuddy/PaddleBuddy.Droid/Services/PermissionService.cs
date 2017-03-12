@@ -5,6 +5,7 @@ using Android.Support.V7.App;
 using PaddleBuddy.Core;
 using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Services;
+using PaddleBuddy.Core.Utilities;
 
 namespace PaddleBuddy.Droid.Services
 {
@@ -20,7 +21,7 @@ namespace PaddleBuddy.Droid.Services
 
         public static void RequestLocation(AppCompatActivity activity)
         {
-            activity.RequestPermissions(PermissionsLocation, SysPrefs.PERMISSION_LOCATION);
+            activity.RequestPermissions(PermissionsLocation, PBPrefs.PERMISSION_LOCATION);
         }
 
         public static bool CheckLocation()
@@ -28,7 +29,7 @@ namespace PaddleBuddy.Droid.Services
             var approved = ContextCompat.CheckSelfPermission(Application.Context, Permission) == Android.Content.PM.Permission.Granted;
             if (approved)
             {
-                MessengerService.Messenger.Send(new PermissionMessage {PermissionCode = SysPrefs.PERMISSION_LOCATION});
+                MessengerService.Messenger.Send(new PermissionMessage {PermissionCode = PBPrefs.PERMISSION_LOCATION});
             }
             return approved;
         }

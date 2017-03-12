@@ -119,7 +119,7 @@ namespace PaddleBuddy.Core.Models
         public bool IsOnTrack(Point lineStart, Point lineEnd, Point current)
         {
             var dist = PBMath.DistanceInMetersFromPointToLineSegment(lineStart, lineEnd, current);
-            return Math.Abs(dist) < SysPrefs.IsOnTrackCloseThreshold;
+            return Math.Abs(dist) < PBPrefs.IsOnTrackCloseThreshold;
         }
 
         public bool CloseToStart(Point current)
@@ -129,12 +129,12 @@ namespace PaddleBuddy.Core.Models
                 LogService.Log("Close to start called after starting. Not good");
             }
             var distance = DistanceToNext(current);
-            return distance < SysPrefs.TripPointsCloseThreshold;
+            return distance < PBPrefs.TripPointsCloseThreshold;
         }
 
         public bool CloseToNext(Point current)
         {
-            return DistanceToNext(current) < SysPrefs.TripPointsCloseThreshold;
+            return DistanceToNext(current) < PBPrefs.TripPointsCloseThreshold;
         }
 
         public double DistanceToNext(Point current)

@@ -3,9 +3,9 @@ using Android.OS;
 using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json;
-using PaddleBuddy.Core;
 using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Services;
+using PaddleBuddy.Core.Utilities;
 using PaddleBuddy.Droid.Controls;
 
 namespace PaddleBuddy.Droid.Fragments
@@ -17,12 +17,12 @@ namespace PaddleBuddy.Droid.Fragments
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            if (Arguments == null || !Arguments.ContainsKey(SysPrefs.SERIALIZABLE_TRIPSUMMARY)) return;
+            if (Arguments == null || !Arguments.ContainsKey(PBPrefs.SERIALIZABLE_TRIPSUMMARY)) return;
             try
             {
                 TripSummary =
                     JsonConvert.DeserializeObject<TripSummary>(
-                        Arguments.GetString(SysPrefs.SERIALIZABLE_TRIPSUMMARY));
+                        Arguments.GetString(PBPrefs.SERIALIZABLE_TRIPSUMMARY));
             }
             catch (Exception e)
             {

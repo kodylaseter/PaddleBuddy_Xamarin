@@ -35,7 +35,7 @@ namespace PaddleBuddy.Core.Services
             for (var i = tripPoints.Count - 1; i >= 0; i--)
             {
                 var dist = PBMath.DistanceInMeters(current, tripPoints[i]);
-                if (dist > SysPrefs.PickNextDestinationThreshold)
+                if (dist > PBPrefs.PickNextDestinationThreshold)
                 {
                     tripPoints.RemoveAt(i);
                 }
@@ -215,7 +215,7 @@ namespace PaddleBuddy.Core.Services
                 var tripSummary = new TripSummary
                 {
                     StartDateTime = DateTime.Now,
-                    RiverId = SysPrefs.RiverIdToSimulate
+                    RiverId = PBPrefs.RiverIdToSimulate
                 };
                 var endTIme = DateTime.Now;
                 endTIme = endTIme.Add(new TimeSpan(0, 2, 20, 0));

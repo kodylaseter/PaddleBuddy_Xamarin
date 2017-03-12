@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+                xmlns:custom="http://schemas.android.com/apk/res/com.paddlebuddy"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
     <!--map bar-->
     <LinearLayout
         android:id="@+id/mapbar_layout"
@@ -97,26 +98,11 @@
             android:text="Test"/>
     </LinearLayout>
 
-
-    <RelativeLayout
+    <paddlebuddy.droid.controls.ProgressBarOverlay 
         android:id="@+id/map_isloading_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:background="@color/semi_transparent_grey">
-        <ProgressBar
-            android:id="@+id/map_progress_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            style="?android:attr/progressBarStyleLarge"/>
-        <TextView 
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/map_progress_bar"
-            android:gravity="center_horizontal"
-            android:text="waiting on gps"/>
-
-    </RelativeLayout>
-
+        android:gravity="center"
+        android:background="@color/semi_transparent_grey"
+        custom:text="waiting for gps"/>
 </RelativeLayout>

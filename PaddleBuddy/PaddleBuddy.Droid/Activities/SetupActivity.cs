@@ -7,6 +7,7 @@ using Android.Views;
 using PaddleBuddy.Core;
 using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Services;
+using PaddleBuddy.Core.Utilities;
 using PaddleBuddy.Droid.Services;
 
 namespace PaddleBuddy.Droid.Activities
@@ -24,15 +25,20 @@ namespace PaddleBuddy.Droid.Activities
         {
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.activity_setup);
-            //hide keyboard
-            Window.SetSoftInputMode(SoftInput.StateAlwaysHidden);
             LogService.Log("setup activity started");
+            
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();//hide keyboard
+            Window.SetSoftInputMode(SoftInput.StateAlwaysHidden);
             _mainActivityStarted = false;
             _dbReady = false;
             _locationPermissionApproved = false;
             _locationReady = false;
             SetupSysPrefs(testOffline: true);
-            if (!IsLoggedIn)
+            if (!Services.UserService.IsLoggedIn(Application.Context))
             {
                 StartActivity(typeof(LoginRegisterActivity));
             }
@@ -42,17 +48,10 @@ namespace PaddleBuddy.Droid.Activities
             }
         }
 
-        public bool IsLoggedIn
-        {
-            get { return false; }
-        }
-
         private void SetupSysPrefs(bool testOffline = false)
         {
-            SysPrefs.Device = SysPrefs.Devices.Android;
-            SysPrefs.TestOffline = testOffline;
-            SysPrefs.DisableMap = testOffline;
-            SysPrefs.Simulate = testOffline;
+            PBPrefs.Device = PBPrefs.Devices.Android;
+            PBPrefs.TestOffline = testOffline;
             if (testOffline)
             {
                 DatabaseService.GetInstance().SeedData();
@@ -64,8 +63,8 @@ namespace PaddleBuddy.Droid.Activities
         private void Setup()
         {
             //todo: consider making these async again
-            LogService.Log(SysPrefs.TestOffline ? "Testing offline" : "Testing online");
-            if (!SysPrefs.TestOffline)
+            LogService.Log(PBPrefs.TestOffline ? "Testing offline" : "Testing online");
+            if (!PBPrefs.TestOffline)
             {
                 MessengerService.Messenger.Register<DbReadyMessage>(this, DbReadyReceived);
                 MessengerService.Messenger.Register<PermissionMessage>(this, PermissionMessageReceived);
@@ -116,7 +115,7 @@ namespace PaddleBuddy.Droid.Activities
         private void PermissionMessageReceived(PermissionMessage obj)
         {
             LogService.Log("permission message received");
-            if (obj.PermissionCode == SysPrefs.PERMISSION_LOCATION && !_locationPermissionApproved)
+            if (obj.PermissionCode == PBPrefs.PERMISSION_LOCATION && !_locationPermissionApproved)
             {
                 LocationPermissionApproved = true;
             }
@@ -158,7 +157,7 @@ namespace PaddleBuddy.Droid.Activities
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             switch (requestCode)
             {
-                case SysPrefs.PERMISSION_LOCATION:
+                case PBPrefs.PERMISSION_LOCATION:
                     {
                         if (grantResults == null || grantResults.Length < 1 || grantResults[0] != Permission.Granted)
                         {
