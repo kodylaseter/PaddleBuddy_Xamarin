@@ -2,19 +2,28 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:orientation="vertical">
-    <LinearLayout 
+              android:orientation="vertical"
+              android:animateLayoutChanges="true">
+    <RelativeLayout 
         android:id="@+id/tripsummary_title_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:orientation="horizontal">
+        android:layout_gravity="center_vertical">
         <TextView
             android:id="@+id/tripsummary_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
             android:textAppearance="@style/textLargeGray"/>
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/expandbutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_keyboard_arrow_down_white_24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
+    </RelativeLayout>
     <RelativeLayout
         android:id="@+id/tripsummary_details"
         android:layout_width="match_parent"

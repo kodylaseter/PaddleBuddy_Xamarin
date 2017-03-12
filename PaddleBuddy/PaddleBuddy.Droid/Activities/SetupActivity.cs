@@ -4,7 +4,6 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Views;
-using PaddleBuddy.Core;
 using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Core.Utilities;

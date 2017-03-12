@@ -13,16 +13,13 @@ using Android.Views;
 using Android.Views.InputMethods;
 using Android.Widget;
 using Newtonsoft.Json;
-using PaddleBuddy.Core;
 using PaddleBuddy.Core.Models;
-using PaddleBuddy.Core.Models.Map;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Core.Utilities;
 using PaddleBuddy.Droid.Adapters;
 using PaddleBuddy.Droid.Controls;
 using PaddleBuddy.Droid.Fragments;
 using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
-using Point = PaddleBuddy.Core.Models.Map.Point;
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace PaddleBuddy.Droid.Activities

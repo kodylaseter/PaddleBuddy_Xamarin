@@ -1,4 +1,6 @@
 using Android.Content;
+using Android.Graphics;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
@@ -15,7 +17,8 @@ namespace PaddleBuddy.Droid.Controls
         private TextView TimesTextView { get; set; }
         private TextView TitleTextView { get; set; }
         private View DetailsGroup { get; set; }
-        private LinearLayout TitleGroup { get; set; }
+        private View TitleGroup { get; set; }
+        private ImageButton ExpandImageButton { get; set; }
 
         private void Initialize()
         {
@@ -23,11 +26,12 @@ namespace PaddleBuddy.Droid.Controls
             SetContentPadding(5, 5, 5, 5);
             LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent);
             AddView(Inflate(Context, Resource.Layout.cardview_tripsummary, null));
-
             TitleTextView = FindViewById<TextView>(Resource.Id.tripsummary_title);
             TimesTextView = FindViewById<TextView>(Resource.Id.tripsummary_times);
             DetailsGroup = FindViewById(Resource.Id.tripsummary_details);
-            TitleGroup = FindViewById<LinearLayout>(Resource.Id.tripsummary_title_group);
+            TitleGroup = FindViewById<View>(Resource.Id.tripsummary_title_group);
+            ExpandImageButton = FindViewById<ImageButton>(Resource.Id.expandbutton);
+            ExpandImageButton.SetColorFilter(new Color(ContextCompat.GetColor(Context, Resource.Color.gray)));
             if (IsExpandable)
             {
                 DetailsGroup.Visibility = ViewStates.Gone;
@@ -43,7 +47,15 @@ namespace PaddleBuddy.Droid.Controls
         {
             TripSummary = tripSummary;
             var titleString = DatabaseService.GetInstance().GetRiverName(TripSummary.RiverId);
-            titleString += " - ";
+            if (string.IsNullOrWhiteSpace(titleString))
+            {
+                titleString = "";
+                LogService.Log("No river name for river id in tripsummarycardview");
+            }
+            else
+            {
+                titleString += " - ";
+            }
             titleString += TripSummary.StartDateTime.ToShortDateString();
             var timesString = TripSummary.StartDateTime.ToStringHrsMinsAmPm();
             timesString += " - " + TripSummary.EndTime.ToStringHrsMinsAmPm();

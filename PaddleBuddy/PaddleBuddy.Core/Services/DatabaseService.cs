@@ -79,12 +79,12 @@ namespace PaddleBuddy.Core.Services
 
         public string GetRiverName(int id)
         {
-            return GetRiver(id).Name;
+            return GetRiver(id)?.Name;
         }
 
         public River GetRiver(int id)
         {
-            return (from river in Rivers where river.Id == id select river).Single();
+            return (from river in Rivers where river.Id == id select river).SingleOrDefault();
         }
 
         public int GetClosestRiverId(Point point = null)
