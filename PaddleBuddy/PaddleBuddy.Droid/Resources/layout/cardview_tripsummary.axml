@@ -8,7 +8,6 @@
         android:id="@+id/tripsummary_title_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
         android:layout_gravity="center_vertical">
         <TextView
             android:id="@+id/tripsummary_title"
@@ -21,13 +20,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:src="@drawable/ic_keyboard_arrow_down_white_24dp"
             android:background="?attr/selectableItemBackgroundBorderless"/>
     </RelativeLayout>
     <RelativeLayout
         android:id="@+id/tripsummary_details"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp">
 
         <!--placeholder for eventual map image-->
         <FrameLayout
