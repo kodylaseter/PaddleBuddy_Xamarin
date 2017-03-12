@@ -43,7 +43,7 @@ namespace PaddleBuddy.Droid.Activities
             }
             else
             {
-                Setup();
+                Task.Run(Setup);
             }
         }
 
@@ -59,7 +59,7 @@ namespace PaddleBuddy.Droid.Activities
         #endregion
 
         #region setup for mainactivity
-        private void Setup()
+        private async Task Setup()
         {
             //todo: consider making these async again
             LogService.Log(PBPrefs.TestOffline ? "Testing offline" : "Testing online");
@@ -68,13 +68,16 @@ namespace PaddleBuddy.Droid.Activities
                 MessengerService.Messenger.Register<DbReadyMessage>(this, DbReadyReceived);
                 MessengerService.Messenger.Register<PermissionMessage>(this, PermissionMessageReceived);
                 MessengerService.Messenger.Register<LocationUpdatedMessage>(this, LocationUpdatedReceived);
-                Task.Run(() => Services.StorageService.GetInstance().Setup());
+                Services.StorageService.GetInstance().Setup();
                 PermissionService.SetupLocation(this);
             }
             else
             {
-                StartActivity(typeof(MainActivity));
-                //StartActivity(typeof(TestActivity));
+                RunOnUiThread(() =>
+                {
+                    StartActivity(typeof(MainActivity));
+                    //StartActivity(typeof(TestActivity));
+                });
             }
         }
 
@@ -88,7 +91,10 @@ namespace PaddleBuddy.Droid.Activities
                 MessengerService.Messenger.Unregister<DbReadyMessage>(this);
                 MessengerService.Messenger.Unregister<PermissionMessage>(this);
                 MessengerService.Messenger.Unregister<LocationUpdatedMessage>(this);
-                StartActivity(typeof(MainActivity));
+                RunOnUiThread(() =>
+                {
+                    StartActivity(typeof(MainActivity));
+                });
             }
         }
 
