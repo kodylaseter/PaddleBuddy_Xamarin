@@ -14,6 +14,14 @@ namespace PaddleBuddy.Droid.Controls
     {
         public EditText EditText { get; set; }
         private ImageButton ImageButton { get; set; }
+        public Action TextCleared;
+
+        public string Text
+        {
+            get { return EditText?.Text; }
+            set { EditText.Text = value; }
+        }
+
 
         private void Initialize()
         {
@@ -58,6 +66,7 @@ namespace PaddleBuddy.Droid.Controls
         private void OnButtonClicked(object sender, EventArgs e)
         {
             EditText.Text = "";
+            TextCleared.Invoke();
         }
 
         private void OnTextChanged(object sender, TextChangedEventArgs e)

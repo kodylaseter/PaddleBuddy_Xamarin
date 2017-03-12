@@ -78,7 +78,7 @@ namespace PaddleBuddy.Droid.Adapters
             {
                 var returnObj = new FilterResults();
                 var results = new List<SearchItem>();
-                if (_adapter.SearchService.OriginalData == null || constraint == null)
+                if (_adapter.SearchService.OriginalData == null || constraint == null || _adapter.SearchService.OriginalData.Count < 1)
                 {
                     return returnObj;
                 }
@@ -100,6 +100,7 @@ namespace PaddleBuddy.Droid.Adapters
             {
                 using (var values = results.Values)
                 {
+                    if (values == null) return;
                     _adapter.SearchService.Items =
                         values.ToArray<Java.Lang.Object>().Select(a => a.ToNetObject<SearchItem>()).ToList();
 
