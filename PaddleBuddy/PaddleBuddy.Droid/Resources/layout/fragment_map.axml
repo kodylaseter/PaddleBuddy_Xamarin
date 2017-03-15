@@ -56,9 +56,9 @@
 
         </LinearLayout>
     </LinearLayout>
-    
+
+
     <!--map-->
-    
     <com.google.android.gms.maps.MapView
         android:id="@+id/map_view"
         android:layout_width="match_parent"
@@ -97,6 +97,8 @@
             android:layout_height="wrap_content"
             android:text="Test"/>
     </LinearLayout>
+    <!--search-->
+    <include layout="@layout/view_mainsearch"/>
 
     <paddlebuddy.droid.controls.ProgressBarOverlay 
         android:id="@+id/map_isloading_overlay"

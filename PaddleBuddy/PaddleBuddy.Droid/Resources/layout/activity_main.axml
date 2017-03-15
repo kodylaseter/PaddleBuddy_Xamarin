@@ -43,9 +43,6 @@
                     android:layout_height="match_parent"
                     android:layout_width="match_parent"
                     android:layout_above="@id/app_bar_layout"/>
-                
-                <include 
-                    layout="@layout/view_mainsearch"/>
             </RelativeLayout>
         </android.support.design.widget.CoordinatorLayout>
 

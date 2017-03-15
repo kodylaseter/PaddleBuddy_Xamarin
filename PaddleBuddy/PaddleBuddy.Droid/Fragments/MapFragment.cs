@@ -6,15 +6,21 @@ using Android.App;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.Graphics;
+using Android.InputMethodServices;
 using Android.OS;
+using Android.Support.V4.Content;
 using Android.Support.V4.Content.Res;
+using Android.Text;
 using Android.Views;
+using Android.Views.InputMethods;
 using Android.Widget;
 using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Core.Utilities;
 using PaddleBuddy.Droid.Activities;
+using PaddleBuddy.Droid.Adapters;
+using PaddleBuddy.Droid.Controls;
 using PaddleBuddy.Droid.Services;
 using PaddleBuddy.Droid.Utilities;
 using Path = PaddleBuddy.Core.Models.Map.Path;
@@ -24,48 +30,106 @@ namespace PaddleBuddy.Droid.Fragments
 {
     public class MapFragment : BaseFragment, IOnMapReadyCallback, GoogleMap.IOnMarkerClickListener, GoogleMap.IOnMapClickListener, GoogleMap.IInfoWindowAdapter
     {
-        private GoogleMap _myMap;
+        #region member variables
         private bool _isLoading;
-        private MapView _mapView;
-        private MapModes _mapMode;
-        private Point _selectedMarkerPoint;
-        private Button _planTripButton;
+        private GoogleMap MyMap { get; set; }
+        private MapView MapView { get; set; }
+        private MapModes MapMode { get; set; }
+        private Point SelectedMarkerPoint { get; set; }
+        private Button PlanTripButton { get; set; }
+        private RelativeLayout ProgressBarLayout { get; set; }
+        private MarkerOptions _currentMarkerOptions;
+        private Marker CurrentMarker { get; set; }
+        private Marker CurrentDestinationMarker { get; set; }
+        private List<Marker> LaunchSiteMarkers { get; set; }
+        private Polyline CurrentTripPolyline { get; set; }
+        private Polyline BrowsePolyline { get; set; }
+        private TextView SpeedTextView { get; set; }
+        /// <summary>
+        /// speed, time of day in totalseconds
+        /// </summary>
+        private List<Tuple<double, double>> Speeds { get; set; }
+        public TripManager TripManager { get; set; }
+
         private LinearLayout _mapBarLayout;
-        private RelativeLayout _progressBarLayout;
         private TextView _mapBarTextView1;
         private TextView _mapBarTextView2;
         private TextView _mapBarTextView3;
-        private MarkerOptions _currentMarkerOptions;
-        private Marker _currentMarker;
-        private Marker _currentDestinationMarker;
-        private List<Marker> _launchSiteMarkers;
-        private Polyline _currentTripPolyline;
-        private Polyline _browsePolyline;
 
 
         private const int NAV_ZOOM = 16;
         private const int BROWSE_ZOOM = 8;
         private const int NAV_TILT = 70;
         private const int BROWSE_TILT = 0;
-
-        //speed variables
         private const int SPEED_CUTOFF_TIME_IN_SECONDS = 10;
-        private TextView _speedTextView;
-        /// <summary>
-        /// speed, time of day in totalseconds
-        /// </summary>
-        private List<Tuple<double, double>> _speeds;
-        public TripManager TripManager { get; set; }
+
+        #region search
+        private ListView SearchListView1 { get; set; }
+        private ListView SearchListView2 { get; set; }
+        private LinearLayout OverallSearchLayout { get; set; }
+        private MainActivitySearchAdapter SearchAdapter1 { get; set; }
+        private MainActivitySearchAdapter SearchAdapter2 { get; set; }
+        private ClearEditText ClearEditText1 { get; set; }
+        private ClearEditText ClearEditText2 { get; set; }
+        private View SearchLayout2 { get; set; }
+        private ImageButton CloseSearchImageButton { get; set; }
+        private SearchItem _selectedSearchItem1;
+        private SearchItem _selectedSearchItem2;
+        private InputMethodManager InputMethodManager => (InputMethodManager)Activity.GetSystemService(Android.Content.Context.InputMethodService);
+        #endregion
+
+        #endregion
+
+        #region init
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             var view = inflater.Inflate(Resource.Layout.fragment_map, container, false);
-            var rootView = view.RootView;
+            MapView = (MapView)view.RootView.FindViewById(Resource.Id.map_view);
+            MapView.OnCreate(savedInstanceState);
+            SpeedTextView = view.FindViewById<TextView>(Resource.Id.speed_textview);
+            _mapBarLayout = view.FindViewById<LinearLayout>(Resource.Id.mapbar_layout);
+            _mapBarTextView1 = view.FindViewById<TextView>(Resource.Id.mapbar_text1);
+            _mapBarTextView2 = view.FindViewById<TextView>(Resource.Id.mapbar_text2);
+            _mapBarTextView3 = view.FindViewById<TextView>(Resource.Id.mapbar_text3);
+            ProgressBarLayout = view.FindViewById<RelativeLayout>(Resource.Id.map_isloading_overlay);
+            view.FindViewById<Button>(Resource.Id.test_simulate_button).Click += OnSimulateButtonClicked;
+            view.FindViewById<ImageButton>(Resource.Id.cancel_trip_button).Click += OnCancelTripClicked;
+
+            SearchListView1 = view.FindViewById<ListView>(Resource.Id.search_listview1);
+            SearchListView2 = view.FindViewById<ListView>(Resource.Id.search_listview2);
+            OverallSearchLayout = view.FindViewById<LinearLayout>(Resource.Id.overall_search_layout);
+            ClearEditText1 = view.FindViewById<ClearEditText>(Resource.Id.search1_clearedittext);
+            ClearEditText2 = view.FindViewById<ClearEditText>(Resource.Id.search2_clearedittext);
+            CloseSearchImageButton = view.FindViewById<ImageButton>(Resource.Id.search_backarrow);
+            SearchLayout2 = view.FindViewById<View>(Resource.Id.search2_layout);
+            CloseSearchImageButton.SetColorFilter(
+                new Color(ContextCompat.GetColor(Context, Resource.Color.gray)));
+            CloseSearchImageButton.Click += (s, e) => CloseSearch();
+            ClearEditText1.EditText.TextChanged += EditText1OnTextChanged;
+            ClearEditText2.EditText.TextChanged += EditText2OnTextChanged;
+            ClearEditText1.TextCleared += Text1Cleared;
+            ClearEditText2.TextCleared += Text2Cleared;
+            SearchAdapter1 = new MainActivitySearchAdapter(Activity);
+            SearchAdapter2 = new MainActivitySearchAdapter(Activity);
+            SearchListView1.Adapter = SearchAdapter1;
+            SearchListView2.Adapter = SearchAdapter2;
+
+            OverallSearchLayout.Clickable = true;
+            OverallSearchLayout.Click += (s, e) => { CloseSearch(); };
+            SearchListView1.ItemClick += OnSearchItem1Selected;
+            SearchListView2.ItemClick += OnSearchItem2Selected;
+            IsLoading = true;
+            return view;
+        }
+
+
+        public override void OnResume()
+        {
+            base.OnResume();
             if (!PBPrefs.TestOffline)
             {
-                _mapView = (MapView)rootView.FindViewById(Resource.Id.map_view);
-                _mapView.OnCreate(savedInstanceState);
-                _mapView.OnResume();
+                MapView.OnResume();
                 try
                 {
                     MapsInitializer.Initialize(Application.Context);
@@ -75,24 +139,18 @@ namespace PaddleBuddy.Droid.Fragments
                     LogService.ExceptionLog("Problem initializing map");
                     LogService.ExceptionLog(e.Message);
                 }
-                _mapView.GetMapAsync(this);
+                MapView.GetMapAsync(this);
             }
-            view.FindViewById<Button>(Resource.Id.plan_trip_button).Click += OnPlanTripButtonClicked;
-            view.FindViewById<Button>(Resource.Id.test_simulate_button).Click += OnSimulateButtonClicked;
-            view.FindViewById<ImageButton>(Resource.Id.cancel_trip_button).Click += OnCancelTripClicked;
-            _speedTextView = view.FindViewById<TextView>(Resource.Id.speed_textview);
-            _mapBarLayout = view.FindViewById<LinearLayout>(Resource.Id.mapbar_layout);
-            _mapBarTextView1 = view.FindViewById<TextView>(Resource.Id.mapbar_text1);
-            _mapBarTextView2 = view.FindViewById<TextView>(Resource.Id.mapbar_text2);
-            _mapBarTextView3 = view.FindViewById<TextView>(Resource.Id.mapbar_text3);
-            _progressBarLayout = view.FindViewById<RelativeLayout>(Resource.Id.map_isloading_overlay);
-            IsLoading = true;
-            _speeds = new List<Tuple<double, double>>();
-            _currentMarker = null;
-            _selectedMarkerPoint = null;
-            _launchSiteMarkers = new List<Marker>();
+            Speeds = new List<Tuple<double, double>>();
+            CurrentMarker = null;
+            SelectedMarkerPoint = null;
+            LaunchSiteMarkers = new List<Marker>();
             SetupBrowse();
-            return view;
+
+            ClearEditText1.SetHint("Search here...");
+            ClearEditText2.SetHint("Search here...");
+            SearchAdapter1.UpdateData();
+            HideClearEditText2();
         }
 
         public void OnMapReady(GoogleMap googleMap)
@@ -132,21 +190,156 @@ namespace PaddleBuddy.Droid.Fragments
         {
             //todo: improve or debug this
             await Task.Delay(500);
-            if (CurrentLocation != null && _browsePolyline == null)
+            if (CurrentLocation != null && BrowsePolyline == null)
             {
                 LocationUpdatedReceived(null);
             }
         }
 
-        private MapModes MapMode
+        public static MapFragment NewInstance()
         {
-            get { return _mapMode; }
+            return new MapFragment();
+        }
+
+        public bool IsLoading
+        {
+            get { return _isLoading; }
             set
             {
-                _mapMode = value;
+                _isLoading = MapIsNull || value;
+                ProgressBarLayout.Visibility = _isLoading ? ViewStates.Visible : ViewStates.Gone;
+            }
+        }
+        #endregion
+
+        #region search
+
+        private SearchItem SelectedSearchItem1
+        {
+            get { return _selectedSearchItem1; }
+            set
+            {
+                var tempValue = value;
+                if (tempValue == null)
+                {
+                    _selectedSearchItem1 = null;
+                    HideClearEditText2();
+                }
+                else
+                {
+                    ClearEditText1.EditText.Text = tempValue.Title;
+                    _selectedSearchItem1 = tempValue;
+                    ShowClearEditText2();
+                }
             }
         }
 
+        private SearchItem SelectedSearchItem2
+        {
+            get { return _selectedSearchItem2; }
+            set
+            {
+                _selectedSearchItem2 = value;
+                if (_selectedSearchItem2 != null)
+                {
+                    ClearEditText2.Text = _selectedSearchItem2.Title;
+                }
+            }
+        }
+
+        private void Text1Cleared()
+        {
+            SelectedSearchItem1 = null;
+        }
+
+        private void Text2Cleared()
+        {
+            SelectedSearchItem2 = null;
+        }
+
+        private void OnSearchItem1Selected(object sender, AdapterView.ItemClickEventArgs e)
+        {
+            SelectedSearchItem1 = SearchAdapter1.GetSearchItem(e.Position);
+        }
+
+        private void OnSearchItem2Selected(object sender, AdapterView.ItemClickEventArgs e)
+        {
+            SelectedSearchItem2 = SearchAdapter2.GetSearchItem(e.Position);
+        }
+
+        private void EditText1OnTextChanged(object sender, TextChangedEventArgs textChangedEventArgs)
+        {
+            SearchAdapter1.Filter.InvokeFilter(textChangedEventArgs.Text.ToString());
+        }
+
+        private void EditText2OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            SearchAdapter2.Filter.InvokeFilter(e.Text.ToString());
+        }
+
+        public void ToggleSearch()
+        {
+            if (OverallSearchLayout.Visibility == ViewStates.Gone)
+            {
+                OpenSearch();
+            }
+            else
+            {
+                CloseSearch();
+            }
+        }
+
+        private void OpenSearch()
+        {
+            ClearEditText1.Text = "";
+            OverallSearchLayout.Visibility = ViewStates.Visible;
+            ClearEditText1.EditText.RequestFocusFromTouch();
+            InputMethodManager.ShowSoftInput(ClearEditText1.EditText, ShowFlags.Implicit);
+        }
+
+        private void CloseSearch()
+        {
+            ClearSearch();
+            OverallSearchLayout.Visibility = ViewStates.Gone;
+            var view = Activity.CurrentFocus;
+            if (view != null)
+            {
+                InputMethodManager.HideSoftInputFromWindow(view.WindowToken,
+                    HideSoftInputFlags.None);
+            }
+        }
+
+        private void ClearSearch()
+        {
+            ClearEditText1.Text = "";
+            ClearEditText2.Text = "";
+            SelectedSearchItem1 = null;
+            SelectedSearchItem2 = null;
+        }
+
+        private void ShowClearEditText2()
+        {
+            SearchLayout2.Visibility = ViewStates.Visible;
+            SearchListView1.Visibility = ViewStates.Gone;
+            SearchListView2.Visibility = ViewStates.Visible;
+            ClearEditText2.Text = "";
+            SearchAdapter2.UpdateData(_selectedSearchItem1.Item);
+            SelectedSearchItem2 = null;
+            ClearEditText2.EditText.RequestFocusFromTouch();
+        }
+
+        private void HideClearEditText2()
+        {
+            SearchLayout2.Visibility = ViewStates.Gone;
+            SearchListView1.Visibility = ViewStates.Visible;
+            SearchListView2.Visibility = ViewStates.Gone;
+            ClearEditText2.Text = "";
+            SelectedSearchItem2 = null;
+        }
+
+        #endregion
+
+        #region update
         private void LocationUpdatedReceived(LocationUpdatedMessage obj)
         {
             if (MapIsNull) return;
@@ -247,7 +440,7 @@ namespace PaddleBuddy.Droid.Fragments
             {
                 DrawCurrentBrowsePathAndSites(true);
                 var points = new List<LatLng> { CurrentLocation.ToLatLng()};
-                points.AddRange(_browsePolyline.Points);
+                points.AddRange(BrowsePolyline.Points);
                 AnimateCameraBounds(points.ToArray());
             }
             catch (Exception e)
@@ -264,7 +457,7 @@ namespace PaddleBuddy.Droid.Fragments
             HideMapBar();
             SimulatorService.GetInstance().StopSimulating();
             ClearTripData();
-            _launchSiteMarkers = new List<Marker>();
+            LaunchSiteMarkers = new List<Marker>();
         }
 
         private void SetupNavigate(List<Point> points)
@@ -273,23 +466,55 @@ namespace PaddleBuddy.Droid.Fragments
             TripManager = new TripManager {Points = points};
         }
 
-        private void ClearTripData()
+        private void StartSimulating()
         {
-            TripManager = null;
-            _currentTripPolyline = null;
-            _currentDestinationMarker = null;
+            var p = DatabaseService.GetInstance().GetPath(PBPrefs.RiverIdToSimulate).Points;
+            if (p.Count <= 1) return;
+            SetupNavigate(p);
+            SimulatorService.GetInstance().StartSimulating(p);
         }
 
-        public bool IsLoading
+        private Point CurrentLocation
         {
-            get { return _isLoading; }
-            set
+            get { return LocationService.GetInstance().CurrentLocation; }
+        }
+
+        #endregion
+
+        #region speed
+        private void UpdateSpeed()
+        {
+            var newTime = CurrentLocation.Time;
+            if (CurrentLocation.Speed > 0)
             {
-                _isLoading = MapIsNull || value;
-                _progressBarLayout.Visibility = _isLoading ? ViewStates.Visible : ViewStates.Gone;
+                Speeds.Add(new Tuple<double, double>(CurrentLocation.Speed, CurrentLocation.Time));
+            }
+            //Speeds.RemoveAll(item => newTime - item.Item2 > SPEED_CUTOFF_TIME_IN_SECONDS || newTime - item.Item2 < 0);
+            for (int i = Speeds.Count - 1; i >= 0; i--)
+            {
+                if (newTime - Speeds[i].Item2 > SPEED_CUTOFF_TIME_IN_SECONDS)
+                {
+                    Speeds.RemoveAt(i);
+                }
+            }
+            if (Speeds.Count > 0)
+            {
+                var avg = Speeds.Average(item => item.Item1);
+                if (avg > 0)
+                {
+                    SpeedTextView.Text = avg.ToString("0.0");
+                    SpeedTextView.Visibility = ViewStates.Visible;
+                }
             }
         }
 
+        private void HideSpeed()
+        {
+            SpeedTextView.Visibility = ViewStates.Gone;
+        }
+        #endregion
+
+        #region mapbar
         private void UpdateMapBar(string text1 = null)
         {
             ShowMapBar();
@@ -310,37 +535,6 @@ namespace PaddleBuddy.Droid.Fragments
             }
         }
 
-        private void UpdateSpeed()
-        {
-            var newTime = CurrentLocation.Time;
-            if (CurrentLocation.Speed > 0)
-            {
-                _speeds.Add(new Tuple<double, double>(CurrentLocation.Speed, CurrentLocation.Time));
-            }
-            //_speeds.RemoveAll(item => newTime - item.Item2 > SPEED_CUTOFF_TIME_IN_SECONDS || newTime - item.Item2 < 0);
-            for (int i = _speeds.Count - 1; i >= 0; i--)
-            {
-                if (newTime - _speeds[i].Item2 > SPEED_CUTOFF_TIME_IN_SECONDS)
-                {
-                    _speeds.RemoveAt(i);
-                }
-            }
-            if (_speeds.Count > 0)
-            {
-                var avg = _speeds.Average(item => item.Item1);
-                if (avg > 0)
-                {
-                    _speedTextView.Text = avg.ToString("0.0");
-                    _speedTextView.Visibility = ViewStates.Visible;
-                }
-            }
-        }
-
-        private void HideSpeed()
-        {
-            _speedTextView.Visibility = ViewStates.Gone;
-        }
-
         private void HideMapBar()
         {
             _mapBarLayout.Visibility = ViewStates.Gone;
@@ -350,31 +544,14 @@ namespace PaddleBuddy.Droid.Fragments
         {
             _mapBarLayout.Visibility = ViewStates.Visible;
         }
+        #endregion
 
-        private GoogleMap MyMap
+        #region trip
+        private void ClearTripData()
         {
-            get { return _myMap; }
-            set { _myMap = value; }
-        }
-
-        public Point SelectedMarkerPoint
-        {
-            get { return _selectedMarkerPoint; }
-            set
-            {
-                _selectedMarkerPoint = value;
-                //_planTripButton?.Visibility = _selectedMarkerPoint != null ? ViewStates.Visible : ViewStates.Gone;
-            }
-        }
-
-        private Point CurrentLocation
-        {
-            get { return LocationService.GetInstance().CurrentLocation; }
-        }
-
-        public static MapFragment NewInstance()
-        {
-            return new MapFragment();
+            TripManager = null;
+            CurrentTripPolyline = null;
+            CurrentDestinationMarker = null;
         }
 
         private void FinishTrip()
@@ -383,20 +560,9 @@ namespace PaddleBuddy.Droid.Fragments
             PrepareForClose();
             NavigateTo(TripSummaryFragment.NewInstance(), PBPrefs.SERIALIZABLE_TRIPSUMMARY, TripManager.ExportTripSummary());
         }
+        #endregion
 
-        private void StartSimulating()
-        {
-            var p = DatabaseService.GetInstance().GetPath(PBPrefs.RiverIdToSimulate).Points;
-            if (p.Count <= 1) return;
-            SetupNavigate(p);
-            SimulatorService.GetInstance().StartSimulating(p);
-        }
-
-        private void OnPlanTripButtonClicked(object sender, EventArgs e)
-        {
-            ((MainActivity)Activity).HandleNavigation(PlanFragment.NewInstance(_selectedMarkerPoint.Id));
-        }
-
+        #region clicks
         private void OnCancelTripClicked(object sender, EventArgs e)
         {
             SetupBrowse();
@@ -429,19 +595,11 @@ namespace PaddleBuddy.Droid.Fragments
         {
             SelectedMarkerPoint = null;
         }
+        #endregion
 
-        public View GetInfoContents(Marker marker)
-        {
-            var view = GetLayoutInflater(null).Inflate(Resource.Layout.infowindow_custom_marker, null);
-            ((TextView) view.FindViewById(Resource.Id.markerTitle)).Text = _selectedMarkerPoint.Label;
-            return view;
-        }
+        private bool MapIsNull => MyMap == null;
 
-        public View GetInfoWindow(Marker marker)
-        {
-            return null;
-        }
-
+        #region draw
         private Marker DrawMarker(Point p)
         {
             if (MapIsNull) return null;
@@ -455,11 +613,11 @@ namespace PaddleBuddy.Droid.Fragments
             if (MapIsNull) return;
             if (reDraw)
             {
-                _currentTripPolyline.Remove();
-                _currentTripPolyline = null;
+                CurrentTripPolyline.Remove();
+                CurrentTripPolyline = null;
             }
-            if (_currentTripPolyline != null) return;
-            _currentTripPolyline = DrawLine(TripManager.Points);
+            if (CurrentTripPolyline != null) return;
+            CurrentTripPolyline = DrawLine(TripManager.Points);
         }
 
         private void DrawCurrentBrowsePathAndSites(bool reDraw = false)
@@ -468,27 +626,27 @@ namespace PaddleBuddy.Droid.Fragments
             if (MapIsNull) return;
             if (reDraw)
             {
-                _browsePolyline?.Remove();
-                _browsePolyline = null;
-                if (_launchSiteMarkers != null)
+                BrowsePolyline?.Remove();
+                BrowsePolyline = null;
+                if (LaunchSiteMarkers != null)
                 {
-                    foreach (var siteMarker in _launchSiteMarkers)
+                    foreach (var siteMarker in LaunchSiteMarkers)
                     {
                         siteMarker.Remove();
                     }
                 }
-                _launchSiteMarkers = new List<Marker>();
+                LaunchSiteMarkers = new List<Marker>();
             }
-            if (_browsePolyline != null && _launchSiteMarkers != null) return;
+            if (BrowsePolyline != null && LaunchSiteMarkers != null) return;
             //todo: check if user has moved camera
             var closestRiverId = DatabaseService.GetInstance().GetClosestRiverId();
             if (closestRiverId >= 0)
             {
-                _browsePolyline = DrawLine(DatabaseService.GetInstance().GetPath(closestRiverId));
+                BrowsePolyline = DrawLine(DatabaseService.GetInstance().GetPath(closestRiverId));
                 var sites = DatabaseService.GetInstance().Points.Where(a => a.IsLaunchSite && a.RiverId == closestRiverId).ToList();
                 foreach (var site in sites)
                 {
-                    _launchSiteMarkers.Add(DrawMarker(site));
+                    LaunchSiteMarkers.Add(DrawMarker(site));
                 }
             }
         }
@@ -523,13 +681,13 @@ namespace PaddleBuddy.Droid.Fragments
             {
                 if (MapIsNull) return;
                 var position = CurrentLocation.ToLatLng();
-                if (_currentMarker != null)
+                if (CurrentMarker != null)
                 {
-                    _currentMarker.Position = position;
+                    CurrentMarker.Position = position;
                 }
                 else
                 {
-                    _currentMarker = MyMap.AddMarker(CurrentMarkerOptions.SetPosition(position));
+                    CurrentMarker = MyMap.AddMarker(CurrentMarkerOptions.SetPosition(position));
                 }
             }
             catch (Exception e)
@@ -543,16 +701,49 @@ namespace PaddleBuddy.Droid.Fragments
         {
             if (MapIsNull) return;
             var position = p.ToLatLng();
-            if (_currentDestinationMarker != null)
+            if (CurrentDestinationMarker != null)
             {
-                _currentDestinationMarker.Position = position;
+                CurrentDestinationMarker.Position = position;
             }
             else
             {
-                _currentDestinationMarker = MyMap.AddMarker(new MarkerOptions().SetPosition(position));
+                CurrentDestinationMarker = MyMap.AddMarker(new MarkerOptions().SetPosition(position));
             }
         }
 
+        public View GetInfoContents(Marker marker)
+        {
+            var view = GetLayoutInflater(null).Inflate(Resource.Layout.infowindow_custom_marker, null);
+            ((TextView)view.FindViewById(Resource.Id.markerTitle)).Text = SelectedMarkerPoint.Label;
+            return view;
+        }
+
+        public View GetInfoWindow(Marker marker)
+        {
+            return null;
+        }
+
+        private MarkerOptions CurrentMarkerOptions
+        {
+            get
+            {
+                if (_currentMarkerOptions != null) return _currentMarkerOptions;
+                var px = 50;
+                var bitmap = Bitmap.CreateBitmap(px, px, Bitmap.Config.Argb8888);
+                var canvas = new Canvas(bitmap);
+                var shape = ResourcesCompat.GetDrawable(Resources, Resource.Drawable.current_circle, null);
+                shape.SetBounds(0, 0, bitmap.Width, bitmap.Height);
+                shape.Draw(canvas);
+                var markerOpts = new MarkerOptions().SetIcon(BitmapDescriptorFactory.FromBitmap(bitmap))
+                    .Anchor(.5f, .5f);
+                _currentMarkerOptions = markerOpts;
+                return _currentMarkerOptions;
+
+            }
+        }
+        #endregion
+
+        #region camera
         public void NavigateCamera()
         {
             if (MapIsNull) return;
@@ -609,27 +800,9 @@ namespace PaddleBuddy.Droid.Fragments
             if (!bearing.Equals(double.NaN)) camPos.Bearing((float)bearing);
             return CameraUpdateFactory.NewCameraPosition(camPos.Build());
         }
+        #endregion
 
-        private MarkerOptions CurrentMarkerOptions
-        {
-            get
-            {
-                if (_currentMarkerOptions != null) return _currentMarkerOptions;
-                var px = 50;
-                var bitmap = Bitmap.CreateBitmap(px, px, Bitmap.Config.Argb8888);
-                var canvas = new Canvas(bitmap);
-                var shape = ResourcesCompat.GetDrawable(Resources, Resource.Drawable.current_circle, null);
-                shape.SetBounds(0, 0, bitmap.Width, bitmap.Height);
-                shape.Draw(canvas);
-                var markerOpts = new MarkerOptions().SetIcon(BitmapDescriptorFactory.FromBitmap(bitmap))
-                    .Anchor(.5f, .5f);
-                _currentMarkerOptions = markerOpts;
-                return _currentMarkerOptions;
 
-            }
-        }
-
-        private bool MapIsNull => MyMap == null;
 
         public enum MapModes
         {
