@@ -110,13 +110,15 @@
             android:layout_height="wrap_content"
             android:text="Test"/>
     </LinearLayout>
-    <!--search-->
-    <include layout="@layout/view_mainsearch"/>
-
-    <paddlebuddy.droid.controls.ProgressBarOverlay 
+    <paddlebuddy.droid.controls.ProgressBarOverlay
         android:id="@+id/map_isloading_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:background="@color/semi_transparent_grey"/>
+        android:background="@color/semi_transparent_grey"/> 
+    
+    <!--search-->
+    <include layout="@layout/view_mainsearch"/>
+
+   
 </RelativeLayout>

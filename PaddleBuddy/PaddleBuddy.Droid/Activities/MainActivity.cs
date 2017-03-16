@@ -102,6 +102,7 @@ namespace PaddleBuddy.Droid.Activities
             {
                 ((MapFragment) GetCurrentContentFragment).CloseSearch();
             }
+            else
             {
                 base.OnBackPressed();
             }

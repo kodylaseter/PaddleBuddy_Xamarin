@@ -36,7 +36,7 @@ namespace PaddleBuddy.Droid.Activities
             _dbReady = false;
             _locationPermissionApproved = false;
             _locationReady = false;
-            SetupSysPrefs(testOffline: false);
+            SetupSysPrefs(testOffline: true);
             if (!Services.UserService.IsLoggedIn(Application.Context))
             {
                 StartActivity(typeof(LoginRegisterActivity));
