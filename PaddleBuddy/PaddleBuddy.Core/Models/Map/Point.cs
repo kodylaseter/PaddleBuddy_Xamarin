@@ -1,4 +1,6 @@
-﻿namespace PaddleBuddy.Core.Models.Map
+﻿using PaddleBuddy.Core.Utilities;
+
+namespace PaddleBuddy.Core.Models.Map
 {
     public class Point
     {
@@ -22,6 +24,17 @@
         public override string ToString()
         {
             return "id: " + Id + ", lat: " + Lat;
+        }
+
+        public SearchItem ToSearchItem()
+        {
+            return new SearchItem
+            {
+                Id = PBUtilities.GetNextId(),
+                Item = this,
+                SearchString = Label,
+                Title = Label
+            };
         }
     }
 }
