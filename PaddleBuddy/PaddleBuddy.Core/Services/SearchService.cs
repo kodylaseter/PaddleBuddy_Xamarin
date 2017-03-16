@@ -45,12 +45,7 @@ namespace PaddleBuddy.Core.Services
                     var river = item as River;
                     if (river != null)
                     {
-                        OriginalData.Add(new SearchItem
-                        {
-                            SearchString = river.Name,
-                            Title = river.Name,
-                            Item = river
-                        });
+                        OriginalData.Add(river.ToSearchItem());
                     }
                 }
                 else if (item.GetType() == typeof (Point))
@@ -58,12 +53,7 @@ namespace PaddleBuddy.Core.Services
                     var point = item as Point;
                     if (point != null)
                     {
-                        OriginalData.Add(new SearchItem
-                        {
-                            SearchString = point.Label ?? point.Id.ToString(),
-                            Title = point.Label,
-                            Item = point
-                        });
+                        OriginalData.Add(point.ToSearchItem());
                     }
                 }
                 else
