@@ -30,7 +30,6 @@ namespace PaddleBuddy.Droid.Adapters
             SearchService.Clear();
             if (o == null)
             {
-                SearchService.AddData(DatabaseService.GetInstance().Points.ToArray<object>());
                 SearchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
             } else 
             {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Gms.Maps.Model;
+using Android.Support.V4.App;
 using Android.Views;
 using PaddleBuddy.Core.Models.Map;
 
@@ -12,6 +13,11 @@ namespace PaddleBuddy.Droid.Utilities
         public static bool IsVisible(this View view)
         {
             return view.Visibility == ViewStates.Visible;
+        }
+
+        public static bool IsTypeOf(this object obj, Type type)
+        {
+            return obj.GetType() == type;
         }
 
         public static LatLng ToLatLng(this Point value)

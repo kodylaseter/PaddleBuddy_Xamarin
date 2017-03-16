@@ -65,4 +65,7 @@
     <style name="textMediumGray" parent="@android:style/TextAppearance.Medium">
         <item name="android:textColor">@color/gray</item>
     </style>
+    <style name="textSmallGray" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@color/gray</item>
+    </style>
 </resources>

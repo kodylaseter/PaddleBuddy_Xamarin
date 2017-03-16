@@ -44,7 +44,8 @@ namespace PaddleBuddy.Droid.Controls
             
             EditText = new EditText(Context)
             {
-                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+                LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent),
+                InputType = InputTypes.TextFlagNoSuggestions
             };
             EditText.TextChanged += OnTextChanged;
             ((LayoutParams)EditText.LayoutParameters).AddRule(LayoutRules.LeftOf, ImageButton.Id);

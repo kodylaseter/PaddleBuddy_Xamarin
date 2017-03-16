@@ -1,26 +1,20 @@
 using System;
 using System.Linq;
 using Android.App;
-using Android.Graphics;
+using Android.InputMethodServices;
 using Android.OS;
 using Android.Support.Design.Widget;
-using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
-using Android.Text;
 using Android.Views;
-using Android.Views.InputMethods;
-using Android.Widget;
 using Newtonsoft.Json;
-using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Core.Utilities;
-using PaddleBuddy.Droid.Adapters;
-using PaddleBuddy.Droid.Controls;
 using PaddleBuddy.Droid.Fragments;
 using PaddleBuddy.Droid.Utilities;
 using ActionBarDrawerToggle = Android.Support.V7.App.ActionBarDrawerToggle;
+using Fragment = Android.Support.V4.App.Fragment;
 using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace PaddleBuddy.Droid.Activities
@@ -34,7 +28,6 @@ namespace PaddleBuddy.Droid.Activities
         private ActionBarDrawerToggle _toggle;
 
         private int DEFAULT_FRAGMENT_ID;
-        private InputMethodManager InputMethodManager => (InputMethodManager) GetSystemService(InputMethodService);
 
         #region init
 
@@ -48,7 +41,6 @@ namespace PaddleBuddy.Droid.Activities
 
             Toolbar = (Toolbar) FindViewById(Resource.Id.toolbar);
             SetSupportActionBar(Toolbar);
-            SupportActionBar.Title = null;
 
             _drawer = (DrawerLayout) FindViewById(Resource.Id.drawer_layout);
             _toggle = new ActionBarDrawerToggle(this, _drawer, Toolbar, Resource.String.navigation_drawer_open,
@@ -67,7 +59,10 @@ namespace PaddleBuddy.Droid.Activities
 
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
-            MenuInflater.Inflate(Resource.Menu.main_menu, menu);
+            if (GetCurrentContentFragment.IsTypeOf(typeof (MapFragment)))
+            {
+                MenuInflater.Inflate(Resource.Menu.main_menu, menu);
+            }
             return base.OnCreateOptionsMenu(menu);
         }
         #endregion
@@ -88,7 +83,10 @@ namespace PaddleBuddy.Droid.Activities
             int id = item.ItemId;
             if (id == Resource.Id.action_search)
             {
-                ((MapFragment) SupportFragmentManager.FindFragmentById(Resource.Id.content_f)).ToggleSearch();
+                if (GetCurrentContentFragment.IsTypeOf(typeof(MapFragment)))
+                {
+                    ((MapFragment)GetCurrentContentFragment).ToggleSearch();
+                }
             }
             return base.OnOptionsItemSelected(item);
         }
@@ -100,11 +98,10 @@ namespace PaddleBuddy.Droid.Activities
             {
                 _drawer.CloseDrawer(GravityCompat.Start);
             }
-            //else if (OverallSearchLayout.IsVisible())
-            //{
-            //    CloseSearch();
-            //}
-            //else
+            else if (GetCurrentContentFragment.IsTypeOf(typeof (MapFragment)))
+            {
+                ((MapFragment) GetCurrentContentFragment).CloseSearch();
+            }
             {
                 base.OnBackPressed();
             }
@@ -157,11 +154,18 @@ namespace PaddleBuddy.Droid.Activities
             try
             {
                 SupportFragmentManager.BeginTransaction().Replace(Resource.Id.content_f, fragment).Commit();
+                SupportFragmentManager.ExecutePendingTransactions();
+                InvalidateOptionsMenu();
             }
             catch (Exception e)
             {
                 LogService.ExceptionLog(e.Message);
             }
+        }
+
+        public Fragment GetCurrentContentFragment
+        {
+            get { return SupportFragmentManager.FindFragmentById(Resource.Id.content_f); }
         }
         #endregion
 

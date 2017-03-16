@@ -9,7 +9,6 @@
     android:padding="@dimen/search_outer_padding"
     android:orientation="vertical"
     android:visibility="gone"
-    android:background="@color/semi_transparent_grey"
     android:windowSoftInputMode="adjustResize">
     <android.support.v7.widget.CardView
         android:id="@+id/search_cardview"
@@ -67,5 +66,3 @@
             android:layout_height="wrap_content"/>
     </android.support.v7.widget.CardView>
 </LinearLayout>
-
-
