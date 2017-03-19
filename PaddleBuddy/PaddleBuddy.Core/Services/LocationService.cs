@@ -41,6 +41,7 @@ namespace PaddleBuddy.Core.Services
                     }
                 }
                 _currentLocation = tempLocation;
+
                 MessengerService.Messenger.Send(new LocationUpdatedMessage());
                 Log("Location Updated");
             }

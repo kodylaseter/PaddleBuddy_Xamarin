@@ -207,6 +207,7 @@
     <Compile Include="Activities\SetupActivity.cs" />
     <Compile Include="Adapters\MainActivitySearchAdapter.cs" />
     <Compile Include="Adapters\TripSummaryAdapter.cs" />
+    <Compile Include="Controls\MapImageButton.cs" />
     <Compile Include="Controls\ProgressBarOverlay.cs" />
     <Compile Include="Controls\ClearEditText.cs" />
     <Compile Include="Controls\SearchItemView.cs" />
@@ -228,6 +229,7 @@
     <Compile Include="Services\PermissionService.cs" />
     <Compile Include="Services\SimulatorService.cs" />
     <Compile Include="Services\StorageService.cs" />
+    <Compile Include="Utilities\AndroidPBUtilities.cs" />
     <Compile Include="Utilities\JavaHolder.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -452,6 +454,26 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\attrs.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-hdpi\ic_gps_fixed_white_24dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-mdpi\ic_gps_fixed_white_24dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-xhdpi\ic_gps_fixed_white_24dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-xxhdpi\ic_gps_fixed_white_24dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-xxxhdpi\ic_gps_fixed_white_24dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\map_image_button_bg.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

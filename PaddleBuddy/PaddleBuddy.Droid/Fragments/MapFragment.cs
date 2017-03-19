@@ -28,11 +28,12 @@ using Point = PaddleBuddy.Core.Models.Map.Point;
 
 namespace PaddleBuddy.Droid.Fragments
 {
-    public class MapFragment : BaseFragment, IOnMapReadyCallback, GoogleMap.IOnMarkerClickListener, GoogleMap.IOnMapClickListener, GoogleMap.IInfoWindowAdapter
+    public class MapFragment : BaseFragment, IOnMapReadyCallback, GoogleMap.IOnMarkerClickListener, GoogleMap.IOnMapClickListener, GoogleMap.IInfoWindowAdapter, GoogleMap.IOnCameraMoveStartedListener
     {
         #region member variables
         private bool _isLoading;
-        private bool IsBrowsing { get; set; }
+        private bool _isBrowsing;
+
         private GoogleMap MyMap { get; set; }
         private MapView MapView { get; set; }
         private MapModes MapMode { get; set; }
@@ -45,7 +46,6 @@ namespace PaddleBuddy.Droid.Fragments
         private List<Marker> LaunchSiteMarkers { get; set; }
         private Polyline CurrentPolyline { get; set; }
         private TextView SpeedTextView { get; set; }
-
         private LinearLayout NavBarLayout { get; set; }
         private View DetailsBarLayout { get; set; }
         private View SearchDetailsBarLayout { get; set; }
@@ -55,6 +55,7 @@ namespace PaddleBuddy.Droid.Fragments
         /// </summary>
         private List<Tuple<double, double>> Speeds { get; set; }
         private TripManager TripManager { get; set; }
+        private MapImageButton StopBrowsingButton { get; set; }
         private bool MapIsNull => MyMap == null;
 
         private TextView DetailsBarTextView1;
@@ -81,6 +82,7 @@ namespace PaddleBuddy.Droid.Fragments
         private ImageButton CloseSearchImageButton { get; set; }
         private SearchItem _selectedSearchItem1;
         private SearchItem _selectedSearchItem2;
+
         #endregion
 
         #endregion
@@ -101,9 +103,6 @@ namespace PaddleBuddy.Droid.Fragments
             DetailsBarTextView2 = view.FindViewById<TextView>(Resource.Id.mapbar_text2);
             DetailsBarTextView3 = view.FindViewById<TextView>(Resource.Id.mapbar_text3);
             ProgressBarOverlay = view.FindViewById<ProgressBarOverlay>(Resource.Id.map_isloading_overlay);
-            view.FindViewById<Button>(Resource.Id.test_simulate_button).Click += OnSimulateButtonClicked;
-            view.FindViewById<ImageButton>(Resource.Id.cancel_trip_button).Click += OnCancelTripClicked;
-
             SearchListView1 = view.FindViewById<ListView>(Resource.Id.search_listview1);
             SearchListView2 = view.FindViewById<ListView>(Resource.Id.search_listview2);
             OverallSearchLayout = view.FindViewById<LinearLayout>(Resource.Id.overall_search_layout);
@@ -112,17 +111,22 @@ namespace PaddleBuddy.Droid.Fragments
             CloseSearchImageButton = view.FindViewById<ImageButton>(Resource.Id.search_backarrow);
             SearchLayout2 = view.FindViewById<View>(Resource.Id.search2_layout);
             SearchResultsCardView = view.FindViewById(Resource.Id.search_results_cardview);
+            StopBrowsingButton = view.FindViewById<MapImageButton>(Resource.Id.stop_browsing_button);
+
             CloseSearchImageButton.SetColorFilter(
                 new Color(ContextCompat.GetColor(Context, Resource.Color.gray)));
             CloseSearchImageButton.Click += (s, e) => CloseSearch();
             ClearEditText1.EditText.TextChanged += EditText1OnTextChanged;
             ClearEditText2.EditText.TextChanged += EditText2OnTextChanged;
+            view.FindViewById<Button>(Resource.Id.test_simulate_button).Click += OnSimulateButtonClicked;
+            view.FindViewById<ImageButton>(Resource.Id.cancel_trip_button).Click += OnCancelTripClicked;
             ClearEditText1.TextCleared += Text1Cleared;
             ClearEditText2.TextCleared += Text2Cleared;
             SearchAdapter1 = new MainActivitySearchAdapter(Activity);
             SearchAdapter2 = new MainActivitySearchAdapter(Activity);
             SearchListView1.Adapter = SearchAdapter1;
             SearchListView2.Adapter = SearchAdapter2;
+            StopBrowsingButton.Click += OnStopBrowsingButtonClicked;
 
             OverallSearchLayout.Clickable = true;
             OverallSearchLayout.Click += (s, e) => { CloseSearch(); };
@@ -162,10 +166,6 @@ namespace PaddleBuddy.Droid.Fragments
             ClearEditText2.SetHint("Search here...");
             SearchAdapter1.UpdateData();
             HideClearEditText2();
-            if (CurrentLocation != null)
-            {
-                LocationUpdatedReceived(null);
-            }
         }
 
         public void OnMapReady(GoogleMap googleMap)
@@ -174,6 +174,11 @@ namespace PaddleBuddy.Droid.Fragments
             MyMap.SetOnMarkerClickListener(this);
             MyMap.SetOnMapClickListener(this);
             MyMap.SetInfoWindowAdapter(this);
+            MyMap.SetOnCameraMoveStartedListener(this);
+            if (CurrentLocation != null)
+            {
+                LocationUpdatedReceived(null);
+            }
         }
 
         public override void OnStop()
@@ -370,19 +375,26 @@ namespace PaddleBuddy.Droid.Fragments
         private void LocationUpdatedReceived(LocationUpdatedMessage obj)
         {
             if (MapIsNull) return;
-            HideLoading();
-            DrawCurrent();
-            switch (MapMode)
+            Activity.RunOnUiThread(() =>
             {
-                case MapModes.Browse:
-                    BrowseUpdate();
-                    break;
-                case MapModes.Navigate:
-                    NavigationUpdate();
-                    break;
-                default: 
-                    throw new NotImplementedException();
-            }
+                HideLoading();
+                if (CurrentLocation != null)
+                {
+                    DrawCurrent();
+                }
+                switch (MapMode)
+                {
+                    case MapModes.Browse:
+                        BrowseUpdate();
+                        break;
+                    case MapModes.Navigate:
+                        NavigationUpdate();
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            });
+            
         }
 
         private void NavigationUpdate()
@@ -461,7 +473,7 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void BrowseUpdate()
         {
-            if (IsLoading || MapIsNull || IsBrowsing) return;
+            if (IsLoading || MapIsNull || IsBrowsing ) return;
             try
             {
                 CurrentPolyline = DrawCurrentBrowsePathAndSites();
@@ -517,6 +529,16 @@ namespace PaddleBuddy.Droid.Fragments
             set
             {
                 _isLoading = MapIsNull || value;
+            }
+        }
+
+        private bool IsBrowsing
+        {
+            get { return _isBrowsing; }
+            set
+            {
+                _isBrowsing = value;
+                StopBrowsingButton.Visibility = _isBrowsing ? ViewStates.Visible : ViewStates.Gone;
             }
         }
 
@@ -632,6 +654,23 @@ namespace PaddleBuddy.Droid.Fragments
         #endregion
 
         #region clicks
+        private void OnStopBrowsingButtonClicked(object sender, EventArgs e)
+        {
+            IsBrowsing = false;
+            if (MapMode == MapModes.Browse)
+            {
+                MoveCameraZoom();
+            }
+        }
+
+        public void OnCameraMoveStarted(int reason)
+        {
+            if (reason == GoogleMap.OnCameraMoveStartedListener.ReasonGesture)
+            {
+                IsBrowsing = true;
+            }
+        }
+
         private void OnCancelTripClicked(object sender, EventArgs e)
         {
             SetupBrowse();
@@ -690,7 +729,7 @@ namespace PaddleBuddy.Droid.Fragments
 
         private Polyline DrawCurrentBrowsePathAndSites()
         {
-            return DrawRiverAndLaunchSites(DatabaseService.GetInstance().GetClosestRiverId());
+            return CurrentLocation != null ? DrawRiverAndLaunchSites(DatabaseService.GetInstance().GetClosestRiverId()) : null;
         }
 
         private Polyline DrawLine(List<Point> points)
@@ -819,21 +858,13 @@ namespace PaddleBuddy.Droid.Fragments
             MyMap.AnimateCamera(camPos);
         }
         
-        private void MoveCameraZoom(bool animate = false, Point p = null, int zoom = int.MaxValue)
+        private void MoveCameraZoom(Point p = null, int zoom = 0)
         {
             if (MapIsNull) return;
             if (p == null) p = CurrentLocation;
-            if (zoom == int.MaxValue) zoom = BROWSE_ZOOM;
 
-            var camPos = CameraUpdateBuilder(p, BROWSE_TILT, zoom, 0);
-            if (animate)
-            {
-                MyMap.AnimateCamera(camPos);
-            }
-            else
-            {
-                MyMap.MoveCamera(camPos);
-            }
+            var camPos = CameraUpdateBuilder(p, BROWSE_TILT, zoom);
+            MyMap.AnimateCamera(camPos);
         }
 
         private Polyline AnimateCameraAndDrawRiver(River river)
