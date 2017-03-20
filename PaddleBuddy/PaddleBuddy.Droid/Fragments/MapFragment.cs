@@ -259,12 +259,6 @@ namespace PaddleBuddy.Droid.Fragments
             HideDetailsBar();
         }
 
-        private void OnNavFabClicked(object sender, EventArgs e)
-        {
-            CloseSearch();
-        }
-
-
         private void EditTextOnTextChanged(object sender, TextChangedEventArgs textChangedEventArgs)
         {
             ShowSearchResults();
@@ -468,11 +462,22 @@ namespace PaddleBuddy.Droid.Fragments
             CurrentPolyline = null;
         }
 
+        private void SetupNavigate(int destinationPointId)
+        {
+            var path = DatabaseService.GetInstance().GetPathWithDestination(destinationPointId);
+            SetupNavigate(path?.Points);
+        }
+
         private void SetupNavigate(List<Point> points)
         {
+            if (points == null || points.Count < 1)
+            {
+                LogService.Log("no points to navigate to");
+                return;
+            };
             MapMode = MapModes.Navigate;
             TripManager = new TripManager {Points = points};
-
+            NavigationUpdate();
         }
 
         private void StartSimulating()
@@ -582,14 +587,31 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void ShowSearchDetailsBar()
         {
-            DetailsBarLayout.Visibility = ViewStates.Visible;
+            ShowDetailsBar();
             SearchDetailsBarLayout.Visibility = ViewStates.Visible;
+            HideNavBar();
         }
 
         private void ShowNavBar()
         {
-            DetailsBarLayout.Visibility = ViewStates.Visible;
+            ShowDetailsBar();
             NavBarLayout.Visibility = ViewStates.Visible;
+            HideSearchDetailsBar();
+        }
+
+        private void ShowDetailsBar()
+        {
+            DetailsBarLayout.Visibility = ViewStates.Visible;
+        }
+
+        private void HideSearchDetailsBar()
+        {
+            SearchDetailsBarLayout.Visibility = ViewStates.Gone;
+        }
+
+        private void HideNavBar()
+        {
+            NavBarLayout.Visibility = ViewStates.Gone;
         }
 
         private void HideDetailsBar()
@@ -615,6 +637,19 @@ namespace PaddleBuddy.Droid.Fragments
         #endregion
 
         #region clicks
+        private void OnNavFabClicked(object sender, EventArgs e)
+        {
+            if (SelectedSearchItem.Item.IsTypeOf(typeof(Point)))
+            {
+                SetupNavigate(((Point)SelectedSearchItem.Item).Id);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+            CloseSearch();
+        }
+
         private void OnStopBrowsingButtonClicked(object sender, EventArgs e)
         {
             IsBrowsing = false;

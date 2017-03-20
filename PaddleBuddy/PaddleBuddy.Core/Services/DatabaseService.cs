@@ -82,9 +82,9 @@ namespace PaddleBuddy.Core.Services
             return GetRiver(id)?.Name;
         }
 
-        public River GetRiver(int id)
+        public River GetRiver(int riverId)
         {
-            return (from river in Rivers where river.Id == id select river).SingleOrDefault();
+            return (from river in Rivers where river.Id == riverId select river).SingleOrDefault();
         }
 
         public int GetClosestRiverId(Point point = null)
@@ -105,9 +105,9 @@ namespace PaddleBuddy.Core.Services
             return GetPath(GetClosestRiverId(point));
         }
 
-        public Point GetPoint(int id)
+        public Point GetPoint(int pointId)
         {
-            return (from point in Points where point.Id == id select point).Single();
+            return (from point in Points where point.Id == pointId select point).Single();
         }
 
         public Point GetNextPoint(Point point)
@@ -124,6 +124,29 @@ namespace PaddleBuddy.Core.Services
                 RiverId = riverId,
                 Points = points
             };
+        }
+
+        public Path GetPathWithDestination(int destinationPointId)
+        {
+            var point = GetInstance().GetPoint(destinationPointId);
+            var path = GetInstance().GetPath(point.RiverId);
+            if (path?.Points != null && path.Points.Count > 0 && path.Points.Contains(point))
+            {
+                try
+                {
+                    var index = path.Points.IndexOf(point);
+                    path.Points.RemoveRange(index, path.Points.Count - index);
+                }
+                catch (Exception e)
+                {
+                    LogService.ExceptionLog(e.Message);
+                }
+            }
+            else
+            {
+                LogService.Log("Unable to trim path in GetPathWithDestination");
+            }
+            return path;
         }
 
         public Path GetPath(Point start, Point end)
