@@ -7,6 +7,7 @@ using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.Graphics;
 using Android.OS;
+using Android.Support.Design.Widget;
 using Android.Support.V4.Content;
 using Android.Support.V4.Content.Res;
 using Android.Text;
@@ -57,6 +58,7 @@ namespace PaddleBuddy.Droid.Fragments
         private TripManager TripManager { get; set; }
         private MapImageButton StopBrowsingButton { get; set; }
         private bool MapIsNull => MyMap == null;
+        private FloatingActionButton NavFab { get; set; }
 
         private TextView DetailsBarTextView1;
         private TextView DetailsBarTextView2;
@@ -70,18 +72,13 @@ namespace PaddleBuddy.Droid.Fragments
         private const int SPEED_CUTOFF_TIME_IN_SECONDS = 10;
 
         #region search
-        private ListView SearchListView1 { get; set; }
-        private ListView SearchListView2 { get; set; }
+        private ListView SearchListView { get; set; }
         private LinearLayout OverallSearchLayout { get; set; }
-        private MainActivitySearchAdapter SearchAdapter1 { get; set; }
-        private MainActivitySearchAdapter SearchAdapter2 { get; set; }
-        private ClearEditText ClearEditText1 { get; set; }
-        private ClearEditText ClearEditText2 { get; set; }
-        private View SearchLayout2 { get; set; }
+        private MainActivitySearchAdapter SearchAdapter { get; set; }
+        private ClearEditText SearchClearEditText { get; set; }
         private View SearchResultsCardView { get; set; }
         private ImageButton CloseSearchImageButton { get; set; }
-        private SearchItem _selectedSearchItem1;
-        private SearchItem _selectedSearchItem2;
+        private SearchItem _selectedSearchItem;
 
         #endregion
 
@@ -103,37 +100,30 @@ namespace PaddleBuddy.Droid.Fragments
             DetailsBarTextView2 = view.FindViewById<TextView>(Resource.Id.mapbar_text2);
             DetailsBarTextView3 = view.FindViewById<TextView>(Resource.Id.mapbar_text3);
             ProgressBarOverlay = view.FindViewById<ProgressBarOverlay>(Resource.Id.map_isloading_overlay);
-            SearchListView1 = view.FindViewById<ListView>(Resource.Id.search_listview1);
-            SearchListView2 = view.FindViewById<ListView>(Resource.Id.search_listview2);
+            SearchListView = view.FindViewById<ListView>(Resource.Id.search_listview);
             OverallSearchLayout = view.FindViewById<LinearLayout>(Resource.Id.overall_search_layout);
-            ClearEditText1 = view.FindViewById<ClearEditText>(Resource.Id.search1_clearedittext);
-            ClearEditText2 = view.FindViewById<ClearEditText>(Resource.Id.search2_clearedittext);
+            SearchClearEditText = view.FindViewById<ClearEditText>(Resource.Id.search_clearedittext);
             CloseSearchImageButton = view.FindViewById<ImageButton>(Resource.Id.search_backarrow);
-            SearchLayout2 = view.FindViewById<View>(Resource.Id.search2_layout);
             SearchResultsCardView = view.FindViewById(Resource.Id.search_results_cardview);
             StopBrowsingButton = view.FindViewById<MapImageButton>(Resource.Id.stop_browsing_button);
+            NavFab = view.FindViewById<FloatingActionButton>(Resource.Id.nav_fab);
 
             CloseSearchImageButton.SetColorFilter(
                 new Color(ContextCompat.GetColor(Context, Resource.Color.gray)));
             CloseSearchImageButton.Click += (s, e) => CloseSearch();
-            ClearEditText1.EditText.TextChanged += EditText1OnTextChanged;
-            ClearEditText2.EditText.TextChanged += EditText2OnTextChanged;
-            ClearEditText1.FocusChange += OnSearchFocused1;
-            ClearEditText2.FocusChange += OnSearchFocused2;
+            SearchClearEditText.EditText.TextChanged += EditTextOnTextChanged;
+            SearchClearEditText.FocusChange += OnSearchFocused;
             view.FindViewById<Button>(Resource.Id.test_simulate_button).Click += OnSimulateButtonClicked;
             view.FindViewById<ImageButton>(Resource.Id.cancel_trip_button).Click += OnCancelTripClicked;
-            ClearEditText1.TextCleared += Text1Cleared;
-            ClearEditText2.TextCleared += Text2Cleared;
-            SearchAdapter1 = new MainActivitySearchAdapter(Activity);
-            SearchAdapter2 = new MainActivitySearchAdapter(Activity);
-            SearchListView1.Adapter = SearchAdapter1;
-            SearchListView2.Adapter = SearchAdapter2;
+            SearchClearEditText.TextCleared += TextCleared;
+            SearchAdapter = new MainActivitySearchAdapter(Activity);
+            SearchListView.Adapter = SearchAdapter;
             StopBrowsingButton.Click += OnStopBrowsingButtonClicked;
+            NavFab.Click += OnNavFabClicked;
 
             OverallSearchLayout.Clickable = true;
             OverallSearchLayout.Click += (s, e) => { CloseSearch(); };
-            SearchListView1.ItemClick += OnSearchItem1Selected;
-            SearchListView2.ItemClick += OnSearchItem2Selected;
+            SearchListView.ItemClick += OnSearchItemSelected;
             ShowLoading("waiting on gps");
             LaunchSiteMarkers = new List<Marker>();
 
@@ -143,10 +133,8 @@ namespace PaddleBuddy.Droid.Fragments
             LaunchSiteMarkers = new List<Marker>();
             SetupBrowse();
 
-            ClearEditText1.SetHint("Search here...");
-            ClearEditText2.SetHint("Search here...");
-            SearchAdapter1.UpdateData();
-            HideClearEditText2();
+            SearchClearEditText.SetHint("Search here...");
+            SearchAdapter.UpdateData();
 
             if (!PBPrefs.TestOffline)
             {
@@ -225,90 +213,62 @@ namespace PaddleBuddy.Droid.Fragments
 
         #region search
 
-        private SearchItem SelectedSearchItem1
+        private SearchItem SelectedSearchItem
         {
-            get { return _selectedSearchItem1; }
+            get { return _selectedSearchItem; }
             set
             {
-                _selectedSearchItem1 = value;
-                if (_selectedSearchItem1 == null)
+                _selectedSearchItem = value;
+                if (_selectedSearchItem == null)
                 {
-                    HideClearEditText2();
+                    ShowSearchResults();
+                    HideNavFab();
                 }
                 else
                 {
-                    if (_selectedSearchItem1.Item.IsTypeOf(typeof (Point)))
+                    if (_selectedSearchItem.Item.IsTypeOf(typeof (Point)))
                     {
                         OpenSearch();
-                        ClearEditText1.EditText.Text = _selectedSearchItem1.Title;
-                    } else if (!_selectedSearchItem1.Item.IsTypeOf(typeof (River)))
+                        SearchClearEditText.EditText.Text = _selectedSearchItem.Title;
+                        ShowNavFab();
+                    } else if (!_selectedSearchItem.Item.IsTypeOf(typeof (River)))
                     {
                         throw new NotImplementedException();
                     }
                     HideKeyboard();
                     HideSearchResults();
-                    UpdateSearchDetails(_selectedSearchItem1);
+                    UpdateSearchDetails(_selectedSearchItem);
                     IsBrowsing = true;
                 }
             }
         }
 
-        private SearchItem SelectedSearchItem2
+        private void TextCleared()
         {
-            get { return _selectedSearchItem2; }
-            set
-            {
-                _selectedSearchItem2 = value;
-                if (_selectedSearchItem2 != null)
-                {
-                    ClearEditText2.Text = _selectedSearchItem2.Title;
-                }
-            }
+            SelectedSearchItem = null;
         }
 
-        private void Text1Cleared()
+        private void OnSearchItemSelected(object sender, AdapterView.ItemClickEventArgs e)
         {
-            SelectedSearchItem1 = null;
+            SelectedSearchItem = SearchAdapter.GetSearchItem(e.Position);
         }
 
-        private void Text2Cleared()
+        private void OnSearchFocused(object sender, View.FocusChangeEventArgs e)
         {
-            SelectedSearchItem2 = null;
-        }
-
-        private void OnSearchItem1Selected(object sender, AdapterView.ItemClickEventArgs e)
-        {
-            SelectedSearchItem1 = SearchAdapter1.GetSearchItem(e.Position);
-        }
-
-        private void OnSearchItem2Selected(object sender, AdapterView.ItemClickEventArgs e)
-        {
-            SelectedSearchItem2 = SearchAdapter2.GetSearchItem(e.Position);
-        }
-
-        private void OnSearchFocused1(object sender, View.FocusChangeEventArgs e)
-        {
-            HideClearEditText2();
             ShowSearchResults();
             HideDetailsBar();
         }
 
-        private void OnSearchFocused2(object sender, View.FocusChangeEventArgs e)
+        private void OnNavFabClicked(object sender, EventArgs e)
         {
-            ShowClearEditText2();
-            HideDetailsBar();
+            CloseSearch();
         }
 
-        private void EditText1OnTextChanged(object sender, TextChangedEventArgs textChangedEventArgs)
-        {
-            ShowSearchResults();
-            SearchAdapter1.Filter.InvokeFilter(textChangedEventArgs.Text.ToString());
-        }
 
-        private void EditText2OnTextChanged(object sender, TextChangedEventArgs e)
+        private void EditTextOnTextChanged(object sender, TextChangedEventArgs textChangedEventArgs)
         {
             ShowSearchResults();
-            SearchAdapter2.Filter.InvokeFilter(e.Text.ToString());
+            SearchAdapter.Filter.InvokeFilter(textChangedEventArgs.Text.ToString());
         }
 
         public void ToggleSearch()
@@ -327,10 +287,10 @@ namespace PaddleBuddy.Droid.Fragments
         {
             if (IsSearchOpen) return; 
             ((MainActivity) Activity).SupportActionBar.Hide();
-            ClearEditText1.Text = "";
+            SearchClearEditText.Text = "";
             OverallSearchLayout.Visibility = ViewStates.Visible;
-            ClearEditText1.EditText.RequestFocusFromTouch();
-            InputMethodManager.ShowSoftInput(ClearEditText1.EditText, ShowFlags.Implicit);
+            SearchClearEditText.EditText.RequestFocusFromTouch();
+            InputMethodManager.ShowSoftInput(SearchClearEditText.EditText, ShowFlags.Implicit);
             ShowSearchResults();
         }
 
@@ -340,36 +300,14 @@ namespace PaddleBuddy.Droid.Fragments
             HideDetailsBar();
             OverallSearchLayout.Visibility = ViewStates.Gone;
             HideKeyboard();
+            HideNavFab();
             ((MainActivity)Activity).SupportActionBar.Show();
         }
 
         private void ClearSearch()
         {
-            ClearEditText1.Text = "";
-            ClearEditText2.Text = "";
-            SelectedSearchItem1 = null;
-            SelectedSearchItem2 = null;
-        }
-
-        private void ShowClearEditText2()
-        {
-            ShowSearchResults();
-            SearchLayout2.Visibility = ViewStates.Visible;
-            SearchListView1.Visibility = ViewStates.Gone;
-            SearchListView2.Visibility = ViewStates.Visible;
-            ClearEditText2.Text = "";
-            SearchAdapter2.UpdateData(_selectedSearchItem1.Item);
-            SelectedSearchItem2 = null;
-            ClearEditText2.EditText.RequestFocusFromTouch();
-        }
-
-        private void HideClearEditText2()
-        {
-            SearchLayout2.Visibility = ViewStates.Gone;
-            SearchListView1.Visibility = ViewStates.Visible;
-            SearchListView2.Visibility = ViewStates.Gone;
-            ClearEditText2.Text = "";
-            SelectedSearchItem2 = null;
+            SearchClearEditText.Text = "";
+            SelectedSearchItem = null;
         }
 
         private void ShowSearchResults()
@@ -381,6 +319,16 @@ namespace PaddleBuddy.Droid.Fragments
         private void HideSearchResults()
         {
             SearchResultsCardView.Visibility = ViewStates.Gone;
+        }
+
+        private void ShowNavFab()
+        {
+            NavFab.Visibility = ViewStates.Visible;
+        }
+
+        private void HideNavFab()
+        {
+            NavFab.Visibility = ViewStates.Gone;
         }
 
         private bool IsSearchOpen => OverallSearchLayout.IsVisible();
@@ -711,8 +659,8 @@ namespace PaddleBuddy.Droid.Fragments
             }
             if (SelectedMarkerPoint != null)
             {
-                SelectedSearchItem1 = SelectedMarkerPoint.ToSearchItem();
-                UpdateSearchDetails(SelectedSearchItem1);
+                SelectedSearchItem = SelectedMarkerPoint.ToSearchItem();
+                UpdateSearchDetails(SelectedSearchItem);
             }
             return true;
         }

@@ -19,8 +19,7 @@
             android:id="@+id/search_cardview_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="6dp"
-            android:animateLayoutChanges="true">
+            android:padding="6dp">
             <ImageButton 
                 android:id="@+id/search_backarrow"
                 android:layout_width="wrap_content"
@@ -30,38 +29,20 @@
                 android:src="@drawable/ic_arrow_back_white_24dp"
                 android:background="?attr/selectableItemBackgroundBorderless"/>
             <paddlebuddy.droid.controls.ClearEditText
-                android:id="@+id/search1_clearedittext"
+                android:id="@+id/search_clearedittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/search_backarrow"/>
-            <LinearLayout
-                android:id="@+id/search2_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/search1_clearedittext"
-                android:layout_toRightOf="@id/search_backarrow"
-                android:orientation="vertical">
-                <View
-                    android:id="@+id/search_divider"
-                    style="@style/horizontalLayoutDivider"/>
-                <paddlebuddy.droid.controls.ClearEditText
-                    android:id="@+id/search2_clearedittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
         </RelativeLayout>
                         
     </android.support.v7.widget.CardView>
     <android.support.v7.widget.CardView
         android:id="@+id/search_results_cardview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:elevation="5dp">
         <ListView
-            android:id="@+id/search_listview1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-        <ListView
-            android:id="@+id/search_listview2"
+            android:id="@+id/search_listview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </android.support.v7.widget.CardView>
