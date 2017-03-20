@@ -118,6 +118,8 @@ namespace PaddleBuddy.Droid.Fragments
             CloseSearchImageButton.Click += (s, e) => CloseSearch();
             ClearEditText1.EditText.TextChanged += EditText1OnTextChanged;
             ClearEditText2.EditText.TextChanged += EditText2OnTextChanged;
+            ClearEditText1.FocusChange += OnSearchFocused1;
+            ClearEditText2.FocusChange += OnSearchFocused2;
             view.FindViewById<Button>(Resource.Id.test_simulate_button).Click += OnSimulateButtonClicked;
             view.FindViewById<ImageButton>(Resource.Id.cancel_trip_button).Click += OnCancelTripClicked;
             ClearEditText1.TextCleared += Text1Cleared;
@@ -134,6 +136,18 @@ namespace PaddleBuddy.Droid.Fragments
             SearchListView2.ItemClick += OnSearchItem2Selected;
             ShowLoading("waiting on gps");
             LaunchSiteMarkers = new List<Marker>();
+
+            Speeds = new List<Tuple<double, double>>();
+            CurrentLoationMarker = null;
+            SelectedMarkerPoint = null;
+            LaunchSiteMarkers = new List<Marker>();
+            SetupBrowse();
+
+            ClearEditText1.SetHint("Search here...");
+            ClearEditText2.SetHint("Search here...");
+            SearchAdapter1.UpdateData();
+            HideClearEditText2();
+
             if (!PBPrefs.TestOffline)
             {
                 MapView.OnResume();
@@ -150,22 +164,6 @@ namespace PaddleBuddy.Droid.Fragments
             }
             IsBrowsing = false;
             return view;
-        }
-
-        public override void OnResume()
-        {
-            base.OnResume();
-            
-            Speeds = new List<Tuple<double, double>>();
-            CurrentLoationMarker = null;
-            SelectedMarkerPoint = null;
-            LaunchSiteMarkers = new List<Marker>();
-            SetupBrowse();
-
-            ClearEditText1.SetHint("Search here...");
-            ClearEditText2.SetHint("Search here...");
-            SearchAdapter1.UpdateData();
-            HideClearEditText2();
         }
 
         public void OnMapReady(GoogleMap googleMap)
@@ -232,18 +230,22 @@ namespace PaddleBuddy.Droid.Fragments
             get { return _selectedSearchItem1; }
             set
             {
-                var tempValue = value;
-                if (tempValue == null)
+                _selectedSearchItem1 = value;
+                if (_selectedSearchItem1 == null)
                 {
-                    _selectedSearchItem1 = null;
                     HideClearEditText2();
                 }
                 else
                 {
+                    if (_selectedSearchItem1.Item.IsTypeOf(typeof (Point)))
+                    {
+                        OpenSearch();
+                        ClearEditText1.EditText.Text = _selectedSearchItem1.Title;
+                    } else if (!_selectedSearchItem1.Item.IsTypeOf(typeof (River)))
+                    {
+                        throw new NotImplementedException();
+                    }
                     HideKeyboard();
-                    OpenSearch();
-                    ClearEditText1.EditText.Text = tempValue.Title;
-                    _selectedSearchItem1 = tempValue;
                     HideSearchResults();
                     UpdateSearchDetails(_selectedSearchItem1);
                     IsBrowsing = true;
@@ -282,6 +284,19 @@ namespace PaddleBuddy.Droid.Fragments
         private void OnSearchItem2Selected(object sender, AdapterView.ItemClickEventArgs e)
         {
             SelectedSearchItem2 = SearchAdapter2.GetSearchItem(e.Position);
+        }
+
+        private void OnSearchFocused1(object sender, View.FocusChangeEventArgs e)
+        {
+            HideClearEditText2();
+            ShowSearchResults();
+            HideDetailsBar();
+        }
+
+        private void OnSearchFocused2(object sender, View.FocusChangeEventArgs e)
+        {
+            ShowClearEditText2();
+            HideDetailsBar();
         }
 
         private void EditText1OnTextChanged(object sender, TextChangedEventArgs textChangedEventArgs)
@@ -338,6 +353,7 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void ShowClearEditText2()
         {
+            ShowSearchResults();
             SearchLayout2.Visibility = ViewStates.Visible;
             SearchListView1.Visibility = ViewStates.Gone;
             SearchListView2.Visibility = ViewStates.Visible;
@@ -359,6 +375,7 @@ namespace PaddleBuddy.Droid.Fragments
         private void ShowSearchResults()
         {
             SearchResultsCardView.Visibility = ViewStates.Visible;
+            HideDetailsBar();
         }
 
         private void HideSearchResults()
@@ -607,15 +624,11 @@ namespace PaddleBuddy.Droid.Fragments
                 var river = (River) item.Item;
                 SearchDetailsTitle.Text = river.Name;
                 CurrentPolyline = AnimateCameraAndDrawRiver(river);
-                //var path = new Path();
-                //Task.Factory.StartNew(() =>
-                //{
-                //    path = DatabaseService.GetInstance().GetPath(river.Id);
-                //}).ContinueWith(obj =>
-                //{
-                //    AnimateCameraBounds(path.Points);
-                //    HideLoading();
-                //}, TaskScheduler.FromCurrentSynchronizationContext());
+            } else if (item.Item.IsTypeOf(typeof (Point)))
+            {
+                var point = (Point) item.Item;
+                SearchDetailsTitle.Text = point.Label;
+                MoveCameraZoom(point, 15);
             }
         }
 
@@ -659,7 +672,7 @@ namespace PaddleBuddy.Droid.Fragments
             IsBrowsing = false;
             if (MapMode == MapModes.Browse)
             {
-                MoveCameraZoom();
+                BrowseUpdate();
             }
         }
 
@@ -696,7 +709,11 @@ namespace PaddleBuddy.Droid.Fragments
                 LogService.ExceptionLog(e.Message);
                 throw e;
             }
-            SelectedSearchItem1 = SelectedMarkerPoint.ToSearchItem();
+            if (SelectedMarkerPoint != null)
+            {
+                SelectedSearchItem1 = SelectedMarkerPoint.ToSearchItem();
+                UpdateSearchDetails(SelectedSearchItem1);
+            }
             return true;
         }
 
