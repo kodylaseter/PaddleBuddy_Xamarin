@@ -135,7 +135,7 @@ namespace PaddleBuddy.Core.Services
                 try
                 {
                     var index = path.Points.IndexOf(point);
-                    path.Points.RemoveRange(index, path.Points.Count - index);
+                    path.Points.RemoveRange(index + 1, path.Points.Count - index - 1);
                 }
                 catch (Exception e)
                 {

@@ -435,7 +435,7 @@ namespace PaddleBuddy.Droid.Fragments
             if (IsLoading || MapIsNull || IsBrowsing ) return;
             try
             {
-                CurrentPolyline = DrawCurrentBrowsePathAndSites();
+                DrawCurrentBrowsePathAndSites();
                 var points = new List<LatLng> { CurrentLocation.ToLatLng()};
                 points.AddRange(CurrentPolyline.Points);
                 AnimateCameraBounds(points.ToArray());
@@ -450,16 +450,11 @@ namespace PaddleBuddy.Droid.Fragments
         private void SetupBrowse()
         {
             MapMode = MapModes.Browse;
+            ClearCurrentLineAndMarkers();
             HideSpeed();
             HideDetailsBar();
             SimulatorService.GetInstance().StopSimulating();
             ClearTripData();
-            LaunchSiteMarkers = new List<Marker>();
-            if (CurrentPolyline != null && CurrentPolyline.Points.Count > 0)
-            {
-                CurrentPolyline.Remove();
-            }
-            CurrentPolyline = null;
         }
 
         private void SetupNavigate(int destinationPointId)
@@ -477,15 +472,28 @@ namespace PaddleBuddy.Droid.Fragments
             };
             MapMode = MapModes.Navigate;
             TripManager = new TripManager {Points = points};
+            ClearCurrentLineAndMarkers();
             NavigationUpdate();
         }
 
         private void StartSimulating()
         {
-            var p = DatabaseService.GetInstance().GetPath(PBPrefs.RiverIdToSimulate).Points;
-            if (p.Count <= 1) return;
-            SetupNavigate(p);
-            SimulatorService.GetInstance().StartSimulating(p);
+            List<Point> points = new List<Point>();
+            if (TripManager != null && TripManager.Points != null && TripManager.Points.Count > 1)
+            {
+                points = TripManager.Points;
+            }
+            else
+            {
+                points = DatabaseService.GetInstance().GetPath(PBPrefs.RiverIdToSimulate).Points;
+                if (points.Count <= 1)
+                {
+                    LogService.Log("No points in startsimulating");
+                    return;
+                }
+            }
+            SetupNavigate(points);
+            SimulatorService.GetInstance().StartSimulating(points);
         }
 
         private Point CurrentLocation
@@ -576,7 +584,7 @@ namespace PaddleBuddy.Droid.Fragments
             {
                 var river = (River) item.Item;
                 SearchDetailsTitle.Text = river.Name;
-                CurrentPolyline = AnimateCameraAndDrawRiver(river);
+                AnimateCameraAndDrawRiver(river);
             } else if (item.Item.IsTypeOf(typeof (Point)))
             {
                 var point = (Point) item.Item;
@@ -642,12 +650,14 @@ namespace PaddleBuddy.Droid.Fragments
             if (SelectedSearchItem.Item.IsTypeOf(typeof(Point)))
             {
                 SetupNavigate(((Point)SelectedSearchItem.Item).Id);
+                NavigationUpdate();
+                CloseSearch();
+
             }
             else
             {
                 throw new NotImplementedException();
             }
-            CloseSearch();
         }
 
         private void OnStopBrowsingButtonClicked(object sender, EventArgs e)
@@ -715,6 +725,24 @@ namespace PaddleBuddy.Droid.Fragments
             return MyMap.AddMarker(marker);
         }
 
+
+        private void ClearCurrentLineAndMarkers()
+        {
+            CurrentPolyline?.Remove();
+            CurrentPolyline = null;
+            if (LaunchSiteMarkers != null)
+            {
+                foreach (var marker in LaunchSiteMarkers)
+                {
+                    marker.Remove();
+                }
+            }
+            LaunchSiteMarkers = null;
+            CurrentDestinationMarker?.Remove();
+            CurrentDestinationMarker = null;
+
+        }
+
         private void DrawCurrentTrip(bool reDraw = false)
         {
             if (MapIsNull) return;
@@ -727,9 +755,9 @@ namespace PaddleBuddy.Droid.Fragments
             CurrentPolyline = DrawLine(TripManager.Points);
         }
 
-        private Polyline DrawCurrentBrowsePathAndSites()
+        private void DrawCurrentBrowsePathAndSites()
         {
-            return CurrentLocation != null ? DrawRiverAndLaunchSites(DatabaseService.GetInstance().GetClosestRiverId()) : null;
+            DrawRiverAndLaunchSites(DatabaseService.GetInstance().GetClosestRiverId());
         }
 
         private Polyline DrawLine(List<Point> points)
@@ -756,9 +784,9 @@ namespace PaddleBuddy.Droid.Fragments
             return DrawLine(path);
         }
 
-        private Polyline DrawRiverAndLaunchSites(int id)
+        private void DrawRiverAndLaunchSites(int id)
         {
-            if (MapIsNull) return null;
+            if (MapIsNull) return;
             CurrentPolyline?.Remove();
             if (LaunchSiteMarkers != null)
             {
@@ -773,7 +801,7 @@ namespace PaddleBuddy.Droid.Fragments
             {
                 LaunchSiteMarkers.Add(DrawMarker(site));
             }
-            return DrawLine(DatabaseService.GetInstance().GetPath(id));
+            CurrentPolyline = DrawLine(DatabaseService.GetInstance().GetPath(id));
         }
 
         private void DrawCurrent()
@@ -867,15 +895,14 @@ namespace PaddleBuddy.Droid.Fragments
             MyMap.AnimateCamera(camPos);
         }
 
-        private Polyline AnimateCameraAndDrawRiver(River river)
+        private void AnimateCameraAndDrawRiver(River river)
         {
             var path = DatabaseService.GetInstance().GetPath(river.Id);
             if (path?.Points != null && path.Points.Count > 0)
             {
                 AnimateCameraBounds(path.Points);
-                return DrawRiverAndLaunchSites(river.Id);
+                DrawRiverAndLaunchSites(river.Id);
             }
-            return null;
         }
 
         private void AnimateCameraBounds(List<Point> points)
