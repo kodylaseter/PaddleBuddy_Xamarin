@@ -107,12 +107,12 @@ namespace PaddleBuddy.Core.Services
 
         public Point GetPoint(int pointId)
         {
-            return (from point in Points where point.Id == pointId select point).Single();
+            return (from point in Points where point.Id == pointId select point).SingleOrDefault();
         }
 
         public Point GetNextPoint(Point point)
         {
-            var link = (from p in Links where p.Begin == point.Id select p).Single();
+            var link = (from p in Links where p.Begin == point.Id select p).SingleOrDefault();
             return GetPoint(link.End);
         }
 

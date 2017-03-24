@@ -20,7 +20,7 @@
         public static bool TestOffline = true;
         public static bool TestLoggedOut = false;
         
-        public static int RiverIdToSimulate = 8;
+        public static int RiverIdToSimulate = 20;
         public static double TripPointsCloseThreshold = 30;
         public static double BearingTooCloseThreshold = 10;
         public static double IsOnTrackCloseThreshold = 80;

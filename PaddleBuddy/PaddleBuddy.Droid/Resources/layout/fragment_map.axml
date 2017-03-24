@@ -10,12 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!--map-->
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/map_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
         <!--details bar-->
         <RelativeLayout
             android:id="@+id/details_layout"
@@ -88,7 +82,13 @@
 
                 </LinearLayout>
             </LinearLayout>
-        </RelativeLayout>
+        </RelativeLayout>    
+        <!--map-->
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/map_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/details_layout"/>
         
         <!--speed-->
         <RelativeLayout
@@ -108,7 +108,7 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/details_layout"
+            android:layout_alignBottom="@id/map_view"
             android:layout_alignRight="@id/map_view">
             <paddlebuddy.droid.controls.MapImageButton
                 android:id="@+id/stop_browsing_button"
@@ -131,6 +131,7 @@
                 android:layout_height="wrap_content"
                 android:text="Test"/>
         </LinearLayout>
+        
         <paddlebuddy.droid.controls.ProgressBarOverlay
             android:id="@+id/map_isloading_overlay"
             android:layout_width="match_parent"
@@ -140,8 +141,6 @@
 
         <!--search-->
         <include layout="@layout/view_mainsearch"/>
-
-
     </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton

@@ -2620,8 +2620,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b00ba
 			public const int cancel_action = 2131427514;
 			
-			// aapt resource value: 0x7f0b00a0
-			public const int cancel_trip_button = 2131427488;
+			// aapt resource value: 0x7f0b009f
+			public const int cancel_trip_button = 2131427487;
 			
 			// aapt resource value: 0x7f0b0022
 			public const int center = 2131427362;
@@ -2686,8 +2686,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b0091
 			public const int design_navigation_view = 2131427473;
 			
-			// aapt resource value: 0x7f0b009c
-			public const int details_layout = 2131427484;
+			// aapt resource value: 0x7f0b009b
+			public const int details_layout = 2131427483;
 			
 			// aapt resource value: 0x7f0b003c
 			public const int disableHome = 2131427388;
@@ -2809,20 +2809,20 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b00a9
 			public const int map_isloading_overlay = 2131427497;
 			
-			// aapt resource value: 0x7f0b009b
-			public const int map_view = 2131427483;
+			// aapt resource value: 0x7f0b00a4
+			public const int map_view = 2131427492;
+			
+			// aapt resource value: 0x7f0b00a0
+			public const int mapbar_layout = 2131427488;
 			
 			// aapt resource value: 0x7f0b00a1
-			public const int mapbar_layout = 2131427489;
+			public const int mapbar_text1 = 2131427489;
 			
 			// aapt resource value: 0x7f0b00a2
-			public const int mapbar_text1 = 2131427490;
+			public const int mapbar_text2 = 2131427490;
 			
 			// aapt resource value: 0x7f0b00a3
-			public const int mapbar_text2 = 2131427491;
-			
-			// aapt resource value: 0x7f0b00a4
-			public const int mapbar_text3 = 2131427492;
+			public const int mapbar_text3 = 2131427491;
 			
 			// aapt resource value: 0x7f0b00b4
 			public const int markerTitle = 2131427508;
@@ -2866,8 +2866,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b0082
 			public const int nav_view = 2131427458;
 			
-			// aapt resource value: 0x7f0b009f
-			public const int navbar_details_layout = 2131427487;
+			// aapt resource value: 0x7f0b009e
+			public const int navbar_details_layout = 2131427486;
 			
 			// aapt resource value: 0x7f0b0090
 			public const int navigation_header_container = 2131427472;
@@ -2980,11 +2980,11 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b0078
 			public const int search_close_btn = 2131427448;
 			
-			// aapt resource value: 0x7f0b009d
-			public const int search_details_layout = 2131427485;
+			// aapt resource value: 0x7f0b009c
+			public const int search_details_layout = 2131427484;
 			
-			// aapt resource value: 0x7f0b009e
-			public const int search_details_title = 2131427486;
+			// aapt resource value: 0x7f0b009d
+			public const int search_details_title = 2131427485;
 			
 			// aapt resource value: 0x7f0b0074
 			public const int search_edit_frame = 2131427444;
