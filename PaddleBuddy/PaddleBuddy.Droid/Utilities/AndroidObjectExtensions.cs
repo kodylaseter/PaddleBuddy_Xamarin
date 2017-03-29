@@ -20,6 +20,8 @@ namespace PaddleBuddy.Droid.Utilities
             return obj.GetType() == type;
         }
 
+
+        #region point and latlng
         public static LatLng ToLatLng(this Point value)
         {
             return new LatLng(value.Lat, value.Lng);
@@ -43,6 +45,9 @@ namespace PaddleBuddy.Droid.Utilities
         {
             return latLngs.Select(a => a.ToPoint()).ToArray();
         }
+        #endregion  
+
+        #region cheesebaron's object conversions
 
         /// <summary>
         /// credit to cheesebaron
@@ -81,5 +86,8 @@ namespace PaddleBuddy.Droid.Utilities
 
             return holder;
         }
+
+        #endregion
+
     }
 }

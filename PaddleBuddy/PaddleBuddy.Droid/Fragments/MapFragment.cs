@@ -59,6 +59,7 @@ namespace PaddleBuddy.Droid.Fragments
         private MapImageButton StopBrowsingButton { get; set; }
         private bool MapIsNull => MyMap == null;
         private FloatingActionButton NavFab { get; set; }
+        private MarkerOptions _unselectedMarkerOptions;
 
         private TextView DetailsBarTextView1;
         private TextView DetailsBarTextView2;
@@ -652,7 +653,6 @@ namespace PaddleBuddy.Droid.Fragments
                 SetupNavigate(((Point)SelectedSearchItem.Item).Id);
                 NavigationUpdate();
                 CloseSearch();
-
             }
             else
             {
@@ -690,22 +690,25 @@ namespace PaddleBuddy.Droid.Fragments
 
         public bool OnMarkerClick(Marker marker)
         {
-            try
+            if (MapMode.Equals(MapModes.Browse))
             {
-                var id = int.Parse(marker.Snippet);
-                SelectedMarkerPoint = DatabaseService.GetInstance().GetPoint(id);
-                
-            }
-            catch (Exception e)
-            {
-                LogService.ExceptionLog("Issue in map fragment marker click");
-                LogService.ExceptionLog(e.Message);
-                throw e;
-            }
-            if (SelectedMarkerPoint != null)
-            {
-                SelectedSearchItem = SelectedMarkerPoint.ToSearchItem();
-                UpdateSearchDetails(SelectedSearchItem);
+                try
+                {
+                    var id = int.Parse(marker.Snippet);
+                    SelectedMarkerPoint = DatabaseService.GetInstance().GetPoint(id);
+                }
+                catch (Exception e)
+                {
+                    LogService.ExceptionLog("Issue in map fragment marker click");
+                    LogService.ExceptionLog(e.Message);
+                    throw e;
+                }
+                if (SelectedMarkerPoint != null)
+                {
+                    SelectedSearchItem = SelectedMarkerPoint.ToSearchItem();
+                    UpdateSearchDetails(SelectedSearchItem);
+                    marker.SetIcon();
+                }
             }
             return true;
         }
@@ -720,11 +723,15 @@ namespace PaddleBuddy.Droid.Fragments
         private Marker DrawMarker(Point p)
         {
             if (MapIsNull) return null;
-            var marker = new MarkerOptions().SetPosition(p.ToLatLng());
+            var marker = UnselectedMarkerOptions;
             if (p.IsLaunchSite) marker.SetTitle(p.Label).SetSnippet(p.Id.ToString());
             return MyMap.AddMarker(marker);
         }
 
+        private void ChangeMarkerToSelected(Marker marker)
+        {
+            ChangeMarkerColor(marker, new Color(ContextCompat.GetColor(Context, Resource.Color.colorAccent)));
+        }
 
         private void ClearCurrentLineAndMarkers()
         {
@@ -854,22 +861,32 @@ namespace PaddleBuddy.Droid.Fragments
 
         private MarkerOptions CurrentMarkerOptions
         {
-            get
-            {
-                if (_currentMarkerOptions != null) return _currentMarkerOptions;
-                var px = 50;
-                var bitmap = Bitmap.CreateBitmap(px, px, Bitmap.Config.Argb8888);
-                var canvas = new Canvas(bitmap);
-                var shape = ResourcesCompat.GetDrawable(Resources, Resource.Drawable.current_circle, null);
-                shape.SetBounds(0, 0, bitmap.Width, bitmap.Height);
-                shape.Draw(canvas);
-                var markerOpts = new MarkerOptions().SetIcon(BitmapDescriptorFactory.FromBitmap(bitmap))
-                    .Anchor(.5f, .5f);
-                _currentMarkerOptions = markerOpts;
-                return _currentMarkerOptions;
-
+            get {
+                return _currentMarkerOptions ??
+                       (_currentMarkerOptions = CreateMarker(50, 50, Resource.Drawable.current_circle));
             }
         }
+
+        private MarkerOptions UnselectedMarkerOptions
+        {
+            get
+            {
+                if (_unselectedMarkerOptions == null) _unselectedMarkerOptions = CreateMarker(50, 50, Resource.Drawable.ic_room_white_24dp);
+                return _unselectedMarkerOptions;
+            }
+        }
+
+        private MarkerOptions CreateMarker(int width, int height, int drawableResource)
+        {
+            var bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888);
+            var canvas = new Canvas(bitmap);
+            var shape = ResourcesCompat.GetDrawable(Resources, drawableResource, null);
+            shape.SetBounds(0, 0, bitmap.Width, bitmap.Height);
+            shape.Draw(canvas);
+            return new MarkerOptions().SetIcon(BitmapDescriptorFactory.FromBitmap(bitmap))
+                .Anchor(.5f, .5f);
+        }
+
         #endregion
 
         #region camera

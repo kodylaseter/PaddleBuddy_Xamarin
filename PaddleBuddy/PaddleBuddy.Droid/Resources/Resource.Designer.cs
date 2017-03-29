@@ -2455,58 +2455,61 @@ namespace PaddleBuddy.Droid
 			public const int ic_place_black_24dp = 2130837631;
 			
 			// aapt resource value: 0x7f020080
-			public const int ic_search_white_24dp = 2130837632;
+			public const int ic_room_white_24dp = 2130837632;
 			
 			// aapt resource value: 0x7f020081
-			public const int Icon = 2130837633;
+			public const int ic_search_white_24dp = 2130837633;
 			
 			// aapt resource value: 0x7f020082
-			public const int list_item_selector = 2130837634;
+			public const int Icon = 2130837634;
 			
 			// aapt resource value: 0x7f020083
-			public const int map_image_button_bg = 2130837635;
+			public const int list_item_selector = 2130837635;
 			
 			// aapt resource value: 0x7f020084
-			public const int navigation_empty_icon = 2130837636;
+			public const int map_image_button_bg = 2130837636;
 			
 			// aapt resource value: 0x7f020085
-			public const int notification_action_background = 2130837637;
+			public const int navigation_empty_icon = 2130837637;
 			
 			// aapt resource value: 0x7f020086
-			public const int notification_bg = 2130837638;
+			public const int notification_action_background = 2130837638;
 			
 			// aapt resource value: 0x7f020087
-			public const int notification_bg_low = 2130837639;
+			public const int notification_bg = 2130837639;
 			
 			// aapt resource value: 0x7f020088
-			public const int notification_bg_low_normal = 2130837640;
+			public const int notification_bg_low = 2130837640;
 			
 			// aapt resource value: 0x7f020089
-			public const int notification_bg_low_pressed = 2130837641;
+			public const int notification_bg_low_normal = 2130837641;
 			
 			// aapt resource value: 0x7f02008a
-			public const int notification_bg_normal = 2130837642;
+			public const int notification_bg_low_pressed = 2130837642;
 			
 			// aapt resource value: 0x7f02008b
-			public const int notification_bg_normal_pressed = 2130837643;
+			public const int notification_bg_normal = 2130837643;
 			
 			// aapt resource value: 0x7f02008c
-			public const int notification_icon_background = 2130837644;
-			
-			// aapt resource value: 0x7f020090
-			public const int notification_template_icon_bg = 2130837648;
-			
-			// aapt resource value: 0x7f020091
-			public const int notification_template_icon_low_bg = 2130837649;
+			public const int notification_bg_normal_pressed = 2130837644;
 			
 			// aapt resource value: 0x7f02008d
-			public const int notification_tile_bg = 2130837645;
+			public const int notification_icon_background = 2130837645;
+			
+			// aapt resource value: 0x7f020091
+			public const int notification_template_icon_bg = 2130837649;
+			
+			// aapt resource value: 0x7f020092
+			public const int notification_template_icon_low_bg = 2130837650;
 			
 			// aapt resource value: 0x7f02008e
-			public const int notify_panel_notification_icon_bg = 2130837646;
+			public const int notification_tile_bg = 2130837646;
 			
 			// aapt resource value: 0x7f02008f
-			public const int side_nav_bar = 2130837647;
+			public const int notify_panel_notification_icon_bg = 2130837647;
+			
+			// aapt resource value: 0x7f020090
+			public const int side_nav_bar = 2130837648;
 			
 			static Drawable()
 			{
