@@ -25,7 +25,6 @@ namespace PaddleBuddy.Droid.Activities
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.activity_setup);
             LogService.Log("setup activity started");
-            
         }
 
         protected override void OnResume()
@@ -36,7 +35,7 @@ namespace PaddleBuddy.Droid.Activities
             _dbReady = false;
             _locationPermissionApproved = false;
             _locationReady = false;
-            SetupSysPrefs(testOffline: false);
+            SetupSysPrefs(testOffline: true);
             if (!Services.UserService.IsLoggedIn(Application.Context))
             {
                 StartActivity(typeof(LoginRegisterActivity));
@@ -126,7 +125,7 @@ namespace PaddleBuddy.Droid.Activities
             }
         }
 
-        public bool DbReady
+        private bool DbReady
         {
             get { return _dbReady; }
             set
@@ -136,7 +135,7 @@ namespace PaddleBuddy.Droid.Activities
             }
         }
 
-        public bool LocationPermissionApproved
+        private bool LocationPermissionApproved
         {
             get { return _locationPermissionApproved; }
             set
@@ -147,7 +146,7 @@ namespace PaddleBuddy.Droid.Activities
             }
         }
 
-        public bool LocationReady
+        private bool LocationReady
         {
             get { return _locationReady; }
             set

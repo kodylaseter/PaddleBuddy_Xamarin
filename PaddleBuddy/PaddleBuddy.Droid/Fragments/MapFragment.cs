@@ -707,7 +707,7 @@ namespace PaddleBuddy.Droid.Fragments
                 {
                     SelectedSearchItem = SelectedMarkerPoint.ToSearchItem();
                     UpdateSearchDetails(SelectedSearchItem);
-                    marker.SetIcon();
+                    ChangeMarkerToSelected(marker);
                 }
             }
             return true;
@@ -731,6 +731,15 @@ namespace PaddleBuddy.Droid.Fragments
         private void ChangeMarkerToSelected(Marker marker)
         {
             ChangeMarkerColor(marker, new Color(ContextCompat.GetColor(Context, Resource.Color.colorAccent)));
+        }
+
+        private void ChangeMarkerColor(Marker marker, Color color)
+        {
+            var pos = marker.Position;
+            marker.Remove();
+            var newMarker = UnselectedMarkerOptions;
+            newMarker.SetPosition(pos);
+
         }
 
         private void ClearCurrentLineAndMarkers()

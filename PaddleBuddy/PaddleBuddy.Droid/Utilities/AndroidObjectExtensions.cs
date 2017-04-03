@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Android.Gms.Maps.Model;
-using Android.Support.V4.App;
 using Android.Views;
-using PaddleBuddy.Core.Models.Map;
+using Point = PaddleBuddy.Core.Models.Map.Point;
 
 namespace PaddleBuddy.Droid.Utilities
 {
@@ -19,7 +18,6 @@ namespace PaddleBuddy.Droid.Utilities
         {
             return obj.GetType() == type;
         }
-
 
         #region point and latlng
         public static LatLng ToLatLng(this Point value)
