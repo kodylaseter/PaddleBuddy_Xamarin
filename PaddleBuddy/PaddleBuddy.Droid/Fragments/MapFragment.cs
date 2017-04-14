@@ -72,6 +72,10 @@ namespace PaddleBuddy.Droid.Fragments
         private const int BROWSE_TILT = 0;
         private const int SPEED_CUTOFF_TIME_IN_SECONDS = 10;
 
+        private const int CURRENT_MARKER_COLORID = Resource.Color.colorPrimaryDark;
+        private const int MAP_MARKER_COLORID = Resource.Color.colorPrimary;
+        private const int MAP_MARKER_COLORID_SELECTED = Resource.Color.colorAccent;
+
         #region search
         private ListView SearchListView { get; set; }
         private LinearLayout OverallSearchLayout { get; set; }
@@ -707,7 +711,7 @@ namespace PaddleBuddy.Droid.Fragments
                 {
                     SelectedSearchItem = SelectedMarkerPoint.ToSearchItem();
                     UpdateSearchDetails(SelectedSearchItem);
-                    ChangeMarkerToSelected(marker);
+                    ChangeMapMarkerToSelected(marker);
                 }
             }
             return true;
@@ -720,28 +724,6 @@ namespace PaddleBuddy.Droid.Fragments
         #endregion
 
         #region draw
-        private Marker DrawMarker(Point p)
-        {
-            if (MapIsNull) return null;
-            var marker = UnselectedMarkerOptions;
-            if (p.IsLaunchSite) marker.SetTitle(p.Label).SetSnippet(p.Id.ToString());
-            return MyMap.AddMarker(marker);
-        }
-
-        private void ChangeMarkerToSelected(Marker marker)
-        {
-            ChangeMarkerColor(marker, new Color(ContextCompat.GetColor(Context, Resource.Color.colorAccent)));
-        }
-
-        private void ChangeMarkerColor(Marker marker, Color color)
-        {
-            var pos = marker.Position;
-            marker.Remove();
-            var newMarker = UnselectedMarkerOptions;
-            newMarker.SetPosition(pos);
-
-        }
-
         private void ClearCurrentLineAndMarkers()
         {
             CurrentPolyline?.Remove();
@@ -872,28 +854,69 @@ namespace PaddleBuddy.Droid.Fragments
         {
             get {
                 return _currentMarkerOptions ??
-                       (_currentMarkerOptions = CreateMarker(50, 50, Resource.Drawable.current_circle));
+                       (_currentMarkerOptions = CreateMarkerOptions(50, 50, Resource.Drawable.current_circle));
             }
         }
 
         private MarkerOptions UnselectedMarkerOptions
         {
-            get
-            {
-                if (_unselectedMarkerOptions == null) _unselectedMarkerOptions = CreateMarker(50, 50, Resource.Drawable.ic_room_white_24dp);
-                return _unselectedMarkerOptions;
+            get {
+                return _unselectedMarkerOptions ??
+                       (_unselectedMarkerOptions = CreateMarkerOptions(CreateMapMarkerIcon()));
             }
         }
 
-        private MarkerOptions CreateMarker(int width, int height, int drawableResource)
+        private MarkerOptions CreateMarkerOptions(int width, int height, int drawableResource)
+        {
+            return new MarkerOptions().SetIcon(CreateMarkerIcon(width, height, drawableResource));
+        }
+
+        private MarkerOptions CreateMarkerOptions(BitmapDescriptor descriptor)
+        {
+            return new MarkerOptions().SetIcon(descriptor).Anchor(0.5f, 0.5f);
+        }
+
+        private BitmapDescriptor CreateMapMarkerIcon(int colorId = MAP_MARKER_COLORID)
+        {
+            return CreateMarkerIcon(100, 100, Resource.Drawable.ic_room_white_24dp, colorId);
+        }
+
+        private BitmapDescriptor CreateMarkerIcon(int width, int height, int drawableResource, int colorId = int.MinValue)
         {
             var bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888);
             var canvas = new Canvas(bitmap);
             var shape = ResourcesCompat.GetDrawable(Resources, drawableResource, null);
+            shape.SetColorFilter(new Color(ContextCompat.GetColor(Context, colorId != int.MinValue ? colorId : Resource.Color.black)), PorterDuff.Mode.SrcAtop);
             shape.SetBounds(0, 0, bitmap.Width, bitmap.Height);
             shape.Draw(canvas);
-            return new MarkerOptions().SetIcon(BitmapDescriptorFactory.FromBitmap(bitmap))
-                .Anchor(.5f, .5f);
+
+            return BitmapDescriptorFactory.FromBitmap(bitmap);
+        }
+
+        private Marker DrawMarker(Point p)
+        {
+            if (MapIsNull) return null;
+            var marker = UnselectedMarkerOptions;
+            if (p.IsLaunchSite) marker.SetTitle(p.Label).SetSnippet(p.Id.ToString());
+            marker.SetPosition(p.ToLatLng());
+            return MyMap.AddMarker(marker);
+        }
+
+        private void ChangeMapMarkerToSelected(Marker marker)
+        {
+            ChangeMapMarkerColor(marker, MAP_MARKER_COLORID_SELECTED);
+            foreach (var m in LaunchSiteMarkers)
+            {
+                if (m.Id != marker.Id)
+                {
+                    ChangeMapMarkerColor(m, MAP_MARKER_COLORID);
+                }
+            }
+        }
+
+        private void ChangeMapMarkerColor(Marker marker, int colorId)
+        {
+            marker.SetIcon(CreateMapMarkerIcon(colorId));
         }
 
         #endregion

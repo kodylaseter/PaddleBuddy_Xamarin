@@ -35,7 +35,7 @@ namespace PaddleBuddy.Droid.Activities
             _dbReady = false;
             _locationPermissionApproved = false;
             _locationReady = false;
-            SetupSysPrefs(testOffline: true);
+            SetupSysPrefs();
             if (!Services.UserService.IsLoggedIn(Application.Context))
             {
                 StartActivity(typeof(LoginRegisterActivity));
@@ -46,11 +46,10 @@ namespace PaddleBuddy.Droid.Activities
             }
         }
 
-        private void SetupSysPrefs(bool testOffline = false)
+        private void SetupSysPrefs()
         {
             PBPrefs.Device = PBPrefs.Devices.Android;
-            PBPrefs.TestOffline = testOffline;
-            if (testOffline)
+            if (PBPrefs.TestOffline)
             {
                 DatabaseService.GetInstance().SeedData();
             }
@@ -114,7 +113,6 @@ namespace PaddleBuddy.Droid.Activities
                 DbReady = true;
             }
         }
-
 
         private void PermissionMessageReceived(PermissionMessage obj)
         {

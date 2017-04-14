@@ -64,6 +64,11 @@ namespace PaddleBuddy.Core.Services
             return GetLinkForPointIds(a.Id, b.Id);
         }
 
+        public List<Point> GetLaunchSites()
+        {
+            return (from p in Points where p.IsLaunchSite select p).ToList();
+        }
+
         /// <summary>
         /// Gets the link from a to b
         /// Maybe check for the opposite? 

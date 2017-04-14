@@ -17,7 +17,7 @@
         //sharedpreferences stuff
         public const string KEY_USER_ID = "USER_ID";
 
-        public static bool TestOffline = true;
+        public static bool TestOffline = false;
         public static bool TestLoggedOut = false;
         
         public static int RiverIdToSimulate = 20;

@@ -7,6 +7,7 @@ using Android.Widget;
 using Java.Lang;
 using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Services;
+using PaddleBuddy.Core.Utilities;
 using PaddleBuddy.Droid.Controls;
 using PaddleBuddy.Droid.Utilities;
 
@@ -25,16 +26,18 @@ namespace PaddleBuddy.Droid.Adapters
             Filter = new SearchItemFilter(this);
         }
 
-        public void UpdateData(object o = null)
+        public void UpdateData()
         {
             SearchService.Clear();
-            if (o == null)
-            {
-                SearchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
-            } else 
+            if (PBPrefs.TestOffline)
             {
                 DatabaseService.GetInstance().SeedPoints();
                 SearchService.AddData(DatabaseService.GetInstance().Points.ToArray<object>());
+            }
+            else
+            {
+                SearchService.AddData(DatabaseService.GetInstance().Rivers.ToArray<object>());
+                SearchService.AddData(DatabaseService.GetInstance().GetLaunchSites().ToArray<object>());
             }
         }
 
