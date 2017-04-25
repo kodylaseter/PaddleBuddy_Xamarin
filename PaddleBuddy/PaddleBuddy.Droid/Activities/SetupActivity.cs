@@ -36,7 +36,7 @@ namespace PaddleBuddy.Droid.Activities
             _locationPermissionApproved = false;
             _locationReady = false;
             SetupSysPrefs();
-            if (!Services.UserService.IsLoggedIn(Application.Context))
+            if (!Services.UserService.IsLoggedIn(Application.Context) && false)
             {
                 StartActivity(typeof(LoginRegisterActivity));
             }
@@ -66,7 +66,7 @@ namespace PaddleBuddy.Droid.Activities
                 MessengerService.Messenger.Register<DbReadyMessage>(this, DbReadyReceived);
                 MessengerService.Messenger.Register<PermissionMessage>(this, PermissionMessageReceived);
                 MessengerService.Messenger.Register<LocationUpdatedMessage>(this, LocationUpdatedReceived);
-                Services.StorageService.GetInstance().Setup();
+                Services.StorageService.GetInstance().Setup(sync: true);
                 PermissionService.SetupLocation(this);
             }
             else

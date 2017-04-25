@@ -11,6 +11,6 @@
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<application android:label="PaddleBuddy" android:theme="@style/AppTheme">
 		<meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
-		<meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyCf2sKdCPms-lp2ZHyfRk6aR2bRPz6_deU" />
+		<meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyAug_k61eizyWrWXcv1mOgK63_7W91IJ_4" />
 	</application>
 </manifest>

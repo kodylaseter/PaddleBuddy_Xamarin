@@ -59,7 +59,7 @@ namespace PaddleBuddy.Droid.Fragments
         private MapImageButton StopBrowsingButton { get; set; }
         private bool MapIsNull => MyMap == null;
         private FloatingActionButton NavFab { get; set; }
-        private MarkerOptions _unselectedMarkerOptions;
+        private MarkerOptions _unselectedMapMarkerOptions;
 
         private TextView DetailsBarTextView1;
         private TextView DetailsBarTextView2;
@@ -76,7 +76,6 @@ namespace PaddleBuddy.Droid.Fragments
         private const int MAP_MARKER_COLORID = Resource.Color.colorPrimary;
         private const int MAP_MARKER_COLORID_SELECTED = Resource.Color.colorAccent;
 
-        #region search
         private ListView SearchListView { get; set; }
         private LinearLayout OverallSearchLayout { get; set; }
         private MainActivitySearchAdapter SearchAdapter { get; set; }
@@ -85,7 +84,6 @@ namespace PaddleBuddy.Droid.Fragments
         private ImageButton CloseSearchImageButton { get; set; }
         private SearchItem _selectedSearchItem;
 
-        #endregion
 
         #endregion
 
@@ -115,12 +113,12 @@ namespace PaddleBuddy.Droid.Fragments
 
             CloseSearchImageButton.SetColorFilter(
                 new Color(ContextCompat.GetColor(Context, Resource.Color.gray)));
-            CloseSearchImageButton.Click += (s, e) => CloseSearch();
+            CloseSearchImageButton.Click += (s, e) => OnCloseSearchClicked();
             SearchClearEditText.EditText.TextChanged += EditTextOnTextChanged;
             SearchClearEditText.FocusChange += OnSearchFocused;
             view.FindViewById<Button>(Resource.Id.test_simulate_button).Click += OnSimulateButtonClicked;
             view.FindViewById<ImageButton>(Resource.Id.cancel_trip_button).Click += OnCancelTripClicked;
-            SearchClearEditText.TextCleared += TextCleared;
+            SearchClearEditText.TextCleared += OnTextCleared;
             SearchAdapter = new MainActivitySearchAdapter(Activity);
             SearchListView.Adapter = SearchAdapter;
             StopBrowsingButton.Click += OnStopBrowsingButtonClicked;
@@ -233,24 +231,31 @@ namespace PaddleBuddy.Droid.Fragments
                 {
                     if (_selectedSearchItem.Item.IsTypeOf(typeof (Point)))
                     {
-                        OpenSearch();
                         SearchClearEditText.EditText.Text = _selectedSearchItem.Title;
+                        OpenSearch();
+                        UpdateSearchDetails(_selectedSearchItem);
                         ShowNavFab();
-                    } else if (!_selectedSearchItem.Item.IsTypeOf(typeof (River)))
+
+                    }
+                    else if (_selectedSearchItem.Item.IsTypeOf(typeof(River)))
+                    {
+
+                    }
+                    else
                     {
                         throw new NotImplementedException();
                     }
                     HideKeyboard();
                     HideSearchResults();
-                    UpdateSearchDetails(_selectedSearchItem);
                     IsBrowsing = true;
                 }
             }
         }
 
-        private void TextCleared()
+        private void OnTextCleared()
         {
             SelectedSearchItem = null;
+            ClearSelectedMarkers();
         }
 
         private void OnSearchItemSelected(object sender, AdapterView.ItemClickEventArgs e)
@@ -275,6 +280,7 @@ namespace PaddleBuddy.Droid.Fragments
             if (OverallSearchLayout.Visibility == ViewStates.Gone)
             {
                 OpenSearch();
+                ShowSearchResults();
             }
             else
             {
@@ -282,15 +288,15 @@ namespace PaddleBuddy.Droid.Fragments
             }
         }
 
-        private void OpenSearch()
+        private void OpenSearch(bool requestFocus = false)
         {
             if (IsSearchOpen) return; 
             ((MainActivity) Activity).SupportActionBar.Hide();
             SearchClearEditText.Text = "";
             OverallSearchLayout.Visibility = ViewStates.Visible;
+            if (!requestFocus) return;
             SearchClearEditText.EditText.RequestFocusFromTouch();
             InputMethodManager.ShowSoftInput(SearchClearEditText.EditText, ShowFlags.Implicit);
-            ShowSearchResults();
         }
 
         public void CloseSearch()
@@ -528,6 +534,7 @@ namespace PaddleBuddy.Droid.Fragments
         #endregion
 
         #region speed
+
         private void UpdateSpeed()
         {
             var newTime = CurrentLocation.Time;
@@ -634,6 +641,7 @@ namespace PaddleBuddy.Droid.Fragments
         #endregion
 
         #region trip
+
         private void ClearTripData()
         {
             TripManager = null;
@@ -650,6 +658,13 @@ namespace PaddleBuddy.Droid.Fragments
         #endregion
 
         #region clicks
+
+        private void OnCloseSearchClicked()
+        {
+            CloseSearch();
+            ClearSelectedMarkers();
+        }
+
         private void OnNavFabClicked(object sender, EventArgs e)
         {
             if (SelectedSearchItem.Item.IsTypeOf(typeof(Point)))
@@ -678,6 +693,7 @@ namespace PaddleBuddy.Droid.Fragments
             if (reason == GoogleMap.OnCameraMoveStartedListener.ReasonGesture)
             {
                 IsBrowsing = true;
+                HideSearchResults();
             }
         }
 
@@ -710,7 +726,6 @@ namespace PaddleBuddy.Droid.Fragments
                 if (SelectedMarkerPoint != null)
                 {
                     SelectedSearchItem = SelectedMarkerPoint.ToSearchItem();
-                    UpdateSearchDetails(SelectedSearchItem);
                     ChangeMapMarkerToSelected(marker);
                 }
             }
@@ -720,10 +735,12 @@ namespace PaddleBuddy.Droid.Fragments
         public void OnMapClick(LatLng point)
         {
             SelectedMarkerPoint = null;
+            HideSearchResults();
         }
         #endregion
 
         #region draw
+
         private void ClearCurrentLineAndMarkers()
         {
             CurrentPolyline?.Remove();
@@ -854,26 +871,32 @@ namespace PaddleBuddy.Droid.Fragments
         {
             get {
                 return _currentMarkerOptions ??
-                       (_currentMarkerOptions = CreateMarkerOptions(50, 50, Resource.Drawable.current_circle));
+                       (_currentMarkerOptions = CreateCurrentMarkerOptions());
             }
         }
 
-        private MarkerOptions UnselectedMarkerOptions
+        private MarkerOptions UnselectedMapMarkerOptions
         {
             get {
-                return _unselectedMarkerOptions ??
-                       (_unselectedMarkerOptions = CreateMarkerOptions(CreateMapMarkerIcon()));
+                return _unselectedMapMarkerOptions ??
+                       (_unselectedMapMarkerOptions = CreateUnselectedMapMarkerOptions(CreateMapMarkerIcon()));
             }
         }
 
-        private MarkerOptions CreateMarkerOptions(int width, int height, int drawableResource)
+        private MarkerOptions CreateCurrentMarkerOptions()
         {
-            return new MarkerOptions().SetIcon(CreateMarkerIcon(width, height, drawableResource));
+            var opts = new MarkerOptions();
+            opts.SetIcon(CreateMarkerIcon(50, 50, Resource.Drawable.current_circle, Resource.Color.red));
+            opts.Anchor(1.0f, 1.0f);
+            return opts;
         }
 
-        private MarkerOptions CreateMarkerOptions(BitmapDescriptor descriptor)
+        private MarkerOptions CreateUnselectedMapMarkerOptions(BitmapDescriptor descriptor)
         {
-            return new MarkerOptions().SetIcon(descriptor).Anchor(0.5f, 0.5f);
+            var opts = new MarkerOptions();
+            opts.SetIcon(descriptor);
+            opts.Anchor(0.5f, 0.5f);
+            return opts;
         }
 
         private BitmapDescriptor CreateMapMarkerIcon(int colorId = MAP_MARKER_COLORID)
@@ -896,7 +919,7 @@ namespace PaddleBuddy.Droid.Fragments
         private Marker DrawMarker(Point p)
         {
             if (MapIsNull) return null;
-            var marker = UnselectedMarkerOptions;
+            var marker = UnselectedMapMarkerOptions;
             if (p.IsLaunchSite) marker.SetTitle(p.Label).SetSnippet(p.Id.ToString());
             marker.SetPosition(p.ToLatLng());
             return MyMap.AddMarker(marker);
@@ -904,17 +927,22 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void ChangeMapMarkerToSelected(Marker marker)
         {
-            ChangeMapMarkerColor(marker, MAP_MARKER_COLORID_SELECTED);
-            foreach (var m in LaunchSiteMarkers)
+            ClearSelectedMarkers();
+            if (marker != null)
             {
-                if (m.Id != marker.Id)
-                {
-                    ChangeMapMarkerColor(m, MAP_MARKER_COLORID);
-                }
+                ChangeMapMarkerToColor(marker, MAP_MARKER_COLORID_SELECTED);
             }
         }
 
-        private void ChangeMapMarkerColor(Marker marker, int colorId)
+        private void ClearSelectedMarkers()
+        {
+            foreach (var m in LaunchSiteMarkers)
+            {
+                ChangeMapMarkerToColor(m, MAP_MARKER_COLORID);
+            }
+        }
+
+        private void ChangeMapMarkerToColor(Marker marker, int colorId)
         {
             marker.SetIcon(CreateMapMarkerIcon(colorId));
         }
@@ -922,6 +950,7 @@ namespace PaddleBuddy.Droid.Fragments
         #endregion
 
         #region camera
+
         public void NavigateCamera()
         {
             if (MapIsNull) return;

@@ -16,4 +16,7 @@
 
     <color name="search_divider">#7A7A7A</color>
     <color name="map_button_contents">#666666</color>
+
+
+    <color name="red">#BB4444</color>
 </resources>
