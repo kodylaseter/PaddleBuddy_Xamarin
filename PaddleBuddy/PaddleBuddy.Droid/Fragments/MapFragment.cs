@@ -35,17 +35,13 @@ namespace PaddleBuddy.Droid.Fragments
         private bool _isLoading;
         private bool _isBrowsing;
 
+        private bool MapIsNull => MyMap == null;
+
         private GoogleMap MyMap { get; set; }
         private MapView MapView { get; set; }
         private MapModes MapMode { get; set; }
         private Point SelectedMarkerPoint { get; set; }
         private ProgressBarOverlay ProgressBarOverlay { get; set; }
-        private MarkerOptions _currentMarkerOptions;
-        private Marker CurrentLoationMarker { get; set; }
-        private Marker SelectedMarker { get; set; }
-        private Marker CurrentDestinationMarker { get; set; }
-        private List<Marker> LaunchSiteMarkers { get; set; }
-        private Polyline CurrentPolyline { get; set; }
         private TextView SpeedTextView { get; set; }
         private LinearLayout NavBarLayout { get; set; }
         private View DetailsBarLayout { get; set; }
@@ -57,9 +53,16 @@ namespace PaddleBuddy.Droid.Fragments
         private List<Tuple<double, double>> Speeds { get; set; }
         private TripManager TripManager { get; set; }
         private MapImageButton StopBrowsingButton { get; set; }
-        private bool MapIsNull => MyMap == null;
         private FloatingActionButton NavFab { get; set; }
         private MarkerOptions _unselectedMapMarkerOptions;
+        private MarkerOptions _currentMarkerOptions;
+
+        //markers
+        private Marker CurrentDestinationMarker { get; set; }
+        private Marker CurrentLoationMarker { get; set; }
+        private List<Marker> LaunchSiteMarkers { get; set; }
+        private Polyline CurrentPolyline { get; set; }
+
 
         private TextView DetailsBarTextView1;
         private TextView DetailsBarTextView2;
@@ -434,7 +437,10 @@ namespace PaddleBuddy.Droid.Fragments
                 else
                 {
                     HideSpeed();
-                    AnimateCameraBounds(new List<Point> { CurrentLocation, TripManager.CurrentPoint });
+                    if (!IsBrowsing)
+                    {
+                        AnimateNavigationUpdate();
+                    }
                     UpdateNavBar("Navigate to river");
                 }
             }
@@ -755,7 +761,6 @@ namespace PaddleBuddy.Droid.Fragments
             LaunchSiteMarkers = null;
             CurrentDestinationMarker?.Remove();
             CurrentDestinationMarker = null;
-
         }
 
         private void DrawCurrentTrip(bool reDraw = false)
@@ -768,6 +773,7 @@ namespace PaddleBuddy.Droid.Fragments
             }
             if (CurrentPolyline != null) return;
             CurrentPolyline = DrawLine(TripManager.Points);
+            DrawCurrentDestination();
         }
 
         private void DrawCurrentBrowsePathAndSites()
@@ -841,9 +847,10 @@ namespace PaddleBuddy.Droid.Fragments
             }
         }
 
-        private void DrawCurrentDestination(Point p)
+        private void DrawCurrentDestination(Point p = null)
         {
             if (MapIsNull) return;
+            if (p == null) p = TripManager.CurrentPoint;
             var position = p.ToLatLng();
             if (CurrentDestinationMarker != null)
             {
@@ -887,7 +894,7 @@ namespace PaddleBuddy.Droid.Fragments
         {
             var opts = new MarkerOptions();
             opts.SetIcon(CreateMarkerIcon(50, 50, Resource.Drawable.current_circle, Resource.Color.red));
-            opts.Anchor(1.0f, 1.0f);
+            opts.Anchor(0.5f, 0.5f);
             return opts;
         }
 
@@ -895,7 +902,7 @@ namespace PaddleBuddy.Droid.Fragments
         {
             var opts = new MarkerOptions();
             opts.SetIcon(descriptor);
-            opts.Anchor(0.5f, 0.5f);
+            opts.Anchor(1.0f, 1.0f);
             return opts;
         }
 
@@ -999,6 +1006,11 @@ namespace PaddleBuddy.Droid.Fragments
             var bounds = builder.Build();
             var cameraUpdate = CameraUpdateFactory.NewLatLngBounds(bounds, View.Width, View.Height, 80);
             MyMap.AnimateCamera(cameraUpdate);
+        }
+
+        private void AnimateNavigationUpdate()
+        {
+            AnimateCameraBounds(new List<Point>{CurrentLocation, TripManager.CurrentPoint});
         }
 
         private CameraUpdate CameraUpdateBuilder(Point p, int tilt = int.MaxValue, int zoom = 0, double bearing = double.NaN)
