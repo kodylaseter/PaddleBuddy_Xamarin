@@ -1,10 +1,14 @@
-﻿namespace PaddleBuddy.Core.Utilities
+﻿using UnitsNet;
+using UnitsNet.Extensions.NumberToLength;
+using UnitsNet.Extensions.NumberToSpeed;
+
+namespace PaddleBuddy.Core.Utilities
 {
     public class PBPrefs
     {
-        private static string LocalDb = "http://10.0.3.3:4000/api/mobile/";
-        private static string LiveDb = "http://paddlebuddy-pbdb.rhcloud.com/api/mobile/";
-        public static string Website = "http://paddlebuddy-pbdb.rhcloud.com";
+        private static readonly string LocalDb = "http://10.0.3.3:4000/api/mobile/";
+        private static readonly string LiveDb = "http://paddlebuddy-pbdb.rhcloud.com/api/mobile/";
+        public static readonly string Website = "http://paddlebuddy-pbdb.rhcloud.com";
         public static bool UseLocalDb => false;
         public static string ApiBase => UseLocalDb ? LocalDb : LiveDb;
 
@@ -17,16 +21,16 @@
         //sharedpreferences stuff
         public const string KEY_USER_ID = "USER_ID";
 
-        public static bool TestOffline = false;
-        public static bool TestLoggedOut = false;
+        public static readonly bool TestOffline = false;
+        public static readonly bool TestLoggedOut = false;
         
-        public static int RiverIdToSimulate = 20;
-        public static double TripPointsCloseThreshold = 30;
-        public static double BearingTooCloseThreshold = 10;
-        public static double IsOnTrackCloseThreshold = 80;
-        public static double PickNextDestinationThreshold = 1000;
-        public static int MetersAheadToAim = 500; //used in camera updates to make current location appear closer to bottom of screen
-        public static float DefaultSpeed = 1.5f; //meters per second
+        public static readonly int RiverIdToSimulate = 20;
+        public static readonly Length TripPointsCloseThreshold = 30.Meters();
+        public static readonly Length BearingTooCloseThreshold = 10.Meters();
+        public static readonly Length IsOnTrackCloseThreshold = 80.Meters();
+        public static readonly Length PickNextDestinationThreshold = 1000.Meters();
+        public static readonly Length DistanceAheadToAim = 500.Meters(); //used in camera updates to make current location appear closer to bottom of screen
+        public static readonly Speed DefaultSpeed = 1.5.MetersPerSecond();
 
         public static Devices Device { get; set; }
         public enum Devices

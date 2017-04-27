@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PaddleBuddy.Core.Models.Map;
 using PaddleBuddy.Core.Services;
+using UnitsNet;
+using UnitsNet.Extensions.NumberToSpeed;
 using Path = System.IO.Path;
 
 namespace PaddleBuddy.Droid.Services
@@ -111,7 +115,8 @@ namespace PaddleBuddy.Droid.Services
                 var resp = await GetAsync("all_links/");
                 if (resp.Success)
                 {
-                    DatabaseService.GetInstance().Links = JsonConvert.DeserializeObject<List<Link>>(resp.Data.ToString());
+                    DatabaseService.GetInstance().Links =
+                        JsonConvert.DeserializeObject<List<Link>>(resp.Data.ToString(), new LinkConverter());
                 }
                 else
                 {
@@ -170,6 +175,46 @@ namespace PaddleBuddy.Droid.Services
                 if (fileInfo.Length <= 0) return false;
             }
             return true;
+        }
+    }
+
+    internal class LinkConverter : JsonConverter
+    {
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            var jo = JObject.Load(reader);
+            var link = new Link();
+            if (jo["id"] != null && (int) jo["id"] > -1)
+            {
+                link.Id = (int) jo["id"];
+            }
+            if (jo["begin"] != null && (int) jo["begin"] > -1)
+            {
+                link.Begin = (int) jo["begin"];
+            }
+            if (jo["end"] != null && (int) jo["end"] > -1)
+            {
+                link.End = (int) jo["end"];
+            }
+            if (jo["riverId"] != null && (int) jo["riverId"] > -1)
+            {
+                link.RiverId = (int) jo["riverId"];
+            }
+            if (jo["speed"] != null && (int) jo["speed"] > -1)
+            {
+                link.Speed = ((int) jo["speed"]).MetersPerSecond();
+            }
+            return link;
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(Link);
         }
     }
 }

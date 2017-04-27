@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using PaddleBuddy.Core.Services;
+using UnitsNet;
+using UnitsNet.Extensions.NumberToLength;
 
 namespace PaddleBuddy.Core.Utilities
 {
     public class PBMath
     {
-        private static double EARTH_RADIUS_IN_METERS = 6371000;
-        private static double EARTH_RADIUS_IN_KM = 6371;
+        private static Length EARTH_RADIUS = 6371000.Meters();
 
         public static double NormalizeDegrees(double degrees)
         {
@@ -44,11 +45,10 @@ namespace PaddleBuddy.Core.Utilities
         /// <param name="distance"> in meters</param>
         /// <param name="bearing"> in degrees</param>
         /// <returns></returns>
-        public static Point PointAtDistanceAlongBearing(Point start, double distance, double bearing)
+        public static Point PointAtDistanceAlongBearing(Point start, Length distance, double bearing)
         {
-            var distanceKm = distance / 1000; //converting to km
             var bearingRad = Degrese2Radians(bearing);
-            var distRatio = distanceKm / EARTH_RADIUS_IN_KM;
+            var distRatio = distance.Kilometers / EARTH_RADIUS.Kilometers;
             var distRatioSine = Math.Sin(distRatio);
             var distRatioCosine = Math.Cos(distRatio);
 
@@ -109,13 +109,13 @@ namespace PaddleBuddy.Core.Utilities
         public static TripEstimate PointsToEstimate(List<Point> points)
         {
             var totalTime = new TimeSpan();
-            double totalDistance = 0;
+            var totalDistance = 0.Meters();
             var index = 0;
             while (points.ElementAtOrDefault(index + 1) != null)
             {
                 var start = points[index];
                 var end = points[index + 1];
-                var dist = DistanceInMeters(start, end);
+                var dist = Distance(start, end);
                 totalDistance += dist;
                 var link = DatabaseService.GetInstance().GetLinkForPointIds(start.Id, end.Id);
                 if (link == null)
@@ -135,26 +135,20 @@ namespace PaddleBuddy.Core.Utilities
                         };
                     }
                 }
-                totalTime += DistanceAndSpeedToTime(dist, link.Speed);
+                totalTime += DistanceAndSpeedToTimeSpan(dist, link.Speed);
                 index++;
 
             }
             return new TripEstimate()
             {
                 Time = totalTime,
-                Distance = totalDistance,
-                DistanceUnit = "meters"
+                Distance = totalDistance
             };
         }
 
-        /// <summary>
-        /// Takes a distance in meters and speed in meters per second and returns timespan
-        /// </summary>
-        /// <param name="distance">Meters</param>
-        /// <param name="speed">Meters/Second</param>
-        private static TimeSpan DistanceAndSpeedToTime(double distance, double speed)
+        private static TimeSpan DistanceAndSpeedToTimeSpan(Length distance, Speed speed)
         {
-            return new TimeSpan(0,0,0,(int)Math.Round(distance / speed)); 
+            return TimeSpan.FromSeconds((distance / speed).Seconds);
         }
 
         /// <summary>
@@ -165,7 +159,7 @@ namespace PaddleBuddy.Core.Utilities
         /// <param name="lineEnd"></param>
         /// <param name="point"></param>
         /// <returns></returns>
-        public static double DistanceInMetersFromPointToLineSegment(Point lineStart, Point lineEnd, Point point)
+        public static Length DistanceFromPointToLineSegment(Point lineStart, Point lineEnd, Point point)
         {
             var angleFromPointToStartToEnd = AngleBetweenPoints(point, lineStart, lineEnd);
             var angleFromPointToEndToStart = AngleBetweenPoints(point, lineEnd, lineStart);
@@ -176,11 +170,11 @@ namespace PaddleBuddy.Core.Utilities
             }
             if (angleFromPointToStartToEnd > 90) //return distance from point to start
             {
-                return DistanceInMeters(point, lineStart);
+                return Distance(point, lineStart);
             }
             if (angleFromPointToEndToStart > 90) //return distance from point to end
             {
-                return DistanceInMeters(point, lineEnd);
+                return Distance(point, lineEnd);
             }
             //return crosstrack
             return CrossTrackError(lineStart, lineEnd, point);
@@ -223,30 +217,22 @@ namespace PaddleBuddy.Core.Utilities
         /// <param name="lineEnd"></param>
         /// <param name="point"></param>
         /// <returns></returns>
-        private static double CrossTrackError(Point lineStart, Point lineEnd, Point point)
+        private static Length CrossTrackError(Point lineStart, Point lineEnd, Point point)
         {
-            var distanceInMeters = DistanceInMeters(lineStart, point);
+            var distance = Distance(lineStart, point);
             var startToPointBearing = Degrese2Radians(BearingBetweenPoints(lineStart, point));
             var lineBearing = Degrese2Radians(BearingBetweenPoints(lineStart, lineEnd));
             var dXt =
-                Math.Asin(Math.Sin(distanceInMeters / EARTH_RADIUS_IN_METERS) * Math.Sin(startToPointBearing - lineBearing)) *
-                EARTH_RADIUS_IN_METERS;
-            return dXt;
+                Math.Asin(Math.Sin(distance.Meters / EARTH_RADIUS.Meters) * Math.Sin(startToPointBearing - lineBearing)) *
+                EARTH_RADIUS.Meters;
+            return dXt.Meters();
         }
 
-        //returns in miles
-        public static double DistanceInMiles(Point begin, Point end)
+        public static Length Distance(Point begin, Point end)
         {
-            if (begin != null && end != null) return DistanceInMeters(begin.Lat, begin.Lng, end.Lat, end.Lng) * 0.000621371;
+            if (begin != null && end != null) return Distance(begin.Lat, begin.Lng, end.Lat, end.Lng);
             Debug.WriteLine("Distance calculation failed");
-            return double.MaxValue;
-        }
-
-        public static double DistanceInMeters(Point begin, Point end)
-        {
-            if (begin != null && end != null) return DistanceInMeters(begin.Lat, begin.Lng, end.Lat, end.Lng);
-            Debug.WriteLine("Distance calculation failed");
-            return double.MaxValue;
+            return Length.MaxValue;
         }
 
         public static double DistanceInRadians(Point p1, Point p2)
@@ -266,10 +252,10 @@ namespace PaddleBuddy.Core.Utilities
         }
 
         //METERS
-        private static double DistanceInMeters(double lat1, double lon1, double lat2, double lon2)
+        private static Length Distance(double lat1, double lon1, double lat2, double lon2)
         {
             var c = DistanceInRadians(lat1, lon1, lat2, lon2);
-            return EARTH_RADIUS_IN_METERS * c;
+            return (EARTH_RADIUS.Meters * c).Meters();
         }
 
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

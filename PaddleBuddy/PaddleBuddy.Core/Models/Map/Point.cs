@@ -1,4 +1,5 @@
 ﻿using PaddleBuddy.Core.Utilities;
+using UnitsNet;
 
 namespace PaddleBuddy.Core.Models.Map
 {
@@ -13,13 +14,14 @@ namespace PaddleBuddy.Core.Models.Map
 
         /// <summary>
         /// In seconds
+        /// Current time of day converted to seconds
         /// </summary>
-        public double Time { get; set; }
+        public Duration Time { get; set; }
 
         /// <summary>
         /// In meters per second
         /// </summary>
-        public double Speed { get; set; }
+        public Speed Speed { get; set; }
 
         public override string ToString()
         {

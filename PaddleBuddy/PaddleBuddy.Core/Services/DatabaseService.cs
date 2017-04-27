@@ -6,6 +6,7 @@ using PaddleBuddy.Core.Models.LinqModels;
 using PaddleBuddy.Core.Models.Map;
 using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Utilities;
+using UnitsNet;
 
 namespace PaddleBuddy.Core.Services
 {
@@ -30,30 +31,30 @@ namespace PaddleBuddy.Core.Services
         {
             //list of points and their distances to the currentlocation
             var tripPoints = tripManager.Points.ToList();
-            var pointsToCheck = new List<Tuple<Point, double>>();
+            var pointsToCheck = new List<Tuple<Point, Length>>();
             //tripPoints.RemoveAll(p => PBUtilities.DistanceInMeters(current, p) > POINT_TOO_FAR_AWAY);
             for (var i = tripPoints.Count - 1; i >= 0; i--)
             {
-                var dist = PBMath.DistanceInMeters(current, tripPoints[i]);
+                var dist = PBMath.Distance(current, tripPoints[i]);
                 if (dist > PBPrefs.PickNextDestinationThreshold)
                 {
                     tripPoints.RemoveAt(i);
                 }
                 else
                 {
-                    pointsToCheck.Add(new Tuple<Point, double>(tripPoints[i], dist));
+                    pointsToCheck.Add(new Tuple<Point, Length>(tripPoints[i], dist));
                 }
             }
             pointsToCheck.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-            var closestNextPoint = new Tuple<Point, double>(null, double.MaxValue);
+            var closestNextPoint = new Tuple<Point, Length>(null, Length.MaxValue);
             foreach (var tup in pointsToCheck)
             {
                 var point = tup.Item1;
                 var next = GetInstance().GetNextPoint(point);
-                var dist = PBMath.DistanceInMetersFromPointToLineSegment(point, next, current);
+                var dist = PBMath.DistanceFromPointToLineSegment(point, next, current);
                 if (dist < closestNextPoint.Item2)
                 {
-                    closestNextPoint = new Tuple<Point, double>(next, dist);
+                    closestNextPoint = new Tuple<Point, Length>(next, dist);
                 }
             }
             return closestNextPoint.Item1;
@@ -102,7 +103,7 @@ namespace PaddleBuddy.Core.Services
             {
                 throw new NotImplementedException();
             };
-            return (from p in Points let dist = PBMath.DistanceInMiles(point, p) orderby dist ascending select p).First().RiverId;
+            return (from p in Points let dist = PBMath.Distance(point, p) orderby dist select p).First().RiverId;
         }
 
         public Path GetClosestRiverPath(Point point = null)

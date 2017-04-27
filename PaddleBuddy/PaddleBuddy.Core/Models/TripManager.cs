@@ -4,6 +4,7 @@ using System.Linq;
 using PaddleBuddy.Core.Models.Map;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Core.Utilities;
+using UnitsNet;
 
 namespace PaddleBuddy.Core.Models
 { 
@@ -118,8 +119,9 @@ namespace PaddleBuddy.Core.Models
         /// <returns></returns>
         public bool IsOnTrack(Point lineStart, Point lineEnd, Point current)
         {
-            var dist = PBMath.DistanceInMetersFromPointToLineSegment(lineStart, lineEnd, current);
-            return Math.Abs(dist) < PBPrefs.IsOnTrackCloseThreshold;
+            var dist = PBMath.DistanceFromPointToLineSegment(lineStart, lineEnd, current);
+            //todo: improve this absolute value stuff
+            return Math.Abs(dist.Meters) < PBPrefs.IsOnTrackCloseThreshold.Meters;
         }
 
         public bool CloseToStart(Point current)
@@ -137,9 +139,9 @@ namespace PaddleBuddy.Core.Models
             return DistanceToNext(current) < PBPrefs.TripPointsCloseThreshold;
         }
 
-        public double DistanceToNext(Point current)
+        public Length DistanceToNext(Point current)
         {
-            return PBMath.DistanceInMeters(current, CurrentPoint);
+            return PBMath.Distance(current, CurrentPoint);
         }
 
         private Point PointAt(int index)

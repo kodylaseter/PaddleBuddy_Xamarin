@@ -6,6 +6,7 @@ using PaddleBuddy.Core.Models.Map;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Core.Utilities;
 using Plugin.CurrentActivity;
+using UnitsNet.Extensions.NumberToLength;
 
 namespace PaddleBuddy.Droid.Services
 {
@@ -71,8 +72,8 @@ namespace PaddleBuddy.Droid.Services
                         StopSimulating();
                         return;
                     }
-                    var inc = PBMath.DistanceInMeters(LS.CurrentLocation, point)/SIM_INC;
-                    while (PBMath.DistanceInMeters(LS.CurrentLocation, point) > PBPrefs.TripPointsCloseThreshold)
+                    var inc = PBMath.Distance(LS.CurrentLocation, point)/SIM_INC;
+                    while (PBMath.Distance(LS.CurrentLocation, point) > PBPrefs.TripPointsCloseThreshold)
                     {
                         if (_stop)
                         {
@@ -110,7 +111,7 @@ namespace PaddleBuddy.Droid.Services
             var bearing = Random.Next(0, 360);
             while (!_stop)
             {
-                SetCurrent(PBMath.PointAtDistanceAlongBearing(LS.CurrentLocation, 60, bearing));
+                SetCurrent(PBMath.PointAtDistanceAlongBearing(LS.CurrentLocation, 60.Meters(), bearing));
                 await Task.Delay(TIME_DELAY);
                 offTrackIncs++;
                 if (offTrackIncs >= numberOfOffTrackIncrements)

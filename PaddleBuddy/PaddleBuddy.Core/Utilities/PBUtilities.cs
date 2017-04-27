@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using UnitsNet;
 
 namespace PaddleBuddy.Core.Utilities
 {
@@ -17,14 +18,13 @@ namespace PaddleBuddy.Core.Utilities
         /// </summary>
         /// <param name="distance"></param>
         /// <returns></returns>
-        public static string FormatDistanceToMilesOrMeters(double distance)
+        public static string FormatDistanceToMilesOrMeters(Length distance)
         {
-            var miles = distance / 1609.34;
-            if (miles > 0.1)
+            if (distance.Miles > 0.1)
             {
-                return miles.ToString("0.00") + "mi";
+                return distance.Miles + "mi";
             }
-            return distance.ToString("0.0") + "m";
+            return distance.Meters + "m";
         }
     }
 }

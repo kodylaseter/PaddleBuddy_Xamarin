@@ -24,6 +24,8 @@ using PaddleBuddy.Droid.Adapters;
 using PaddleBuddy.Droid.Controls;
 using PaddleBuddy.Droid.Services;
 using PaddleBuddy.Droid.Utilities;
+using UnitsNet;
+using UnitsNet.Extensions.NumberToDuration;
 using Path = PaddleBuddy.Core.Models.Map.Path;
 using Point = PaddleBuddy.Core.Models.Map.Point;
 
@@ -50,7 +52,7 @@ namespace PaddleBuddy.Droid.Fragments
         /// <summary>
         /// speed, time of day in totalseconds
         /// </summary>
-        private List<Tuple<double, double>> Speeds { get; set; }
+        private List<Tuple<Speed, Duration>> Speeds { get; set; }
         private TripManager TripManager { get; set; }
         private MapImageButton StopBrowsingButton { get; set; }
         private FloatingActionButton NavFab { get; set; }
@@ -69,11 +71,11 @@ namespace PaddleBuddy.Droid.Fragments
         private TextView DetailsBarTextView3;
 
 
-        private const int NAV_ZOOM = 16;
-        private const int BROWSE_ZOOM = 8;
-        private const int NAV_TILT = 70;
-        private const int BROWSE_TILT = 0;
-        private const int SPEED_CUTOFF_TIME_IN_SECONDS = 10;
+        private static readonly int NAV_ZOOM = 16;
+        private static readonly int BROWSE_ZOOM = 8;
+        private static readonly int NAV_TILT = 70;
+        private static readonly int BROWSE_TILT = 0;
+        private static readonly Duration SPEED_CUTOFF_TIME_IN_SECONDS = 10.Seconds();
 
         private const int CURRENT_MARKER_COLORID = Resource.Color.colorPrimaryDark;
         private const int MAP_MARKER_COLORID = Resource.Color.colorPrimary;
@@ -133,7 +135,7 @@ namespace PaddleBuddy.Droid.Fragments
             ShowLoading("waiting on gps");
             LaunchSiteMarkers = new List<Marker>();
 
-            Speeds = new List<Tuple<double, double>>();
+            Speeds = new List<Tuple<Speed, Duration>>();
             CurrentLoationMarker = null;
             SelectedMarkerPoint = null;
             LaunchSiteMarkers = new List<Marker>();
@@ -406,17 +408,17 @@ namespace PaddleBuddy.Droid.Fragments
                     var newDestination = DatabaseService.GetInstance().PickNextDestination(CurrentLocation, TripManager);
                     AnimateCameraBounds(new List<Point> {CurrentLocation, newDestination});
                     TripManager.UpdateForNewDestination(newDestination);
-                    double distance;
+                    Length distance;
                     if (TripManager.HasPrevious)
                     {
                         distance =
-                            PBMath.DistanceInMetersFromPointToLineSegment(TripManager.PreviousPoint,
+                            PBMath.DistanceFromPointToLineSegment(TripManager.PreviousPoint,
                                 TripManager.CurrentPoint,
                                 CurrentLocation);
                     }
                     else
                     {
-                        distance = PBMath.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint);
+                        distance = PBMath.Distance(CurrentLocation, TripManager.CurrentPoint);
                     }
                     UpdateNavBar($"Navigate to river - {PBUtilities.FormatDistanceToMilesOrMeters(distance)}");
                 }
@@ -544,11 +546,10 @@ namespace PaddleBuddy.Droid.Fragments
         private void UpdateSpeed()
         {
             var newTime = CurrentLocation.Time;
-            if (CurrentLocation.Speed > 0)
+            if (CurrentLocation.Speed.MetersPerSecond > 0)
             {
-                Speeds.Add(new Tuple<double, double>(CurrentLocation.Speed, CurrentLocation.Time));
+                Speeds.Add(new Tuple<Speed, Duration>(CurrentLocation.Speed, CurrentLocation.Time));
             }
-            //Speeds.RemoveAll(item => newTime - item.Item2 > SPEED_CUTOFF_TIME_IN_SECONDS || newTime - item.Item2 < 0);
             for (int i = Speeds.Count - 1; i >= 0; i--)
             {
                 if (newTime - Speeds[i].Item2 > SPEED_CUTOFF_TIME_IN_SECONDS)
@@ -558,7 +559,7 @@ namespace PaddleBuddy.Droid.Fragments
             }
             if (Speeds.Count > 0)
             {
-                var avg = Speeds.Average(item => item.Item1);
+                var avg = Speeds.Average(item => item.Item1.MetersPerSecond);
                 if (avg > 0)
                 {
                     SpeedTextView.Text = avg.ToString("0.0");
@@ -962,11 +963,11 @@ namespace PaddleBuddy.Droid.Fragments
         {
             if (MapIsNull) return;
             //trying to avoid setting bearing when points are too close to accurately calulate it
-            var dist = PBMath.DistanceInMeters(CurrentLocation, TripManager.CurrentPoint);
+            var dist = PBMath.Distance(CurrentLocation, TripManager.CurrentPoint);
             if (dist < PBPrefs.BearingTooCloseThreshold)
                 return;
             var bearing = PBMath.BearingBetweenPoints(CurrentLocation, TripManager.CurrentPoint);
-            var camTarget = PBMath.PointAtDistanceAlongBearing(CurrentLocation, PBPrefs.MetersAheadToAim, bearing);
+            var camTarget = PBMath.PointAtDistanceAlongBearing(CurrentLocation, PBPrefs.DistanceAheadToAim, bearing);
             var camPos = CameraUpdateBuilder(camTarget, NAV_TILT, NAV_ZOOM, bearing);
             MyMap.AnimateCamera(camPos);
         }

@@ -1,4 +1,6 @@
-﻿namespace PaddleBuddy.Core.Models.Map
+﻿using UnitsNet;
+
+namespace PaddleBuddy.Core.Models.Map
 {
     public class Link
     {
@@ -9,6 +11,6 @@
         /// <summary>
         /// in meters per second
         /// </summary>
-        public float Speed { get; set; } 
+        public Speed Speed { get; set; }
     }
 }

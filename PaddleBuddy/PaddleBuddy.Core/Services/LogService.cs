@@ -11,6 +11,7 @@ namespace PaddleBuddy.Core.Services
 
         public static void TagAndLog(string tag, string msg)
         {
+            var a = 5;
             Debug.WriteLine($"PB-{tag}: {msg}");
         }
 

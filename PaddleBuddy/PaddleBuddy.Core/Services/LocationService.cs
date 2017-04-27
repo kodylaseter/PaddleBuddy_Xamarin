@@ -5,6 +5,7 @@ using PaddleBuddy.Core.Models.Messages;
 using PaddleBuddy.Core.Utilities;
 using Plugin.Geolocator;
 using Plugin.Geolocator.Abstractions;
+using UnitsNet.Extensions.NumberToDuration;
 
 namespace PaddleBuddy.Core.Services
 {
@@ -30,12 +31,12 @@ namespace PaddleBuddy.Core.Services
             set
             {
                 var tempLocation = value;
-                var time = DateTime.Now.TimeOfDay.TotalSeconds;
+                var time = DateTime.Now.TimeOfDay.TotalSeconds.Seconds();
                 tempLocation.Time = time;
-                if (_currentLocation != null && _currentLocation.Time > 0 && time > 0)
+                if (_currentLocation != null && _currentLocation.Time.Seconds > 0 && time.Seconds > 0)
                 {
-                    var speed = PBMath.DistanceInMeters(tempLocation, CurrentLocation) / (tempLocation.Time - CurrentLocation.Time);
-                    if (speed > 0) //todo: filter out bad speeds
+                    var speed = PBMath.Distance(tempLocation, CurrentLocation) / (tempLocation.Time - CurrentLocation.Time);
+                    if (speed.MetersPerSecond > 0) //todo: filter out bad speeds
                     {
                         tempLocation.Speed = speed;
                     }
