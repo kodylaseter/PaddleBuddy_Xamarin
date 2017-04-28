@@ -20,6 +20,11 @@ namespace PaddleBuddy.Core.Models
 
         public override string ToString()
         {
+            return string.Format("[TripEstimate: Time={0}, Distance={1}, StartId={2}, EndId={3}, RiverId={4}, TimeRemaining={5}]", Time, Distance, StartId, EndId, RiverId, TimeRemaining);
+        }
+
+        public string ToPrettyString()
+        {
             return Time.ToString() + " for " + Distance.Miles + " " + "Miles";
         }
     }

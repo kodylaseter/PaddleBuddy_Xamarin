@@ -60,19 +60,23 @@ namespace PaddleBuddy.Core.Models
             TripSummary.PointsHistory.Add(p);
         }
 
-        public Point StartPoint
+        public Point StartCheckPoint
         {
             get { return Points.First(); }
         }
 
-        public Point CurrentPoint
+        public Point CurrentCheckPoint
         {
             get { return PointAt(Index); }
         }
 
-        public Point PreviousPoint
+        public Point PreviousCheckPoint
         {
             get { return PointAt(Index - 1);}
+        }
+
+        public Point FinalCheckPoint {
+            get { return Points.Last(); }
         }
 
         public bool HasStarted
@@ -141,7 +145,7 @@ namespace PaddleBuddy.Core.Models
 
         public Length DistanceToNext(Point current)
         {
-            return PBMath.Distance(current, CurrentPoint);
+            return PBMath.Distance(current, CurrentCheckPoint);
         }
 
         private Point PointAt(int index)

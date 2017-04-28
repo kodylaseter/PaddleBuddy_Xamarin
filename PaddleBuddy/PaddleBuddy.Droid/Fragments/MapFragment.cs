@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -384,7 +384,7 @@ namespace PaddleBuddy.Droid.Fragments
             TripManager.AddToPointHistory(CurrentLocation);
             if (TripManager.HasStarted)
             {
-                if (TripManager.IsOnTrack(TripManager.PreviousPoint, TripManager.CurrentPoint, CurrentLocation))
+                if (TripManager.IsOnTrack(TripManager.PreviousCheckPoint, TripManager.CurrentCheckPoint, CurrentLocation))
                 {
                     NavigateCamera();
                     UpdateNavBar();
@@ -412,13 +412,13 @@ namespace PaddleBuddy.Droid.Fragments
                     if (TripManager.HasPrevious)
                     {
                         distance =
-                            PBMath.DistanceFromPointToLineSegment(TripManager.PreviousPoint,
-                                TripManager.CurrentPoint,
+                            PBMath.DistanceFromPointToLineSegment(TripManager.PreviousCheckPoint,
+                                TripManager.CurrentCheckPoint,
                                 CurrentLocation);
                     }
                     else
                     {
-                        distance = PBMath.Distance(CurrentLocation, TripManager.CurrentPoint);
+                        distance = PBMath.Distance(CurrentLocation, TripManager.CurrentCheckPoint);
                     }
                     UpdateNavBar($"Navigate to river - {PBUtilities.FormatDistanceToMilesOrMeters(distance)}");
                 }
@@ -851,7 +851,7 @@ namespace PaddleBuddy.Droid.Fragments
         private void DrawCurrentDestination(Point p = null)
         {
             if (MapIsNull) return;
-            if (p == null) p = TripManager.CurrentPoint;
+            if (p == null) p = TripManager.FinalCheckPoint;
             var position = p.ToLatLng();
             if (CurrentDestinationMarker != null)
             {
@@ -903,13 +903,13 @@ namespace PaddleBuddy.Droid.Fragments
         {
             var opts = new MarkerOptions();
             opts.SetIcon(descriptor);
-            opts.Anchor(1.0f, 1.0f);
+            opts.Anchor(1.0f, 0.5f);
             return opts;
         }
 
         private BitmapDescriptor CreateMapMarkerIcon(int colorId = MAP_MARKER_COLORID)
         {
-            return CreateMarkerIcon(100, 100, Resource.Drawable.ic_room_white_24dp, colorId);
+            return CreateMarkerIcon(50, 50, Resource.Drawable.ic_room_white_24dp, colorId);
         }
 
         private BitmapDescriptor CreateMarkerIcon(int width, int height, int drawableResource, int colorId = int.MinValue)
@@ -963,10 +963,10 @@ namespace PaddleBuddy.Droid.Fragments
         {
             if (MapIsNull) return;
             //trying to avoid setting bearing when points are too close to accurately calulate it
-            var dist = PBMath.Distance(CurrentLocation, TripManager.CurrentPoint);
+            var dist = PBMath.Distance(CurrentLocation, TripManager.CurrentCheckPoint);
             if (dist < PBPrefs.BearingTooCloseThreshold)
                 return;
-            var bearing = PBMath.BearingBetweenPoints(CurrentLocation, TripManager.CurrentPoint);
+            var bearing = PBMath.BearingBetweenPoints(CurrentLocation, TripManager.CurrentCheckPoint);
             var camTarget = PBMath.PointAtDistanceAlongBearing(CurrentLocation, PBPrefs.DistanceAheadToAim, bearing);
             var camPos = CameraUpdateBuilder(camTarget, NAV_TILT, NAV_ZOOM, bearing);
             MyMap.AnimateCamera(camPos);
@@ -1011,7 +1011,7 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void AnimateNavigationUpdate()
         {
-            AnimateCameraBounds(new List<Point>{CurrentLocation, TripManager.CurrentPoint});
+            AnimateCameraBounds(new List<Point>{CurrentLocation, TripManager.CurrentCheckPoint});
         }
 
         private CameraUpdate CameraUpdateBuilder(Point p, int tilt = int.MaxValue, int zoom = 0, double bearing = double.NaN)

@@ -79,8 +79,8 @@ namespace PaddleBuddy.Core.Services
         /// <returns></returns>
         public Link GetLinkForPointIds(int id1, int id2)
         {
-            var link = Links.SingleOrDefault(l => l.Begin == id1 && l.End == id2);
-            return link;
+            //return Links.SingleOrDefault(l => l.Begin == id1 && l.End == id2);
+            return (from link in Links where link.Begin == id1 && link.End == id2 select link).SingleOrDefault();
         }
 
         public string GetRiverName(int id)

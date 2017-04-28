@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,7 +30,7 @@ namespace PaddleBuddy.Droid.Services
             {
                 await UpdateAll();
             }
-            if (HasData(names))
+            else if (HasData(names))
             {
                 LogService.Log("Device has local data");
                 DatabaseService.GetInstance().Points = JsonConvert.DeserializeObject<List<Point>>(ReadSerializedFromFile("points"));
@@ -182,7 +182,35 @@ namespace PaddleBuddy.Droid.Services
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+			if (value == null)
+			{
+				serializer.Serialize(writer, null);
+				return;
+			}
+
+            // find all properties with type 'int'
+            var properties = value.GetType().GetProperties();
+
+			writer.WriteStartObject();
+
+			foreach (var property in properties)
+			{
+				writer.WritePropertyName(property.Name);
+                if (property.Name == "Speed") {
+                    try {
+                        var speed = property.GetValue(value, null);
+                        speed = ((Speed)speed).MetersPerSecond;
+                        serializer.Serialize(writer, speed);
+                    } catch (Exception) {
+                        LogService.ExceptionLog("Issue serializing link");
+                    }
+				}
+				else
+				{
+					serializer.Serialize(writer, property.GetValue(value, null));
+                }
+			}
+			writer.WriteEndObject();
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -205,9 +233,9 @@ namespace PaddleBuddy.Droid.Services
             {
                 link.RiverId = (int) jo["riverId"];
             }
-            if (jo["speed"] != null && (int) jo["speed"] > -1)
+            if (jo["speed"] != null && (float)jo["speed"] > -1)
             {
-                link.Speed = ((int) jo["speed"]).MetersPerSecond();
+                link.Speed = ((float)jo["speed"]).MetersPerSecond();
             }
             return link;
         }

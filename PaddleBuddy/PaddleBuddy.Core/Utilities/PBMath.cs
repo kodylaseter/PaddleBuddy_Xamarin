@@ -108,7 +108,7 @@ namespace PaddleBuddy.Core.Utilities
 
         public static TripEstimate PointsToEstimate(List<Point> points)
         {
-            var totalTime = new TimeSpan();
+            var totalTime = new Duration();
             var totalDistance = 0.Meters();
             var index = 0;
             while (points.ElementAtOrDefault(index + 1) != null)
@@ -135,20 +135,27 @@ namespace PaddleBuddy.Core.Utilities
                         };
                     }
                 }
-                totalTime += DistanceAndSpeedToTimeSpan(dist, link.Speed);
+
+                totalTime += DistanceAndSpeedToDuration(dist, link.Speed);
                 index++;
 
             }
-            return new TripEstimate()
+            var ret = new TripEstimate()
             {
-                Time = totalTime,
+                Time = new TimeSpan(0, 0, (int)(totalTime.Seconds)),
                 Distance = totalDistance
             };
+
+            LogService.Log(ret.ToString());
+            return ret;
         }
 
-        private static TimeSpan DistanceAndSpeedToTimeSpan(Length distance, Speed speed)
+        private static Duration DistanceAndSpeedToDuration(Length distance, Speed speed)
         {
-            return TimeSpan.FromSeconds((distance / speed).Seconds);
+            var ret = distance / speed;
+            LogService.Log($"{ret.Seconds} seconds for {distance.Meters} meters at {speed.MetersPerSecond} meters per second");
+
+            return distance / speed;
         }
 
         /// <summary>
