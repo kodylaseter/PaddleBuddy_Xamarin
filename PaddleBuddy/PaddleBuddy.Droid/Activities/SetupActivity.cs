@@ -36,13 +36,13 @@ namespace PaddleBuddy.Droid.Activities
             _locationPermissionApproved = false;
             _locationReady = false;
             SetupSysPrefs();
-            if (!Services.UserService.IsLoggedIn(Application.Context) && false)
-            {
-                StartActivity(typeof(LoginRegisterActivity));
+            if (Services.UserService.IsLoggedIn(Application.Context))
+			{
+				Task.Run(Setup);
             }
             else
-            {
-                Task.Run(Setup);
+			{
+				StartActivity(typeof(LoginRegisterActivity));
             }
         }
 
@@ -52,6 +52,9 @@ namespace PaddleBuddy.Droid.Activities
             if (PBPrefs.TestOffline)
             {
                 DatabaseService.GetInstance().SeedData();
+            }
+            if (PBPrefs.TestLoggedOut) {
+                Services.UserService.ClearUserId(this);
             }
         }
         #endregion

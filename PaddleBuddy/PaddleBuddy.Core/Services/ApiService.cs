@@ -50,7 +50,6 @@ namespace PaddleBuddy.Core.Services
                 var fullUrl = PBPrefs.ApiBase + url;
                 try
                 {
-                    
                     response = await fullUrl.GetJsonAsync<Response>();
                 }
                 catch (Exception e)

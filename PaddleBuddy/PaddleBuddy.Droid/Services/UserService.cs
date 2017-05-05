@@ -7,7 +7,7 @@ namespace PaddleBuddy.Droid.Services
     {
         public static bool IsLoggedIn(Context context)
         {
-            return GetUserId(context) != int.MinValue && !PBPrefs.TestLoggedOut;
+            return GetUserId(context) != int.MinValue;
         }
 
         public static int GetUserId(Context context)
@@ -19,6 +19,11 @@ namespace PaddleBuddy.Droid.Services
         public static void SetUserId(Context context, int id)
         {
             PutInt(context, PBPrefs.KEY_USER_ID, id);
+        }
+
+        public static void ClearUserId(Context context) 
+        {
+            SetUserId(context, int.MinValue);
         }
     }
 }

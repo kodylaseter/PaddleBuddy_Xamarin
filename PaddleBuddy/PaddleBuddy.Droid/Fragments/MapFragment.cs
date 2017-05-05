@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Android.App;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
@@ -903,13 +902,13 @@ namespace PaddleBuddy.Droid.Fragments
         {
             var opts = new MarkerOptions();
             opts.SetIcon(descriptor);
-            opts.Anchor(1.0f, 0.5f);
+            opts.Anchor(0.5f, 0.9f);
             return opts;
         }
 
         private BitmapDescriptor CreateMapMarkerIcon(int colorId = MAP_MARKER_COLORID)
         {
-            return CreateMarkerIcon(50, 50, Resource.Drawable.ic_room_white_24dp, colorId);
+            return CreateMarkerIcon(90, 90, Resource.Drawable.ic_room_white_24dp, colorId);
         }
 
         private BitmapDescriptor CreateMarkerIcon(int width, int height, int drawableResource, int colorId = int.MinValue)

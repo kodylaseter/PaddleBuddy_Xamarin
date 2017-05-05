@@ -22,7 +22,7 @@ namespace PaddleBuddy.Core.Utilities
         public const string KEY_USER_ID = "USER_ID";
 
         public static readonly bool TestOffline = false;
-        public static readonly bool TestLoggedOut = false;
+        public static readonly bool TestLoggedOut = true;
         
         public static readonly int RiverIdToSimulate = 20;
         public static readonly Length TripPointsCloseThreshold = 30.Meters();
