@@ -9,9 +9,13 @@ namespace PaddleBuddy.Core.Services
             TagAndLog("G", msg);
         }
 
+        public static void Log(object o)
+        {
+            TagAndLog("G", o.ToString());
+        }
+
         public static void TagAndLog(string tag, string msg)
         {
-            var a = 5;
             Debug.WriteLine($"PB-{tag}: {msg}");
         }
 

@@ -3,7 +3,11 @@ using System.Threading.Tasks;
 using Android.OS;
 using Android.Views;
 using Android.Widget;
+using Newtonsoft.Json.Linq;
+using PaddleBuddy.Core.Models;
+using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Activities;
+using PaddleBuddy.Droid.Controls;
 using PaddleBuddy.Droid.Services;
 
 namespace PaddleBuddy.Droid.Fragments
@@ -35,9 +39,22 @@ namespace PaddleBuddy.Droid.Fragments
 
         private async Task Login()
         {
-            await Task.Delay(1000);
-            UserService.SetUserId(Context, 1);
-            Activity.RunOnUiThread(() => Activity.Finish());
+            UserService.GetInstance().ClearUserPrefs();
+            var response = await UserService.GetInstance().Login(
+                View.FindViewById<ClearEditText>(Resource.Id.email).Text, 
+                View.FindViewById<ClearEditText>(Resource.Id.password).Text);
+            if (response.Success)
+            {
+                var user = ((JObject) response.Data).ToObject<User>();
+                LogService.Log("success");
+                UserService.GetInstance().SetUserPrefs(user);
+                Activity.RunOnUiThread(() => ProgressOverlay.Visibility = ViewStates.Gone);
+                Activity.RunOnUiThread(() => Activity.Finish());
+            }
+            else
+            {
+                LogService.Log("Blah");
+            }
         }
 
         public static LoginFragment NewInstance()

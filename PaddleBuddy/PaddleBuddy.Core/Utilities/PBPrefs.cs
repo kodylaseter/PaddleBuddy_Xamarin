@@ -6,11 +6,10 @@ namespace PaddleBuddy.Core.Utilities
 {
     public class PBPrefs
     {
-        private static readonly string LocalDb = "http://10.0.3.3:4000/api/mobile/";
-        private static readonly string LiveDb = "http://paddlebuddy-pbdb.rhcloud.com/api/mobile/";
-        public static readonly string Website = "http://paddlebuddy-pbdb.rhcloud.com";
-        public static bool UseLocalDb => false;
-        public static string ApiBase => UseLocalDb ? LocalDb : LiveDb;
+        private static readonly string LocalWeb = "http://10.82.142.129:4040/";
+        private static readonly string LiveWEb = "http://paddlebuddy-pbdb.rhcloud.com/";
+        public static bool UseLocalWeb => false;
+        public static string WebBase => UseLocalWeb ? LocalWeb : LiveWEb;
 
         //permission stuff
         public const int PERMISSION_LOCATION = 0;
@@ -20,6 +19,8 @@ namespace PaddleBuddy.Core.Utilities
 
         //sharedpreferences stuff
         public const string KEY_USER_ID = "USER_ID";
+
+        public const string KEY_JWT_TOKEN = "JWT_TOKEN";
 
         public static readonly bool TestOffline = false;
         public static readonly bool TestLoggedOut = true;

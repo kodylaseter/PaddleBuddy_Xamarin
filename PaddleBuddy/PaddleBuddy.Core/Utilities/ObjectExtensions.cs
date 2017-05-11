@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using PaddleBuddy.Core.Models;
 
 namespace PaddleBuddy.Core.Utilities
 {

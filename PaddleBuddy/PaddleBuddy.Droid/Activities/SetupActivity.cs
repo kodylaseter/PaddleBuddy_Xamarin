@@ -9,6 +9,7 @@ using PaddleBuddy.Core.Services;
 using PaddleBuddy.Core.Utilities;
 using PaddleBuddy.Droid.Services;
 
+
 namespace PaddleBuddy.Droid.Activities
 {
     [Activity(Label = "PaddleBuddy", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/AppTheme")]
@@ -24,7 +25,14 @@ namespace PaddleBuddy.Droid.Activities
         {
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.activity_setup);
+            SetupDependencyServices();
+            SetupSysPrefs();
             LogService.Log("setup activity started");
+        }
+
+        private void SetupDependencyServices()
+        {
+            Core.Services.UserService.GetInstance().SetUserServiceDevice(new UserServiceAndroid());
         }
 
         protected override void OnResume()
@@ -35,13 +43,14 @@ namespace PaddleBuddy.Droid.Activities
             _dbReady = false;
             _locationPermissionApproved = false;
             _locationReady = false;
-            SetupSysPrefs();
-            if (Services.UserService.IsLoggedIn(Application.Context))
+            if (Core.Services.UserService.GetInstance().IsLoggedIn())
 			{
+			    LogService.Log("Running setup in setupactivity");
 				Task.Run(Setup);
             }
             else
 			{
+			    LogService.Log("Starting loginregister activity");
 				StartActivity(typeof(LoginRegisterActivity));
             }
         }
@@ -53,8 +62,9 @@ namespace PaddleBuddy.Droid.Activities
             {
                 DatabaseService.GetInstance().SeedData();
             }
-            if (PBPrefs.TestLoggedOut) {
-                Services.UserService.ClearUserId(this);
+            if (PBPrefs.TestLoggedOut)
+            {
+                Core.Services.UserService.GetInstance().ClearUserId();
             }
         }
         #endregion

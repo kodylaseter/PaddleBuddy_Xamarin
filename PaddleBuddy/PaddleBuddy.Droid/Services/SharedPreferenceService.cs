@@ -1,3 +1,4 @@
+using Android.App;
 using Android.Content;
 using Android.Preferences;
 
@@ -5,29 +6,27 @@ namespace PaddleBuddy.Droid.Services
 {
     public class SharedPreferenceService
     {
-        private static ISharedPreferences GetSharedPreferences(Context context)
+        private static ISharedPreferences SharedPreferences => PreferenceManager.GetDefaultSharedPreferences(Application
+            .Context);
+
+        protected static void PutInt(string key, int i)
         {
-            return PreferenceManager.GetDefaultSharedPreferences(context);
+            SharedPreferences.Edit().PutInt(key, i).Apply();
         }
 
-        protected static void PutInt(Context context, string key, int i)
+        protected static void PutString(string key, string str)
         {
-            GetSharedPreferences(context).Edit().PutInt(key, i).Apply();
+            SharedPreferences.Edit().PutString(key, str).Apply();
         }
 
-        protected static void PutString(Context context, string key, string str)
+        protected static int GetInt(string key)
         {
-            GetSharedPreferences(context).Edit().PutString(key, str).Apply();
+            return SharedPreferences.GetInt(key, int.MinValue);
         }
 
-        protected static int GetInt(Context context, string key)
+        protected static string GetString(string key)
         {
-            return GetSharedPreferences(context).GetInt(key, int.MinValue);
-        }
-
-        protected static string GetString(Context context, string key)
-        {
-            return GetSharedPreferences(context).GetString(key, "");
+            return SharedPreferences.GetString(key, "");
         }
     }
 }

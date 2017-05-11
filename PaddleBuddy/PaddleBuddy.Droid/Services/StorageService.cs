@@ -63,7 +63,7 @@ namespace PaddleBuddy.Droid.Services
         {
             try
             {
-                var resp = await GetAsync("all_points/");
+                var resp = await ApiGetAsync("all_points");
                 if (resp.Success)
                 {
                     DatabaseService.GetInstance().Points = JsonConvert.DeserializeObject<List<Point>>(resp.Data.ToString());
@@ -88,7 +88,7 @@ namespace PaddleBuddy.Droid.Services
         {
             try
             {
-                var resp = await GetAsync("all_rivers/");
+                var resp = await ApiGetAsync("all_rivers");
                 if (resp.Success)
                 {
                     DatabaseService.GetInstance().Rivers = JsonConvert.DeserializeObject<List<River>>(resp.Data.ToString());
@@ -112,7 +112,7 @@ namespace PaddleBuddy.Droid.Services
         {
             try
             {
-                var resp = await GetAsync("all_links/");
+                var resp = await ApiGetAsync("all_links");
                 if (resp.Success)
                 {
                     DatabaseService.GetInstance().Links =

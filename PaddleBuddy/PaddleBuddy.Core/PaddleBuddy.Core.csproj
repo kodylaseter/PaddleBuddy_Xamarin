@@ -61,10 +61,12 @@
     <Compile Include="Services\MessengerService.cs" />
     <Compile Include="Services\NetworkService.cs" />
     <Compile Include="Services\SearchService.cs" />
+    <Compile Include="Services\UserService.cs" />
     <Compile Include="Utilities\PBPrefs.cs" />
     <Compile Include="Utilities\ObjectExtensions.cs" />
     <Compile Include="Utilities\PBMath.cs" />
     <Compile Include="Utilities\PBUtilities.cs" />
+    <Compile Include="DependencyServices\IUserService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Flurl, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -138,6 +140,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DependencyServices\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

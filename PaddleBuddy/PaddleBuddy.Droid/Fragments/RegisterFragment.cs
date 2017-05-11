@@ -3,7 +3,9 @@ using System.Threading.Tasks;
 using Android.OS;
 using Android.Views;
 using Android.Widget;
+using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Services;
+using PaddleBuddy.Droid.Controls;
 
 namespace PaddleBuddy.Droid.Fragments
 {
@@ -24,12 +26,15 @@ namespace PaddleBuddy.Droid.Fragments
             Task.Run(Register);
         }
 
-        private async Task Register()
-        {
-            UserService.SetUserId(Context, 2);
-            await Task.Delay(1000);
-            Activity.RunOnUiThread(() => Activity.Finish());
-        }
+		private async Task Register()
+		{
+		    UserService.GetInstance().ClearUserPrefs();
+			var response = await UserService.GetInstance().Register(
+				View.FindViewById<ClearEditText>(Resource.Id.email).Text,
+				View.FindViewById<ClearEditText>(Resource.Id.password).Text);
+		    ProgressOverlay.Visibility = ViewStates.Gone;
+			LogService.Log(response.Success ? "Registered!" : response.Detail);
+		}
 
         public static RegisterFragment NewInstance()
         {

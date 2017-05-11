@@ -10,21 +10,25 @@ namespace PaddleBuddy.Core.Services
     {
         private const string ContentTypeJson = "application/json";
         
-        public async Task<Response> PostAsync(string url, object data)
+        public async Task<Response> PostAsync(string url, object data, bool auth = true)
         {
             var response = new Response();
 
             if (NetworkService.IsServerAvailable)
             {
-                var fullUrl = PBPrefs.ApiBase + url;
+                var fullUrl = PBPrefs.WebBase + url;
                 try
                 {
-                    response = await fullUrl.WithHeader("ContentType", ContentTypeJson)
-                        .PostJsonAsync(data).ReceiveJson<Response>();
+                    var request = fullUrl.WithHeader("ContentType", ContentTypeJson);
+                    if (auth)
+                    {
+                        request.WithHeader("x-access-token", UserService.GetInstance().GetJwt());
+                    }
+                    response = await request.PostJsonAsync(data).ReceiveJson<Response>();
                 }
                 catch (Exception e)
-                {
-                    LogService.ExceptionLog("Problem reaching remote server");
+				{
+					LogService.ExceptionLog($"Problem reaching remote server, url attempted: {PBPrefs.WebBase + url}");
                     LogService.ExceptionLog(e.Message);
                     response = new Response
                     {
@@ -39,7 +43,6 @@ namespace PaddleBuddy.Core.Services
                 LogService.Log("No network connection available!");
             }
             return response;
-
         }
 
         public async Task<Response> GetAsync(string url)
@@ -47,14 +50,16 @@ namespace PaddleBuddy.Core.Services
             var response = new Response();
             if (NetworkService.IsServerAvailable)
             {
-                var fullUrl = PBPrefs.ApiBase + url;
+                var fullUrl = PBPrefs.WebBase + url;
                 try
                 {
+                    LogService.Log(UserService.GetInstance().GetJwt());
+                    var request = fullUrl.WithHeader("x-access-token", UserService.GetInstance().GetJwt().Trim());
                     response = await fullUrl.GetJsonAsync<Response>();
                 }
                 catch (Exception e)
                 {
-                    LogService.ExceptionLog("Problem reaching remote server");
+                    LogService.ExceptionLog($"Problem reaching remote server, url attempted: {PBPrefs.WebBase + url}");
                     LogService.ExceptionLog(e.Message);
                     response = new Response
                     {
@@ -71,12 +76,17 @@ namespace PaddleBuddy.Core.Services
             return response;
         }
 
+        public async Task<Response> ApiGetAsync(string url)
+        {
+            return await GetAsync("api/mobile/" + url);
+        }
+
         public async Task<Response> GetAsync(string url, object multiple)
         {
             var response = new Response();
             if (NetworkService.IsServerAvailable)
             {
-                var fullUrl = PBPrefs.ApiBase + url;
+                var fullUrl = PBPrefs.WebBase + url;
                 try
                 {
                     response = await fullUrl.WithHeaders(multiple).GetJsonAsync<Response>();
