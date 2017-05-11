@@ -8,7 +8,6 @@ using PaddleBuddy.Core.Models;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Activities;
 using PaddleBuddy.Droid.Controls;
-using PaddleBuddy.Droid.Services;
 
 namespace PaddleBuddy.Droid.Fragments
 {
@@ -43,17 +42,19 @@ namespace PaddleBuddy.Droid.Fragments
             var response = await UserService.GetInstance().Login(
                 View.FindViewById<ClearEditText>(Resource.Id.email).Text, 
                 View.FindViewById<ClearEditText>(Resource.Id.password).Text);
+
+			LogService.Log(response.Success ? "Success!" : response.Detail);
+			Activity.RunOnUiThread(() => ProgressOverlay.Visibility = ViewStates.Gone);
             if (response.Success)
             {
                 var user = ((JObject) response.Data).ToObject<User>();
-                LogService.Log("success");
                 UserService.GetInstance().SetUserPrefs(user);
                 Activity.RunOnUiThread(() => ProgressOverlay.Visibility = ViewStates.Gone);
                 Activity.RunOnUiThread(() => Activity.Finish());
             }
             else
             {
-                LogService.Log("Blah");
+                LogService.Log("Login failed");
             }
         }
 

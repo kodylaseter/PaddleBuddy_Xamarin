@@ -21,8 +21,6 @@ namespace PaddleBuddy.Core.Services
 
         public async Task<Response> Login(string email, string password)
         {
-            if (string.IsNullOrEmpty(email)) email = "test";
-            if (string.IsNullOrEmpty(password)) password = "test";
             var user = new User
             {
                 Email = email,
@@ -34,14 +32,17 @@ namespace PaddleBuddy.Core.Services
 
         public async Task<Response> Register(string email, string password) 
         {
-			var user = new User
-			{
-				Email = email,
-				Password = password
-			};
+            var user = new User
+            {
+                Email = email,
+                Password = password
+            };
             var response = await PostAsync("register?src=mobile", user, false);
-            LogService.Log(response);
             return response;
+        }
+
+        public string GetUserPrefsString() {
+            return $"Id: {GetUserId()}, Token: {GetJwt()}";
         }
 
         public void SetUserPrefs(User user)

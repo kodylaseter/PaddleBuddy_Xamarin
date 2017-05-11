@@ -53,13 +53,12 @@ namespace PaddleBuddy.Core.Services
                 var fullUrl = PBPrefs.WebBase + url;
                 try
                 {
-                    LogService.Log(UserService.GetInstance().GetJwt());
-                    var request = fullUrl.WithHeader("x-access-token", UserService.GetInstance().GetJwt().Trim());
-                    response = await fullUrl.GetJsonAsync<Response>();
+                    var request = fullUrl.WithHeader("x-access-token", UserService.GetInstance().GetJwt());
+                    response = await request.GetJsonAsync<Response>();
                 }
                 catch (Exception e)
                 {
-                    LogService.ExceptionLog($"Problem reaching remote server, url attempted: {PBPrefs.WebBase + url}");
+                    LogService.ExceptionLog($"Problem reaching remote server, url attempted: {fullUrl}");
                     LogService.ExceptionLog(e.Message);
                     response = new Response
                     {
@@ -79,42 +78,6 @@ namespace PaddleBuddy.Core.Services
         public async Task<Response> ApiGetAsync(string url)
         {
             return await GetAsync("api/mobile/" + url);
-        }
-
-        public async Task<Response> GetAsync(string url, object multiple)
-        {
-            var response = new Response();
-            if (NetworkService.IsServerAvailable)
-            {
-                var fullUrl = PBPrefs.WebBase + url;
-                try
-                {
-                    response = await fullUrl.WithHeaders(multiple).GetJsonAsync<Response>();
-                }
-                catch (Exception e)
-                {
-                    LogService.ExceptionLog("Problem reaching remote server");
-                    LogService.ExceptionLog(e.Message);
-                    response = new Response
-                    {
-                        Success = false
-                    };
-                }
-            }
-            else
-            {
-                response.Success = false;
-                response.Detail = "No network connection";
-                LogService.Log("No network connection available!");
-            }
-
-            return response;
-        }
-
-        public async Task<Response> GetAsync(string url, string name, string value)
-        {
-            //TODO: implement single header api get
-            throw new NotImplementedException();
         }
     }
 }

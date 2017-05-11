@@ -43,6 +43,7 @@ namespace PaddleBuddy.Droid.Activities
             _dbReady = false;
             _locationPermissionApproved = false;
             _locationReady = false;
+            LogService.Log(Core.Services.UserService.GetInstance().GetUserPrefsString());
             if (Core.Services.UserService.GetInstance().IsLoggedIn())
 			{
 			    LogService.Log("Running setup in setupactivity");

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using UnitsNet;
+using Newtonsoft.Json.Linq;
 
 namespace PaddleBuddy.Core.Utilities
 {
@@ -26,5 +27,19 @@ namespace PaddleBuddy.Core.Utilities
             }
             return distance.Meters + "m";
         }
+
+		private static Random random = new Random();
+		public static string RandomString(int length)
+		{
+			var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var stringChars = new char[length];
+
+			for (int i = 0; i < stringChars.Length; i++)
+			{
+				stringChars[i] = chars[random.Next(chars.Length)];
+			}
+
+			return new String(stringChars);
+		}
     }
 }
