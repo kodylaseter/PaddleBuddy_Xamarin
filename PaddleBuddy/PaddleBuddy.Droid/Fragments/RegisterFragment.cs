@@ -29,14 +29,19 @@ namespace PaddleBuddy.Droid.Fragments
 
 		private async Task Register()
 		{
-		    UserService.GetInstance().ClearUserPrefs();
-            var email = View.FindViewById<ClearEditText>(Resource.Id.email).Text;
-			if (string.IsNullOrEmpty(email)) email = PaddleBuddy.Core.Utilities.PBUtilities.RandomString(8);
-			var password = View.FindViewById<ClearEditText>(Resource.Id.password).Text;
-			if (string.IsNullOrEmpty(password)) password = PaddleBuddy.Core.Utilities.PBUtilities.RandomString(8);
-            LogService.Log($"EMail: {email}");
-            LogService.Log($"Password: {password}");
-            var response = await UserService.GetInstance().Register(email, password);
+			UserService.GetInstance().ClearUserPrefs();
+			var user = new User
+			{
+				Email = View.FindViewById<ClearEditText>(Resource.Id.email).Text,
+				Password = View.FindViewById<ClearEditText>(Resource.Id.password).Text
+			};
+			var error = user.Validate();
+			if (!string.IsNullOrEmpty(error))
+			{
+				HandleError(error);
+				return;
+			}
+            var response = await UserService.GetInstance().Register(user);
             LogService.Log(response.Success ? "Registered!" : $"Failure details: {response.Detail}");
 			if (response.Success)
 			{
@@ -46,6 +51,16 @@ namespace PaddleBuddy.Droid.Fragments
 			{
 				LogService.Log("Register failed");
 			}
+		}
+
+	    private void HideProgressOverlay()
+	    {
+		    
+	    }
+
+		private void HandleError(string error)
+		{
+            LogService.Log(error);
 		}
 
         public static RegisterFragment NewInstance()

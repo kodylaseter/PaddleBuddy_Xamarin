@@ -19,24 +19,14 @@ namespace PaddleBuddy.Core.Services
             UserServiceDevice = userService;
         }
 
-        public async Task<Response> Login(string email, string password)
+        public async Task<Response> Login(User user)
         {
-            var user = new User
-            {
-                Email = email,
-                Password = password
-            };
             var response = await PostAsync("login?src=mobile", user, false);
             return response;
         }
 
-        public async Task<Response> Register(string email, string password) 
+        public async Task<Response> Register(User user) 
         {
-            var user = new User
-            {
-                Email = email,
-                Password = password
-            };
             var response = await PostAsync("register?src=mobile", user, false);
             return response;
         }

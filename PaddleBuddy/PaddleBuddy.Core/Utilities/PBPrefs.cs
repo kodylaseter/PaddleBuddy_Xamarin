@@ -33,6 +33,8 @@ namespace PaddleBuddy.Core.Utilities
         public static readonly Length DistanceAheadToAim = 500.Meters(); //used in camera updates to make current location appear closer to bottom of screen
         public static readonly Speed DefaultSpeed = 1.5.MetersPerSecond();
 
+        public static readonly int MinPasswordLength = 6;
+
         public static Devices Device { get; set; }
         public enum Devices
         {

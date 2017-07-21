@@ -31,31 +31,50 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void OnLoginClicked(object sender, EventArgs e)
         {
-            ProgressOverlay.Visibility = ViewStates.Visible;
+            UpdateProgressBarOverlayVisibilityTo(true);
             Task.Run(Login);
         }
 
 
         private async Task Login()
         {
-            UserService.GetInstance().ClearUserPrefs();
-            var response = await UserService.GetInstance().Login(
-                View.FindViewById<ClearEditText>(Resource.Id.email).Text, 
-                View.FindViewById<ClearEditText>(Resource.Id.password).Text);
+			UserService.GetInstance().ClearUserPrefs();
+            var user = new User
+            {
+                Email = View.FindViewById<ClearEditText>(Resource.Id.email).Text,
+                Password = View.FindViewById<ClearEditText>(Resource.Id.password).Text
+            };
+            var error = user.Validate();
+            if (!string.IsNullOrEmpty(error)) {
+                HandleError(error);
+                UpdateProgressBarOverlayVisibilityTo(false);
+                return;
+            }
+
+            var response = await UserService.GetInstance().Login(user);
 
 			LogService.Log(response.Success ? "Success!" : response.Detail);
-			Activity.RunOnUiThread(() => ProgressOverlay.Visibility = ViewStates.Gone);
             if (response.Success)
             {
-                var user = ((JObject) response.Data).ToObject<User>();
-                UserService.GetInstance().SetUserPrefs(user);
-                Activity.RunOnUiThread(() => ProgressOverlay.Visibility = ViewStates.Gone);
+                var responseUser = ((JObject) response.Data).ToObject<User>();
+                UserService.GetInstance().SetUserPrefs(responseUser);
                 Activity.RunOnUiThread(() => Activity.Finish());
             }
             else
             {
                 LogService.Log("Login failed");
+                UpdateProgressBarOverlayVisibilityTo(false);
             }
+        }
+
+        private void UpdateProgressBarOverlayVisibilityTo(bool isVisible)
+        {
+            Activity.RunOnUiThread(() => ProgressOverlay.Visibility = isVisible ? ViewStates.Visible : ViewStates.Gone);
+        }
+
+        private void HandleError(string error)
+        {
+            LogService.Log(error);
         }
 
         public static LoginFragment NewInstance()

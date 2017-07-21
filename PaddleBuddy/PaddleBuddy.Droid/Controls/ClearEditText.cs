@@ -67,7 +67,7 @@ namespace PaddleBuddy.Droid.Controls
         private void OnButtonClicked(object sender, EventArgs e)
         {
             EditText.Text = "";
-            TextCleared.Invoke();
+            TextCleared?.Invoke();
         }
 
         private void OnTextChanged(object sender, TextChangedEventArgs e)
