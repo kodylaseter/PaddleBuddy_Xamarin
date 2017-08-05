@@ -23,7 +23,7 @@ namespace PaddleBuddy.Droid.Fragments
 
         private void OnRegisterClicked(object sender, EventArgs e)
         {
-            ProgressOverlay.Visibility = ViewStates.Visible;
+            UpdateProgressBarOverlayVisibilityTo(true);
             Task.Run(Register);
         }
 
@@ -39,6 +39,7 @@ namespace PaddleBuddy.Droid.Fragments
 			if (!string.IsNullOrEmpty(error))
 			{
 				HandleError(error);
+				UpdateProgressBarOverlayVisibilityTo(false);
 				return;
 			}
             var response = await UserService.GetInstance().Register(user);
@@ -49,13 +50,14 @@ namespace PaddleBuddy.Droid.Fragments
 			}
 			else
 			{
+				UpdateProgressBarOverlayVisibilityTo(false);
 				LogService.Log("Register failed");
 			}
 		}
 
-	    private void HideProgressOverlay()
+	    private void UpdateProgressBarOverlayVisibilityTo(bool isVisible)
 	    {
-		    
+		    Activity.RunOnUiThread(() => ProgressOverlay.Visibility = isVisible ? ViewStates.Visible : ViewStates.Gone);
 	    }
 
 		private void HandleError(string error)

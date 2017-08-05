@@ -445,7 +445,6 @@ namespace PaddleBuddy.Droid.Fragments
                     UpdateNavBar("Navigate to river");
                 }
             }
-            
         }
 
         private void BrowseUpdate()
