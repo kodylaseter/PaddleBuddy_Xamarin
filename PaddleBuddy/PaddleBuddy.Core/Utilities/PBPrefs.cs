@@ -23,7 +23,7 @@ namespace PaddleBuddy.Core.Utilities
         public const string KEY_JWT_TOKEN = "JWT_TOKEN";
 
         public static readonly bool TestOffline = false;
-        public static readonly bool TestLoggedOut = true;
+        public static readonly bool TestLoggedOut = false;
         
         public static readonly int RiverIdToSimulate = 20;
         public static readonly Length TripPointsCloseThreshold = 30.Meters();

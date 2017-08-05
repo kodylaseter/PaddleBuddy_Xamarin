@@ -36,8 +36,6 @@ namespace PaddleBuddy.Droid.Fragments
         private bool _isLoading;
         private bool _isBrowsing;
 
-        private bool MapIsNull => MyMap == null;
-
         private GoogleMap MyMap { get; set; }
         private MapView MapView { get; set; }
         private MapModes MapMode { get; set; }
@@ -64,11 +62,9 @@ namespace PaddleBuddy.Droid.Fragments
         private List<Marker> LaunchSiteMarkers { get; set; }
         private Polyline CurrentPolyline { get; set; }
 
-
         private TextView DetailsBarTextView1;
         private TextView DetailsBarTextView2;
         private TextView DetailsBarTextView3;
-
 
         private static readonly int NAV_ZOOM = 16;
         private static readonly int BROWSE_ZOOM = 8;
@@ -215,7 +211,9 @@ namespace PaddleBuddy.Droid.Fragments
             ProgressBarOverlay.Visibility = ViewStates.Gone;
             IsLoading = false;
         }
-        
+
+        private bool MapIsNull => MyMap == null || View.Width < 1 || View.Height < 1;
+
         #endregion
 
         #region search
@@ -460,7 +458,6 @@ namespace PaddleBuddy.Droid.Fragments
             catch (Exception e)
             {
                 LogService.ExceptionLog(e.Message);
-                throw e;
             }
         }
 

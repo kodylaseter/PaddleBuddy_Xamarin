@@ -53,7 +53,7 @@ namespace PaddleBuddy.Core.Services
             if (Geolocator.IsListening) return;
             Log("start listening");
             //parameters are milliseconds, meters
-            Geolocator.StartListeningAsync(2000, 5, true);
+            Geolocator.StartListeningAsync(1000, 1, true);
         }
 
         public void StopListening()

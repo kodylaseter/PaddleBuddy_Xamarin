@@ -2596,8 +2596,8 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b004d
 			public const int action_mode_close_button = 2131427405;
 			
-			// aapt resource value: 0x7f0b00df
-			public const int action_search = 2131427551;
+			// aapt resource value: 0x7f0b00de
+			public const int action_search = 2131427550;
 			
 			// aapt resource value: 0x7f0b00b8
 			public const int action_text = 2131427512;
@@ -2869,23 +2869,20 @@ namespace PaddleBuddy.Droid
 			// aapt resource value: 0x7f0b00aa
 			public const int nav_fab = 2131427498;
 			
-			// aapt resource value: 0x7f0b00da
-			public const int nav_history = 2131427546;
+			// aapt resource value: 0x7f0b00db
+			public const int nav_history = 2131427547;
 			
-			// aapt resource value: 0x7f0b00dc
-			public const int nav_manage = 2131427548;
+			// aapt resource value: 0x7f0b00dd
+			public const int nav_logout = 2131427549;
 			
 			// aapt resource value: 0x7f0b00d9
 			public const int nav_map = 2131427545;
 			
-			// aapt resource value: 0x7f0b00de
-			public const int nav_send = 2131427550;
+			// aapt resource value: 0x7f0b00da
+			public const int nav_plan = 2131427546;
 			
-			// aapt resource value: 0x7f0b00dd
-			public const int nav_share = 2131427549;
-			
-			// aapt resource value: 0x7f0b00db
-			public const int nav_slideshow = 2131427547;
+			// aapt resource value: 0x7f0b00dc
+			public const int nav_settings = 2131427548;
 			
 			// aapt resource value: 0x7f0b0082
 			public const int nav_view = 2131427458;

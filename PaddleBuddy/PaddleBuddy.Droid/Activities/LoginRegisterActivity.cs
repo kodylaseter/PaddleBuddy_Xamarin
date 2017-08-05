@@ -2,12 +2,13 @@
 using Android.App;
 using Android.OS;
 using Android.Support.V7.App;
+using Android.Views;
 using PaddleBuddy.Core.Services;
 using PaddleBuddy.Droid.Fragments;
 
 namespace PaddleBuddy.Droid.Activities
 {
-    [Activity(Label = "PaddleBuddy", Theme = "@style/AppTheme")]
+    [Activity(Label = "PaddleBuddy", Theme = "@style/AppTheme", WindowSoftInputMode = SoftInput.AdjustResize)]
     public class LoginRegisterActivity : AppCompatActivity
     {
         protected override void OnCreate(Bundle bundle)

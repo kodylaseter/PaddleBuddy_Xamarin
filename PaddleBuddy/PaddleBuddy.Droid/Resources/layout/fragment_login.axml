@@ -10,7 +10,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:weightSum="7"
-        android:windowSoftInputMode="adjustPan">
+        android:fitsSystemWindows="true">
         <View 
             android:layout_height="wrap_content"
             android:layout_width="0dp"
@@ -41,6 +41,7 @@
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textPassword"
                 custom:hint="password"
                 custom:centerHint="true"/>
             <Button

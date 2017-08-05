@@ -119,10 +119,22 @@ namespace PaddleBuddy.Droid.Activities
                     id = (int)NavDraweritems.Map;
                     fragment = MapFragment.NewInstance();
                     break;
+                case Resource.Id.nav_plan:
+                    id = (int)NavDraweritems.Plan;
+                    fragment = PlanFragment.NewInstance();
+                    break;
                 case Resource.Id.nav_history:
                     id = (int)NavDraweritems.History;
                     fragment = TripHistoryFragment.NewInstance();
                     break;
+                case Resource.Id.nav_settings:
+                    id = (int) NavDraweritems.Settings;
+                    fragment = MapFragment.NewInstance(); //TODO: fix this
+                    break;
+                case Resource.Id.nav_logout:
+                    Core.Services.UserService.GetInstance().ClearUserPrefs();
+                    Finish();
+                    return;
                 default:
                     id = (int)NavDraweritems.Map;
                     fragment = MapFragment.NewInstance();
@@ -188,7 +200,10 @@ namespace PaddleBuddy.Droid.Activities
         private enum NavDraweritems
         {
             Map = 0,
-            History = 1
+            History = 1,
+            Plan = 2,
+            Settings = 3,
+            LogOut = 4
         }
     }
 }
